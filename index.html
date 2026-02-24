@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>MD Quizzes - Exam Mode</title>
+<title>MD Quizzes - Pro Exam Mode</title>
 
 <style>
 body{
@@ -19,7 +19,7 @@ h1{
 }
 
 .container{
-  max-width:900px;
+  max-width:1000px;
   margin:auto;
   padding:20px;
 }
@@ -46,15 +46,19 @@ select,button{
   font-size:20px;
 }
 
+.options-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+  margin-top:20px;
+}
+
 .option{
-  display:block;
-  margin:10px auto;
-  padding:10px;
-  width:80%;
+  padding:12px;
   background:#001d3d;
   border:2px solid #00bfff;
   color:white;
-  border-radius:25px;
+  border-radius:15px;
   cursor:pointer;
   transition:0.3s;
 }
@@ -64,41 +68,42 @@ select,button{
   color:black;
 }
 
-.correct{
-  background:green !important;
-}
-
-.wrong{
-  background:red !important;
-}
+.correct{ background:green !important; }
+.wrong{ background:red !important; }
 
 #timer{
-  font-size:20px;
+  font-size:18px;
   margin-top:10px;
   color:yellow;
 }
 
-/* Speedometer */
-.speedometer{
-  width:200px;
-  height:200px;
-  border-radius:50%;
-  background:conic-gradient(gold 0deg, #222 0deg);
-  margin:20px auto;
+/* Score Display */
+.score-container{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin:20px 0;
+}
+
+.digit-box{
+  width:50px;
+  height:60px;
+  background:black;
+  border:2px solid gold;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:22px;
-  font-weight:bold;
+  font-size:28px;
   color:gold;
-  box-shadow:0 0 20px gold;
+  font-weight:bold;
+  box-shadow:0 0 10px gold;
 }
 </style>
 </head>
 
 <body>
 
-<h1>🎯 MD QUIZZES - EXAM MODE</h1>
+<h1>🎯 MD QUIZZES - PRO MODE</h1>
 
 <div class="container">
 
@@ -118,7 +123,7 @@ Questions:
 <option value="20">20</option>
 </select>
 
-Positive Marks:
+Positive:
 <select id="positiveMarks">
 <option value="1">1</option>
 <option value="2">2</option>
@@ -126,7 +131,7 @@ Positive Marks:
 <option value="4">4</option>
 </select>
 
-Negative Marks:
+Negative:
 <select id="negativeMarks">
 <option value="0">0</option>
 <option value="1">1</option>
@@ -138,7 +143,12 @@ Negative Marks:
 
 <div id="timer">Time: 00:00:00</div>
 
-<div class="speedometer" id="speedometer">0</div>
+<div class="score-container">
+<div class="digit-box" id="d1">0</div>
+<div class="digit-box" id="d2">0</div>
+<div class="digit-box" id="d3">0</div>
+<div class="digit-box" id="d4">0</div>
+</div>
 
 <div id="quiz"></div>
 <div id="result"></div>
@@ -147,6 +157,7 @@ Negative Marks:
 
 <script>
 
+let allQuestions=[];
 let questions=[];
 let currentQuestion=0;
 let score=0;
@@ -157,98 +168,120 @@ let timerInterval;
 let seconds=0;
 
 function formatTime(sec){
-  let hrs=Math.floor(sec/3600);
-  let mins=Math.floor((sec%3600)/60);
-  let secs=sec%60;
-  return String(hrs).padStart(2,'0')+":"+
-         String(mins).padStart(2,'0')+":"+
-         String(secs).padStart(2,'0');
+ let h=Math.floor(sec/3600);
+ let m=Math.floor((sec%3600)/60);
+ let s=sec%60;
+ return String(h).padStart(2,'0')+":"+
+        String(m).padStart(2,'0')+":"+
+        String(s).padStart(2,'0');
 }
 
 function startTimer(){
-  seconds=0;
-  timerInterval=setInterval(()=>{
-    seconds++;
-    document.getElementById("timer").innerText="Time: "+formatTime(seconds);
-  },1000);
+ seconds=0;
+ clearInterval(timerInterval);
+ timerInterval=setInterval(()=>{
+   seconds++;
+   document.getElementById("timer").innerText="Time: "+formatTime(seconds);
+ },1000);
 }
 
 function loadScript(src,callback){
-  let script=document.createElement("script");
-  script.src=src;
-  script.onload=callback;
-  document.body.appendChild(script);
+ let script=document.createElement("script");
+ script.src=src;
+ script.onload=callback;
+ document.body.appendChild(script);
+}
+
+function shuffleArray(arr){
+ return arr.sort(()=>Math.random()-0.5);
 }
 
 function startQuiz(){
-  const chapter=document.getElementById("chapterSelect").value;
-  if(!chapter){ alert("Select chapter"); return; }
 
-  positive=parseInt(document.getElementById("positiveMarks").value);
-  negative=parseInt(document.getElementById("negativeMarks").value);
-  totalQuestions=parseInt(document.getElementById("questionCount").value);
+ const chapter=document.getElementById("chapterSelect").value;
+ if(!chapter){ alert("Select chapter"); return; }
 
-  document.getElementById("result").innerHTML="";
-  document.getElementById("speedometer").innerText="0";
+ positive=parseInt(document.getElementById("positiveMarks").value);
+ negative=parseInt(document.getElementById("negativeMarks").value);
+ totalQuestions=parseInt(document.getElementById("questionCount").value);
 
-  loadScript(chapter,function(){
-    questions=questions.slice(0,totalQuestions);
-    currentQuestion=0;
-    score=0;
-    startTimer();
-    loadQuestion();
-  });
+ score=0;
+ updateScoreDisplay();
+
+ loadScript(chapter,function(){
+
+   allQuestions=[...questions];
+   shuffleArray(allQuestions);
+
+   questions=allQuestions.slice(0,totalQuestions);
+
+   questions.forEach(q=>{
+     let correctAnswer=q.options[q.correct];
+     shuffleArray(q.options);
+     q.correct=q.options.indexOf(correctAnswer);
+   });
+
+   currentQuestion=0;
+   startTimer();
+   loadQuestion();
+ });
 }
 
 function loadQuestion(){
-  const q=questions[currentQuestion];
-  const quizDiv=document.getElementById("quiz");
+ const q=questions[currentQuestion];
+ const quizDiv=document.getElementById("quiz");
 
-  quizDiv.innerHTML=`
-    <div class="question-box">Q${currentQuestion+1}. ${q.question}</div>
-    ${q.options.map((opt,i)=>
-      `<button class="option" onclick="checkAnswer(${i},this)">${opt}</button>`
-    ).join("")}
-  `;
+ quizDiv.innerHTML=`
+  <div class="question-box">
+   Q${currentQuestion+1}. ${q.question}
+  </div>
+  <div class="options-grid">
+   ${q.options.map((opt,i)=>
+    `<button class="option" onclick="checkAnswer(${i},this)">${opt}</button>`
+   ).join("")}
+  </div>
+ `;
 }
 
-function updateSpeedometer(){
-  let percentage=(score/(totalQuestions*positive))*360;
-  document.getElementById("speedometer").style.background=
-    `conic-gradient(gold ${percentage}deg, #222 0deg)`;
-  document.getElementById("speedometer").innerText=score;
+function updateScoreDisplay(){
+ let formatted=Math.max(0,score).toString().padStart(4,'0');
+ document.getElementById("d1").innerText=formatted[0];
+ document.getElementById("d2").innerText=formatted[1];
+ document.getElementById("d3").innerText=formatted[2];
+ document.getElementById("d4").innerText=formatted[3];
 }
 
 function checkAnswer(index,btn){
-  const correctIndex=questions[currentQuestion].correct;
-  const buttons=document.querySelectorAll(".option");
 
-  buttons.forEach(b=>b.disabled=true);
+ const correctIndex=questions[currentQuestion].correct;
+ const buttons=document.querySelectorAll(".option");
 
-  if(index===correctIndex){
-    btn.classList.add("correct");
-    score+=positive;
-  }else{
-    btn.classList.add("wrong");
-    buttons[correctIndex].classList.add("correct");
-    score-=negative;
-  }
+ buttons.forEach(b=>b.disabled=true);
 
-  updateSpeedometer();
+ if(index===correctIndex){
+   btn.classList.add("correct");
+   score+=positive;
+ }else{
+   btn.classList.add("wrong");
+   buttons[correctIndex].classList.add("correct");
+   score-=negative;
+ }
 
-  setTimeout(()=>{
-    currentQuestion++;
-    if(currentQuestion<totalQuestions){
-      loadQuestion();
-    }else{
-      clearInterval(timerInterval);
-      document.getElementById("quiz").innerHTML="";
-      document.getElementById("result").innerHTML=
-      `<h2>Test Finished</h2>
-       <p>Final Score: ${score}</p>
-       <p>Total Time: ${formatTime(seconds)}</p>`;
-    }
-  },1000);
+ updateScoreDisplay();
+
+ setTimeout(()=>{
+   currentQuestion++;
+   if(currentQuestion<questions.length){
+     loadQuestion();
+   }else{
+     clearInterval(timerInterval);
+     document.getElementById("quiz").innerHTML="";
+     document.getElementById("result").innerHTML=
+       `<h2>Test Finished</h2>
+        <p>Final Score: ${score}</p>
+        <p>Total Time: ${formatTime(seconds)}</p>`;
+   }
+ },1000);
 }
 
 </script>
