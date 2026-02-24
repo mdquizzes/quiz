@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>MD Quizzes - Advanced Mode</title>
+<title>MD Quizzes - Fixed Version</title>
 
 <style>
 body{
@@ -24,17 +24,17 @@ h1{
   padding:20px;
 }
 
-select,button{
+button{
   padding:8px;
   margin:6px;
   border-radius:6px;
   border:none;
+  cursor:pointer;
 }
 
 .start-btn{
   background:gold;
   font-weight:bold;
-  cursor:pointer;
 }
 
 .question-box{
@@ -59,20 +59,14 @@ select,button{
   border:2px solid #00bfff;
   color:white;
   border-radius:15px;
-  cursor:pointer;
+}
+
+.option.selected{
+  background:orange;
 }
 
 .correct{ background:green !important; }
 .wrong{ background:red !important; }
-
-.nav-buttons{
-  margin-top:20px;
-}
-
-.nav-buttons button{
-  background:gold;
-  font-weight:bold;
-}
 
 .score-container{
   display:flex;
@@ -92,9 +86,7 @@ select,button{
   font-size:32px;
   color:gold;
   font-weight:bold;
-  box-shadow:0 0 10px gold;
 }
-
 .review-box{
   background:#111;
   padding:15px;
@@ -107,7 +99,7 @@ select,button{
 
 <body>
 
-<h1>🎯 MD QUIZZES - ADVANCED MODE</h1>
+<h1>🎯 MD QUIZZES - STABLE MODE</h1>
 
 <div class="container">
 
@@ -126,13 +118,14 @@ select,button{
 </div>
 
 <div id="quiz"></div>
-<div class="nav-buttons" id="navButtons"></div>
+<div id="navButtons"></div>
 <div id="result"></div>
 
 </div>
 
 <script>
 
+let allQuestions=[];
 let questions=[];
 let userAnswers=[];
 let currentQuestion=0;
@@ -163,7 +156,10 @@ function startQuiz(){
 
  loadScript(chapter,function(){
 
-   shuffleArray(questions);
+   allQuestions=[...questions];
+   shuffleArray(allQuestions);
+
+   questions=allQuestions;
 
    questions.forEach(q=>{
      let correctAnswer=q.options[q.correct];
@@ -180,27 +176,32 @@ function startQuiz(){
 }
 
 function loadQuestion(){
+
  const q=questions[currentQuestion];
+
+ let optionsHTML=q.options.map((opt,i)=>{
+   let selectedClass=userAnswers[currentQuestion]===i ? "selected" : "";
+   return `<button class="option ${selectedClass}" onclick="selectAnswer(${i})">${opt}</button>`;
+ }).join("");
 
  quiz.innerHTML=`
   <div class="question-box">
-  Q${currentQuestion+1}. ${q.question}
+   Q${currentQuestion+1}. ${q.question}
   </div>
-  <div class="options-grid">
-   ${q.options.map((opt,i)=>
-     `<button class="option" onclick="selectAnswer(${i})">${opt}</button>`
-   ).join("")}
-  </div>
+  <div class="options-grid">${optionsHTML}</div>
  `;
 
  navButtons.innerHTML=`
   ${currentQuestion>0 ? '<button onclick="prevQuestion()">Previous</button>' : ''}
-  ${currentQuestion<questions.length-1 ? '<button onclick="nextQuestion()">Next</button>' : '<button onclick="finishTest()">Submit</button>'}
+  ${currentQuestion<questions.length-1 
+    ? '<button onclick="nextQuestion()">Next</button>' 
+    : '<button onclick="finishTest()">Submit</button>'}
  `;
 }
 
 function selectAnswer(index){
  userAnswers[currentQuestion]=index;
+ loadQuestion();   // refresh to show selection
 }
 
 function prevQuestion(){
@@ -224,7 +225,6 @@ function finishTest(){
  });
 
  updateScoreDisplay();
-
  showScorecard();
 }
 
@@ -252,10 +252,12 @@ function showScorecard(){
   <h3>Review Wrong Answers</h3>
   ${wrongHTML || "All Answers Correct 🎉"}
  `;
+
  quiz.innerHTML="";
  navButtons.innerHTML="";
 }
 
 </script>
+
 </body>
 </html>
