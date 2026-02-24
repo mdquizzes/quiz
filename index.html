@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>MD Quizzes - Stable Final Fix</title>
+<title>MD Quizzes - KBC Mode</title>
 
 <style>
 body{
@@ -13,10 +13,13 @@ body{
   text-align:center;
 }
 
-h1{ color:gold; }
+h1{
+  color:gold;
+  text-shadow:0 0 15px gold;
+}
 
 .container{
-  max-width:1000px;
+  max-width:900px;
   margin:auto;
   padding:20px;
 }
@@ -26,41 +29,68 @@ select,button{
   margin:6px;
   border-radius:6px;
   border:none;
-  cursor:pointer;
 }
 
-.start-btn{ background:gold; font-weight:bold; }
+.start-btn{
+  background:gold;
+  font-weight:bold;
+  cursor:pointer;
+}
 
 .question-box{
   background:#002855;
   padding:20px;
-  border-radius:10px;
+  border-radius:12px;
   margin-top:20px;
+  box-shadow:0 0 15px #00bfff;
+  font-size:20px;
 }
 
 .options-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:15px;
+  gap:15px;
+  margin-top:20px;
 }
 
 .option{
-  padding:10px;
+  padding:12px;
   background:#001d3d;
   border:2px solid #00bfff;
   color:white;
-  border-radius:8px;
+  border-radius:12px;
+  cursor:pointer;
+  transition:0.3s;
 }
 
-.option.selected{ background:orange; }
+.option:hover{
+  background:#00bfff;
+  color:black;
+}
 
-.nav{ margin-top:20px; }
+.correct{ background:green !important; }
+.wrong{ background:red !important; }
 
-.score-display{
-  font-size:20px;
-  margin-top:15px;
+/* 3 Digit Score Display */
+.score-container{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin:20px 0;
+}
+
+.digit-box{
+  width:60px;
+  height:70px;
+  background:black;
+  border:2px solid gold;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:32px;
   color:gold;
+  font-weight:bold;
+  box-shadow:0 0 15px gold;
 }
 
 #timer{
@@ -68,20 +98,12 @@ select,button{
   font-size:18px;
   color:yellow;
 }
-
-.review-box{
-  background:#111;
-  padding:10px;
-  margin:10px 0;
-  border:1px solid gold;
-  text-align:left;
-}
 </style>
 </head>
 
 <body>
 
-<h1>MD QUIZZES</h1>
+<h1>🎯 MD QUIZZES - KBC MODE</h1>
 
 <div class="container">
 
@@ -91,42 +113,17 @@ select,button{
 <option value="js/cell_biology.js">Cell Biology</option>
 </select>
 
-<br>
-
-Questions:
-<select id="questionCount">
-<option value="10">10</option>
-<option value="20">20</option>
-<option value="30">30</option>
-<option value="40">40</option>
-<option value="50">50</option>
-<option value="60">60</option>
-<option value="80">80</option>
-</select>
-
-Positive:
-<select id="positiveMarks">
-<option value="1">1</option>
-<option value="2">2</option>
-<option value="3">3</option>
-<option value="4">4</option>
-</select>
-
-Negative:
-<select id="negativeMarks">
-<option value="0">0</option>
-<option value="1">1</option>
-<option value="2">2</option>
-</select>
-
-<br>
 <button class="start-btn" onclick="startQuiz()">Start Test</button>
 
 <div id="timer">Time: 00:00:00</div>
-<div class="score-display" id="liveScore">Score: 0</div>
+
+<div class="score-container">
+<div class="digit-box" id="d1">0</div>
+<div class="digit-box" id="d2">0</div>
+<div class="digit-box" id="d3">0</div>
+</div>
 
 <div id="quiz"></div>
-<div class="nav" id="nav"></div>
 <div id="result"></div>
 
 </div>
@@ -134,13 +131,12 @@ Negative:
 <script>
 
 let quizQuestions=[];
-let userAnswers=[];
 let currentQuestion=0;
 let score=0;
-let positive=1;
-let negative=0;
 let timerInterval;
 let seconds=0;
+
+/* ---------- TIMER ---------- */
 
 function formatTime(sec){
  let h=Math.floor(sec/3600);
@@ -160,7 +156,41 @@ function startTimer(){
  },1000);
 }
 
+/* ---------- SOUND (KBC STYLE) ---------- */
+
+function playCorrectSound(){
+ let ctx=new (window.AudioContext||window.webkitAudioContext)();
+ let osc=ctx.createOscillator();
+ osc.type="sine";
+ osc.frequency.value=600;
+ osc.connect(ctx.destination);
+ osc.start();
+ setTimeout(()=>osc.stop(),300);
+}
+
+function playWrongSound(){
+ let ctx=new (window.AudioContext||window.webkitAudioContext)();
+ let osc=ctx.createOscillator();
+ osc.type="sawtooth";
+ osc.frequency.value=150;
+ osc.connect(ctx.destination);
+ osc.start();
+ setTimeout(()=>osc.stop(),400);
+}
+
+/* ---------- SCORE DISPLAY ---------- */
+
+function updateScoreDisplay(){
+ let formatted=Math.max(0,score).toString().padStart(3,'0');
+ d1.innerText=formatted[0];
+ d2.innerText=formatted[1];
+ d3.innerText=formatted[2];
+}
+
+/* ---------- LOAD SCRIPT SAFELY ---------- */
+
 function loadScript(src,callback){
+
  let oldScript=document.getElementById("chapterScript");
  if(oldScript) oldScript.remove();
 
@@ -171,122 +201,81 @@ function loadScript(src,callback){
  document.body.appendChild(script);
 }
 
-function shuffleArray(arr){
- return arr.sort(()=>Math.random()-0.5);
-}
+/* ---------- START QUIZ ---------- */
 
 function startQuiz(){
 
  const chapter=document.getElementById("chapterSelect").value;
  if(!chapter){ alert("Select chapter"); return; }
 
- positive=parseInt(document.getElementById("positiveMarks").value);
- negative=parseInt(document.getElementById("negativeMarks").value);
- let requestedCount=parseInt(document.getElementById("questionCount").value);
-
  loadScript(chapter,function(){
 
    if(!window.chapterQuestions){
-     alert("Questions not loaded correctly.");
+     alert("Questions not loaded.");
      return;
    }
 
-   let original=[...window.chapterQuestions];
-   shuffleArray(original);
-
-   quizQuestions=original.slice(0,
-     Math.min(requestedCount, original.length)
-   );
-
-   userAnswers=new Array(quizQuestions.length).fill(null);
+   quizQuestions=[...window.chapterQuestions];
    currentQuestion=0;
    score=0;
-
-   updateLiveScore();
+   updateScoreDisplay();
    startTimer();
    loadQuestion();
  });
 }
 
+/* ---------- LOAD QUESTION ---------- */
+
 function loadQuestion(){
 
  const q=quizQuestions[currentQuestion];
-
- let optionsHTML=q.options.map((opt,i)=>{
-   let selected=userAnswers[currentQuestion]===i ? "selected" : "";
-   return `<button class="option ${selected}" onclick="selectAnswer(${i})">${opt}</button>`;
- }).join("");
 
  document.getElementById("quiz").innerHTML=`
   <div class="question-box">
    Q${currentQuestion+1}. ${q.question}
   </div>
-  <div class="options-grid">${optionsHTML}</div>
- `;
-
- document.getElementById("nav").innerHTML=`
-  ${currentQuestion>0 ? '<button onclick="prevQuestion()">Previous</button>' : ''}
-  ${currentQuestion<quizQuestions.length-1 
-    ? '<button onclick="nextQuestion()">Next</button>' 
-    : '<button onclick="submitTest()">Submit</button>'}
+  <div class="options-grid">
+   ${q.options.map((opt,i)=>
+     `<button class="option" onclick="checkAnswer(${i},this)">${opt}</button>`
+   ).join("")}
+  </div>
  `;
 }
 
-function selectAnswer(index){
- userAnswers[currentQuestion]=index;
- updateLiveScore();
- loadQuestion();
-}
+/* ---------- CHECK ANSWER ---------- */
 
-function prevQuestion(){ currentQuestion--; loadQuestion(); }
-function nextQuestion(){ currentQuestion++; loadQuestion(); }
+function checkAnswer(index,btn){
 
-function updateLiveScore(){
+ const correctIndex=quizQuestions[currentQuestion].correct;
+ const buttons=document.querySelectorAll(".option");
 
- score=0;
+ buttons.forEach(b=>b.disabled=true);
 
- quizQuestions.forEach((q,i)=>{
-   if(userAnswers[i]===q.correct){
-     score+=positive;
+ if(index===correctIndex){
+   btn.classList.add("correct");
+   score++;
+   playCorrectSound();
+ }else{
+   btn.classList.add("wrong");
+   buttons[correctIndex].classList.add("correct");
+   playWrongSound();
+ }
+
+ updateScoreDisplay();
+
+ setTimeout(()=>{
+   currentQuestion++;
+   if(currentQuestion<quizQuestions.length){
+     loadQuestion();
+   }else{
+     clearInterval(timerInterval);
+     document.getElementById("quiz").innerHTML="";
+     document.getElementById("result").innerHTML=
+       `<h2>Quiz Finished</h2>
+        <p>Final Score: ${score}</p>
+        <p>Total Time: ${formatTime(seconds)}</p>`;
    }
-   else if(userAnswers[i]!==null){
-     score-=negative;
-   }
- });
-
- document.getElementById("liveScore").innerText="Score: "+score;
-}
-
-function submitTest(){
-
- updateLiveScore();
- clearInterval(timerInterval);
-
- let reviewHTML="";
-
- quizQuestions.forEach((q,i)=>{
-   if(userAnswers[i]!==q.correct){
-     reviewHTML+=`
-      <div class="review-box">
-       <b>Q${i+1}:</b> ${q.question}<br>
-       Your Answer: ${q.options[userAnswers[i]] || "Not Attempted"}<br>
-       Correct Answer: ${q.options[q.correct]}
-      </div>
-     `;
-   }
- });
-
- document.getElementById("result").innerHTML=`
-  <h2>Final Scorecard</h2>
-  <p>Total Questions: ${quizQuestions.length}</p>
-  <p>Final Score: ${score}</p>
-  <p>Total Time: ${formatTime(seconds)}</p>
-  <h3>Review Wrong Answers</h3>
-  ${reviewHTML || "All Answers Correct 🎉"}
- `;
-
- document.getElementById("quiz").innerHTML="";
- document.getElementById("nav").innerHTML="";
+ },1000);
 }
 
 </script>
