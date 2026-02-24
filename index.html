@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>MD Quizzes - Structured Format</title>
+<title>MD QUIZZES - Advanced Test Engine</title>
 
 <style>
 body{
@@ -40,7 +40,8 @@ select,button{
   border-radius:12px;
   margin-top:20px;
   box-shadow:0 0 15px #00bfff;
-  font-size:20px;
+  font-size:18px;
+  text-align:left;
 }
 
 .options-grid{
@@ -62,46 +63,55 @@ select,button{
 .correct{ background:green !important; }
 .wrong{ background:red !important; }
 
-.score-container{
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  margin:20px 0;
-}
-
-.digit-box{
-  width:60px;
-  height:70px;
-  background:black;
-  border:2px solid gold;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:28px;
-  color:gold;
-  font-weight:bold;
-}
-
 #timer{
   margin-top:10px;
   font-size:18px;
   color:yellow;
 }
 
-.solution-box{
+.result-card{
   background:#111;
-  padding:15px;
-  margin-top:15px;
-  border:1px solid gold;
+  padding:20px;
+  border-radius:12px;
+  margin-top:20px;
   text-align:left;
+}
+
+.progress-bar{
+  width:100%;
+  height:20px;
+  background:#333;
+  border-radius:20px;
+  overflow:hidden;
+  margin-top:10px;
+}
+
+.progress-correct{
+  height:100%;
+  background:green;
+  float:left;
+}
+
+.progress-wrong{
+  height:100%;
+  background:red;
+  float:left;
 }
 
 .review-btn{
   background:orange;
-  font-weight:bold;
+  padding:10px 15px;
+  border:none;
+  margin-top:15px;
   cursor:pointer;
-  padding:10px 18px;
-  margin-top:10px;
+  font-weight:bold;
+}
+
+.solution-box{
+  background:#222;
+  padding:15px;
+  margin-top:15px;
+  border:1px solid gold;
 }
 </style>
 </head>
@@ -114,8 +124,16 @@ select,button{
 
 <select id="chapterSelect">
 <option value="">Select Chapter</option>
-<option value="js/human_physiology.js">Human Physiology</option>
+<option value="js/biology_and_human_welfare.js">Biology & Human Welfare</option>
+<option value="js/biotechnology.js">Biotechnology</option>
 <option value="js/cell_biology.js">Cell Biology</option>
+<option value="js/human_physiology.js">Human Physiology</option>
+<option value="js/human_reproduction.js">Human Reproduction</option>
+<option value="js/molecular_basis_of_inheritance.js">Molecular Basis of Inheritance</option>
+<option value="js/neet_chemistry.js">NEET Chemistry</option>
+<option value="js/neet_physics.js">NEET Physics</option>
+<option value="js/plant_physiology.js">Plant Physiology</option>
+<option value="js/sexual_reproduction_flower.js">Sexual Reproduction in Flowering Plants</option>
 </select>
 
 <br>
@@ -139,8 +157,8 @@ Positive:
 
 Negative:
 <select id="negativeMarks">
-<option value="0" selected>0</option>
-<option value="1">1</option>
+<option value="0">0</option>
+<option value="1" selected>1</option>
 <option value="2">2</option>
 </select>
 
@@ -148,12 +166,6 @@ Negative:
 <button class="start-btn" onclick="startQuiz()">Start Test</button>
 
 <div id="timer">Time: 00:00:00</div>
-
-<div class="score-container">
-<div class="digit-box" id="d1">0</div>
-<div class="digit-box" id="d2">0</div>
-<div class="digit-box" id="d3">0</div>
-</div>
 
 <div id="quiz"></div>
 <div id="result"></div>
@@ -166,12 +178,14 @@ let quizQuestions=[];
 let currentQuestion=0;
 let score=0;
 let positive=4;
-let negative=0;
+let negative=1;
 let timerInterval;
 let seconds=0;
-let wrongAnswers=[];
 
-/* TIMER */
+let correctCount=0;
+let incorrectCount=0;
+let attempted=0;
+let wrongAnswers=[];
 
 function formatTime(sec){
  let h=Math.floor(sec/3600);
@@ -191,27 +205,9 @@ function startTimer(){
  },1000);
 }
 
-/* SCORE DISPLAY */
-
-function updateScoreDisplay(){
- let formatted=Math.abs(score).toString().padStart(3,'0');
-
- if(score<0){
-   d1.innerText="-";
-   d2.innerText=formatted[formatted.length-2] || "0";
-   d3.innerText=formatted[formatted.length-1] || "0";
- }else{
-   d1.innerText=formatted[0];
-   d2.innerText=formatted[1];
-   d3.innerText=formatted[2];
- }
-}
-
-/* LOAD SCRIPT */
-
 function loadScript(src,callback){
- let oldScript=document.getElementById("chapterScript");
- if(oldScript) oldScript.remove();
+ let old=document.getElementById("chapterScript");
+ if(old) old.remove();
 
  let script=document.createElement("script");
  script.src=src;
@@ -220,8 +216,6 @@ function loadScript(src,callback){
  document.body.appendChild(script);
 }
 
-/* START QUIZ */
-
 function startQuiz(){
 
  const chapter=document.getElementById("chapterSelect").value;
@@ -229,27 +223,26 @@ function startQuiz(){
 
  positive=parseInt(document.getElementById("positiveMarks").value);
  negative=parseInt(document.getElementById("negativeMarks").value);
- let requestedCount=parseInt(document.getElementById("questionCount").value);
+ let count=parseInt(document.getElementById("questionCount").value);
 
+ correctCount=0;
+ incorrectCount=0;
+ attempted=0;
  wrongAnswers=[];
+ score=0;
  document.getElementById("result").innerHTML="";
 
  loadScript(chapter,function(){
 
    let all=[...window.chapterQuestions];
    all.sort(()=>Math.random()-0.5);
-
-   quizQuestions=all.slice(0,Math.min(requestedCount,all.length));
+   quizQuestions=all.slice(0,Math.min(count,all.length));
 
    currentQuestion=0;
-   score=0;
-   updateScoreDisplay();
    startTimer();
    loadQuestion();
  });
 }
-
-/* LOAD QUESTION */
 
 function loadQuestion(){
 
@@ -269,33 +262,31 @@ function loadQuestion(){
  `;
 }
 
-/* CHECK ANSWER */
-
 function checkAnswer(index,btn){
 
  const q=quizQuestions[currentQuestion];
  const buttons=document.querySelectorAll(".option");
-
  buttons.forEach(b=>b.disabled=true);
+
+ attempted++;
 
  if(q.answers[index].correct){
    btn.classList.add("correct");
    score+=positive;
+   correctCount++;
  }else{
    btn.classList.add("wrong");
    q.answers.forEach((a,i)=>{
      if(a.correct) buttons[i].classList.add("correct");
    });
-
    score-=negative;
+   incorrectCount++;
 
    wrongAnswers.push({
      question:q.question,
      solution:q.solution
    });
  }
-
- updateScoreDisplay();
 
  setTimeout(()=>{
    currentQuestion++;
@@ -304,46 +295,68 @@ function checkAnswer(index,btn){
    }else{
      finishQuiz();
    }
- },1200);
+ },1000);
 }
-
-/* FINISH QUIZ */
 
 function finishQuiz(){
 
  clearInterval(timerInterval);
+
+ let total=quizQuestions.length;
+ let unattempted=total-attempted;
+ let accuracy = attempted>0 ? ((correctCount/attempted)*100).toFixed(2) : 0;
+ let percentage = ((score/(total*positive))*100).toFixed(2);
+ let attemptPercent = ((attempted/total)*100).toFixed(2);
+
+ let correctWidth=(correctCount/total)*100;
+ let wrongWidth=(incorrectCount/total)*100;
+
  document.getElementById("quiz").innerHTML="";
 
  document.getElementById("result").innerHTML=`
-   <h2>Quiz Finished</h2>
-   <p>Final Score: ${score}</p>
-   <p>Total Time: ${formatTime(seconds)}</p>
-   ${wrongAnswers.length>0 ?
-     `<button class="review-btn" onclick="showReview()">
-        Review Wrong Answers
-      </button>` :
-      "<p>🎉 All Answers Correct!</p>"
-   }
+ <div class="result-card">
+  <h2>Scorecard</h2>
+  <p><b>Total Score:</b> ${score}</p>
+  <p>✅ Correct: ${correctCount}</p>
+  <p>❌ Incorrect: ${incorrectCount}</p>
+  <p>⚪ Unattempted: ${unattempted}</p>
+
+  <div class="progress-bar">
+    <div class="progress-correct" style="width:${correctWidth}%"></div>
+    <div class="progress-wrong" style="width:${wrongWidth}%"></div>
+  </div>
+
+  <hr>
+
+  <p>📊 Percentage: ${percentage}%</p>
+  <p>🎯 Accuracy: ${accuracy}%</p>
+  <p>📝 Attempt Percentage: ${attemptPercent}%</p>
+  <p>⏱ Time Taken: ${formatTime(seconds)}</p>
+
+  ${wrongAnswers.length>0 ?
+  `<button class="review-btn" onclick="showReview()">Review Wrong Answers</button>`
+  :
+  "<p>🎉 Perfect Performance!</p>"}
+
+ </div>
  `;
 }
 
-/* REVIEW SECTION */
-
 function showReview(){
 
- let reviewHTML="<h3>Wrong Answers Review</h3>";
+ let html="<h3>Wrong Answers Review</h3>";
 
  wrongAnswers.forEach((item,i)=>{
-   reviewHTML+=`
-     <div class="solution-box">
-       <b>Q${i+1}:</b> ${item.question}<br><br>
-       <b>Solution:</b><br>
-       ${item.solution}
-     </div>
+   html+=`
+    <div class="solution-box">
+      <b>Q${i+1}:</b> ${item.question}<br><br>
+      <b>Solution:</b><br>
+      ${item.solution}
+    </div>
    `;
  });
 
- document.getElementById("result").innerHTML+=reviewHTML;
+ document.getElementById("result").innerHTML+=html;
 }
 
 </script>
