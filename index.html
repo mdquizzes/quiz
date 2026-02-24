@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>MD Quizzes - Human Physiology</title>
+  <title>MD Quizzes</title>
   <meta charset="UTF-8">
   <style>
     body {
@@ -10,16 +10,18 @@
       margin: auto;
       padding: 20px;
     }
+    select, button {
+      padding: 8px;
+      margin: 10px 0;
+    }
     .question {
       font-size: 18px;
       margin-bottom: 10px;
     }
-    button {
+    button.option {
       display: block;
       margin: 5px 0;
-      padding: 8px;
       width: 100%;
-      cursor: pointer;
     }
     #result {
       margin-top: 20px;
@@ -29,24 +31,58 @@
 </head>
 <body>
 
-<h1>Human Physiology Quiz</h1>
+<h1>MD Quizzes</h1>
+
+<h3>Select Chapter:</h3>
+<select id="chapterSelect">
+  <option value="">-- Select --</option>
+  <option value="human_physiology.js">Human Physiology</option>
+</select>
+
+<button onclick="startQuiz()">Start Quiz</button>
+
+<hr>
 
 <div id="quiz"></div>
 <div id="result"></div>
 
-<script src="human_physiology.js"></script>
-
 <script>
+let questions = [];
 let currentQuestion = 0;
 let score = 0;
+
+function loadScript(src, callback) {
+  let script = document.createElement("script");
+  script.src = src;
+  script.onload = callback;
+  document.body.appendChild(script);
+}
+
+function startQuiz() {
+  const chapter = document.getElementById("chapterSelect").value;
+  if (!chapter) {
+    alert("Please select a chapter");
+    return;
+  }
+
+  document.getElementById("quiz").innerHTML = "";
+  document.getElementById("result").innerHTML = "";
+
+  loadScript(chapter, function () {
+    currentQuestion = 0;
+    score = 0;
+    loadQuestion();
+  });
+}
 
 function loadQuestion() {
   const q = questions[currentQuestion];
   const quizDiv = document.getElementById("quiz");
+
   quizDiv.innerHTML = `
     <div class="question">${q.question}</div>
-    ${q.options.map((opt, i) => 
-      `<button onclick="checkAnswer(${i})">${opt}</button>`
+    ${q.options.map((opt, i) =>
+      `<button class="option" onclick="checkAnswer(${i})">${opt}</button>`
     ).join("")}
   `;
 }
@@ -55,7 +91,9 @@ function checkAnswer(index) {
   if (index === questions[currentQuestion].correct) {
     score++;
   }
+
   currentQuestion++;
+
   if (currentQuestion < questions.length) {
     loadQuestion();
   } else {
@@ -64,9 +102,6 @@ function checkAnswer(index) {
       "Quiz Finished! Score: " + score + "/" + questions.length;
   }
 }
-
-loadQuestion();
 </script>
-
 </body>
 </html>
