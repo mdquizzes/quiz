@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>MD Quizzes - Final Stable</title>
+<title>MD Quizzes - Stable Final Fix</title>
 
 <style>
 body{
@@ -133,7 +133,6 @@ Negative:
 
 <script>
 
-let originalQuestions=[];
 let quizQuestions=[];
 let userAnswers=[];
 let currentQuestion=0;
@@ -187,16 +186,16 @@ function startQuiz(){
 
  loadScript(chapter,function(){
 
-   if(typeof questions==="undefined"){
+   if(!window.chapterQuestions){
      alert("Questions not loaded correctly.");
      return;
    }
 
-   originalQuestions=[...questions];
-   shuffleArray(originalQuestions);
+   let original=[...window.chapterQuestions];
+   shuffleArray(original);
 
-   quizQuestions=originalQuestions.slice(0,
-     Math.min(requestedCount, originalQuestions.length)
+   quizQuestions=original.slice(0,
+     Math.min(requestedCount, original.length)
    );
 
    userAnswers=new Array(quizQuestions.length).fill(null);
@@ -235,18 +234,12 @@ function loadQuestion(){
 
 function selectAnswer(index){
  userAnswers[currentQuestion]=index;
+ updateLiveScore();
  loadQuestion();
 }
 
-function prevQuestion(){
- currentQuestion--;
- loadQuestion();
-}
-
-function nextQuestion(){
- currentQuestion++;
- loadQuestion();
-}
+function prevQuestion(){ currentQuestion--; loadQuestion(); }
+function nextQuestion(){ currentQuestion++; loadQuestion(); }
 
 function updateLiveScore(){
 
@@ -269,14 +262,6 @@ function submitTest(){
  updateLiveScore();
  clearInterval(timerInterval);
 
- document.getElementById("result").innerHTML=`
-  <h2>Final Scorecard</h2>
-  <p>Total Questions: ${quizQuestions.length}</p>
-  <p>Final Score: ${score}</p>
-  <p>Total Time: ${formatTime(seconds)}</p>
-  <h3>Review Wrong Answers</h3>
- `;
-
  let reviewHTML="";
 
  quizQuestions.forEach((q,i)=>{
@@ -291,8 +276,14 @@ function submitTest(){
    }
  });
 
- document.getElementById("result").innerHTML+=
-   reviewHTML || "All Answers Correct 🎉";
+ document.getElementById("result").innerHTML=`
+  <h2>Final Scorecard</h2>
+  <p>Total Questions: ${quizQuestions.length}</p>
+  <p>Final Score: ${score}</p>
+  <p>Total Time: ${formatTime(seconds)}</p>
+  <h3>Review Wrong Answers</h3>
+  ${reviewHTML || "All Answers Correct 🎉"}
+ `;
 
  document.getElementById("quiz").innerHTML="";
  document.getElementById("nav").innerHTML="";
