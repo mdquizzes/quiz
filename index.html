@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>MD Quizzes - KBC Mode</title>
+<title>MD Quizzes - KBC Pro Mode</title>
 
 <style>
 body{
@@ -19,7 +19,7 @@ h1{
 }
 
 .container{
-  max-width:900px;
+  max-width:950px;
   margin:auto;
   padding:20px;
 }
@@ -60,7 +60,6 @@ select,button{
   color:white;
   border-radius:12px;
   cursor:pointer;
-  transition:0.3s;
 }
 
 .option:hover{
@@ -71,7 +70,7 @@ select,button{
 .correct{ background:green !important; }
 .wrong{ background:red !important; }
 
-/* 3 Digit Score Display */
+/* Score Box */
 .score-container{
   display:flex;
   justify-content:center;
@@ -103,7 +102,7 @@ select,button{
 
 <body>
 
-<h1>🎯 MD QUIZZES - KBC MODE</h1>
+<h1>🎯 MD QUIZZES - KBC PRO</h1>
 
 <div class="container">
 
@@ -113,6 +112,33 @@ select,button{
 <option value="js/cell_biology.js">Cell Biology</option>
 </select>
 
+<br>
+
+Questions:
+<select id="questionCount">
+<option value="10">10</option>
+<option value="20">20</option>
+<option value="40">40</option>
+<option value="60">60</option>
+<option value="80">80</option>
+</select>
+
+Positive Marks:
+<select id="positiveMarks">
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4" selected>4</option>
+</select>
+
+Negative Marks:
+<select id="negativeMarks">
+<option value="0" selected>0</option>
+<option value="1">1</option>
+<option value="2">2</option>
+</select>
+
+<br>
 <button class="start-btn" onclick="startQuiz()">Start Test</button>
 
 <div id="timer">Time: 00:00:00</div>
@@ -133,6 +159,8 @@ select,button{
 let quizQuestions=[];
 let currentQuestion=0;
 let score=0;
+let positive=4;
+let negative=0;
 let timerInterval;
 let seconds=0;
 
@@ -156,26 +184,26 @@ function startTimer(){
  },1000);
 }
 
-/* ---------- SOUND (KBC STYLE) ---------- */
+/* ---------- SOUND ---------- */
 
 function playCorrectSound(){
  let ctx=new (window.AudioContext||window.webkitAudioContext)();
  let osc=ctx.createOscillator();
  osc.type="sine";
- osc.frequency.value=600;
+ osc.frequency.value=700;
  osc.connect(ctx.destination);
  osc.start();
- setTimeout(()=>osc.stop(),300);
+ setTimeout(()=>osc.stop(),250);
 }
 
 function playWrongSound(){
  let ctx=new (window.AudioContext||window.webkitAudioContext)();
  let osc=ctx.createOscillator();
  osc.type="sawtooth";
- osc.frequency.value=150;
+ osc.frequency.value=180;
  osc.connect(ctx.destination);
  osc.start();
- setTimeout(()=>osc.stop(),400);
+ setTimeout(()=>osc.stop(),350);
 }
 
 /* ---------- SCORE DISPLAY ---------- */
@@ -187,10 +215,9 @@ function updateScoreDisplay(){
  d3.innerText=formatted[2];
 }
 
-/* ---------- LOAD SCRIPT SAFELY ---------- */
+/* ---------- SAFE SCRIPT LOAD ---------- */
 
 function loadScript(src,callback){
-
  let oldScript=document.getElementById("chapterScript");
  if(oldScript) oldScript.remove();
 
@@ -208,6 +235,10 @@ function startQuiz(){
  const chapter=document.getElementById("chapterSelect").value;
  if(!chapter){ alert("Select chapter"); return; }
 
+ positive=parseInt(document.getElementById("positiveMarks").value);
+ negative=parseInt(document.getElementById("negativeMarks").value);
+ let requestedCount=parseInt(document.getElementById("questionCount").value);
+
  loadScript(chapter,function(){
 
    if(!window.chapterQuestions){
@@ -215,7 +246,14 @@ function startQuiz(){
      return;
    }
 
-   quizQuestions=[...window.chapterQuestions];
+   let all=[...window.chapterQuestions];
+
+   /* Shuffle */
+   all.sort(()=>Math.random()-0.5);
+
+   /* Limit question count */
+   quizQuestions=all.slice(0,Math.min(requestedCount,all.length));
+
    currentQuestion=0;
    score=0;
    updateScoreDisplay();
@@ -253,11 +291,12 @@ function checkAnswer(index,btn){
 
  if(index===correctIndex){
    btn.classList.add("correct");
-   score++;
+   score+=positive;
    playCorrectSound();
  }else{
    btn.classList.add("wrong");
    buttons[correctIndex].classList.add("correct");
+   score-=negative;
    playWrongSound();
  }
 
