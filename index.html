@@ -77,7 +77,7 @@ select,button{
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:32px;
+  font-size:28px;
   color:gold;
   font-weight:bold;
 }
@@ -94,6 +94,14 @@ select,button{
   margin-top:15px;
   border:1px solid gold;
   text-align:left;
+}
+
+.review-btn{
+  background:orange;
+  font-weight:bold;
+  cursor:pointer;
+  padding:10px 18px;
+  margin-top:10px;
 }
 </style>
 </head>
@@ -161,6 +169,7 @@ let positive=4;
 let negative=0;
 let timerInterval;
 let seconds=0;
+let wrongAnswers=[];
 
 /* TIMER */
 
@@ -182,13 +191,20 @@ function startTimer(){
  },1000);
 }
 
-/* SCORE */
+/* SCORE DISPLAY */
 
 function updateScoreDisplay(){
- let formatted=Math.max(0,score).toString().padStart(3,'0');
- d1.innerText=formatted[0];
- d2.innerText=formatted[1];
- d3.innerText=formatted[2];
+ let formatted=Math.abs(score).toString().padStart(3,'0');
+
+ if(score<0){
+   d1.innerText="-";
+   d2.innerText=formatted[formatted.length-2] || "0";
+   d3.innerText=formatted[formatted.length-1] || "0";
+ }else{
+   d1.innerText=formatted[0];
+   d2.innerText=formatted[1];
+   d3.innerText=formatted[2];
+ }
 }
 
 /* LOAD SCRIPT */
@@ -215,12 +231,10 @@ function startQuiz(){
  negative=parseInt(document.getElementById("negativeMarks").value);
  let requestedCount=parseInt(document.getElementById("questionCount").value);
 
- loadScript(chapter,function(){
+ wrongAnswers=[];
+ document.getElementById("result").innerHTML="";
 
-   if(!window.chapterQuestions){
-     alert("Questions not loaded.");
-     return;
-   }
+ loadScript(chapter,function(){
 
    let all=[...window.chapterQuestions];
    all.sort(()=>Math.random()-0.5);
@@ -272,34 +286,64 @@ function checkAnswer(index,btn){
    q.answers.forEach((a,i)=>{
      if(a.correct) buttons[i].classList.add("correct");
    });
+
    score-=negative;
+
+   wrongAnswers.push({
+     question:q.question,
+     solution:q.solution
+   });
  }
 
  updateScoreDisplay();
 
  setTimeout(()=>{
-   document.getElementById("quiz").innerHTML+=`
+   currentQuestion++;
+   if(currentQuestion<quizQuestions.length){
+     loadQuestion();
+   }else{
+     finishQuiz();
+   }
+ },1200);
+}
+
+/* FINISH QUIZ */
+
+function finishQuiz(){
+
+ clearInterval(timerInterval);
+ document.getElementById("quiz").innerHTML="";
+
+ document.getElementById("result").innerHTML=`
+   <h2>Quiz Finished</h2>
+   <p>Final Score: ${score}</p>
+   <p>Total Time: ${formatTime(seconds)}</p>
+   ${wrongAnswers.length>0 ?
+     `<button class="review-btn" onclick="showReview()">
+        Review Wrong Answers
+      </button>` :
+      "<p>🎉 All Answers Correct!</p>"
+   }
+ `;
+}
+
+/* REVIEW SECTION */
+
+function showReview(){
+
+ let reviewHTML="<h3>Wrong Answers Review</h3>";
+
+ wrongAnswers.forEach((item,i)=>{
+   reviewHTML+=`
      <div class="solution-box">
+       <b>Q${i+1}:</b> ${item.question}<br><br>
        <b>Solution:</b><br>
-       ${q.solution}
+       ${item.solution}
      </div>
    `;
+ });
 
-   setTimeout(()=>{
-     currentQuestion++;
-     if(currentQuestion<quizQuestions.length){
-       loadQuestion();
-     }else{
-       clearInterval(timerInterval);
-       document.getElementById("quiz").innerHTML="";
-       document.getElementById("result").innerHTML=
-         `<h2>Quiz Finished</h2>
-          <p>Final Score: ${score}</p>
-          <p>Total Time: ${formatTime(seconds)}</p>`;
-     }
-   },2000);
-
- },800);
+ document.getElementById("result").innerHTML+=reviewHTML;
 }
 
 </script>
