@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>MD Quizzes - Stable Final</title>
+<title>MD Quizzes - Final Stable</title>
 
 <style>
 body{
@@ -13,17 +13,15 @@ body{
   text-align:center;
 }
 
-h1{
-  color:gold;
-}
+h1{ color:gold; }
 
 .container{
-  max-width:900px;
+  max-width:1000px;
   margin:auto;
   padding:20px;
 }
 
-button{
+select,button{
   padding:8px 12px;
   margin:6px;
   border-radius:6px;
@@ -31,10 +29,7 @@ button{
   cursor:pointer;
 }
 
-.start-btn{
-  background:gold;
-  font-weight:bold;
-}
+.start-btn{ background:gold; font-weight:bold; }
 
 .question-box{
   background:#002855;
@@ -58,18 +53,20 @@ button{
   border-radius:8px;
 }
 
-.option.selected{
-  background:orange;
-}
+.option.selected{ background:orange; }
 
-.nav{
-  margin-top:20px;
-}
+.nav{ margin-top:20px; }
 
-.score-box{
-  margin-top:20px;
+.score-display{
   font-size:20px;
+  margin-top:15px;
   color:gold;
+}
+
+#timer{
+  margin-top:10px;
+  font-size:18px;
+  color:yellow;
 }
 
 .review-box{
@@ -94,11 +91,42 @@ button{
 <option value="js/cell_biology.js">Cell Biology</option>
 </select>
 
+<br>
+
+Questions:
+<select id="questionCount">
+<option value="10">10</option>
+<option value="20">20</option>
+<option value="30">30</option>
+<option value="40">40</option>
+<option value="50">50</option>
+<option value="60">60</option>
+<option value="80">80</option>
+</select>
+
+Positive:
+<select id="positiveMarks">
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+</select>
+
+Negative:
+<select id="negativeMarks">
+<option value="0">0</option>
+<option value="1">1</option>
+<option value="2">2</option>
+</select>
+
+<br>
 <button class="start-btn" onclick="startQuiz()">Start Test</button>
+
+<div id="timer">Time: 00:00:00</div>
+<div class="score-display" id="liveScore">Score: 0</div>
 
 <div id="quiz"></div>
 <div class="nav" id="nav"></div>
-<div class="score-box" id="scoreBox"></div>
 <div id="result"></div>
 
 </div>
@@ -110,116 +138,164 @@ let quizQuestions=[];
 let userAnswers=[];
 let currentQuestion=0;
 let score=0;
+let positive=1;
+let negative=0;
+let timerInterval;
+let seconds=0;
+
+function formatTime(sec){
+ let h=Math.floor(sec/3600);
+ let m=Math.floor((sec%3600)/60);
+ let s=sec%60;
+ return String(h).padStart(2,'0')+":"+
+        String(m).padStart(2,'0')+":"+
+        String(s).padStart(2,'0');
+}
+
+function startTimer(){
+ seconds=0;
+ clearInterval(timerInterval);
+ timerInterval=setInterval(()=>{
+   seconds++;
+   document.getElementById("timer").innerText="Time: "+formatTime(seconds);
+ },1000);
+}
 
 function loadScript(src,callback){
-  let oldScript=document.getElementById("chapterScript");
-  if(oldScript) oldScript.remove();
+ let oldScript=document.getElementById("chapterScript");
+ if(oldScript) oldScript.remove();
 
-  let script=document.createElement("script");
-  script.src=src;
-  script.id="chapterScript";
-  script.onload=callback;
-  document.body.appendChild(script);
+ let script=document.createElement("script");
+ script.src=src;
+ script.id="chapterScript";
+ script.onload=callback;
+ document.body.appendChild(script);
+}
+
+function shuffleArray(arr){
+ return arr.sort(()=>Math.random()-0.5);
 }
 
 function startQuiz(){
 
-  const chapter=document.getElementById("chapterSelect").value;
-  if(!chapter){ alert("Select chapter"); return; }
+ const chapter=document.getElementById("chapterSelect").value;
+ if(!chapter){ alert("Select chapter"); return; }
 
-  loadScript(chapter,function(){
+ positive=parseInt(document.getElementById("positiveMarks").value);
+ negative=parseInt(document.getElementById("negativeMarks").value);
+ let requestedCount=parseInt(document.getElementById("questionCount").value);
 
-    if(typeof questions==="undefined"){
-      alert("Questions not loaded correctly.");
-      return;
-    }
+ loadScript(chapter,function(){
 
-    originalQuestions=[...questions];
-    quizQuestions=originalQuestions.map(q=>({...q}));
-    userAnswers=new Array(quizQuestions.length).fill(null);
-    currentQuestion=0;
-    score=0;
+   if(typeof questions==="undefined"){
+     alert("Questions not loaded correctly.");
+     return;
+   }
 
-    loadQuestion();
-  });
+   originalQuestions=[...questions];
+   shuffleArray(originalQuestions);
+
+   quizQuestions=originalQuestions.slice(0,
+     Math.min(requestedCount, originalQuestions.length)
+   );
+
+   userAnswers=new Array(quizQuestions.length).fill(null);
+   currentQuestion=0;
+   score=0;
+
+   updateLiveScore();
+   startTimer();
+   loadQuestion();
+ });
 }
 
 function loadQuestion(){
 
-  const q=quizQuestions[currentQuestion];
+ const q=quizQuestions[currentQuestion];
 
-  let optionsHTML=q.options.map((opt,i)=>{
-    let selected=userAnswers[currentQuestion]===i ? "selected" : "";
-    return `<button class="option ${selected}" onclick="selectAnswer(${i})">${opt}</button>`;
-  }).join("");
+ let optionsHTML=q.options.map((opt,i)=>{
+   let selected=userAnswers[currentQuestion]===i ? "selected" : "";
+   return `<button class="option ${selected}" onclick="selectAnswer(${i})">${opt}</button>`;
+ }).join("");
 
-  document.getElementById("quiz").innerHTML=`
-    <div class="question-box">
-      Q${currentQuestion+1}. ${q.question}
-    </div>
-    <div class="options-grid">
-      ${optionsHTML}
-    </div>
-  `;
+ document.getElementById("quiz").innerHTML=`
+  <div class="question-box">
+   Q${currentQuestion+1}. ${q.question}
+  </div>
+  <div class="options-grid">${optionsHTML}</div>
+ `;
 
-  document.getElementById("nav").innerHTML=`
-    ${currentQuestion>0 ? '<button onclick="prevQuestion()">Previous</button>' : ''}
-    ${currentQuestion<quizQuestions.length-1 
-      ? '<button onclick="nextQuestion()">Next</button>' 
-      : '<button onclick="submitTest()">Submit</button>'}
-  `;
+ document.getElementById("nav").innerHTML=`
+  ${currentQuestion>0 ? '<button onclick="prevQuestion()">Previous</button>' : ''}
+  ${currentQuestion<quizQuestions.length-1 
+    ? '<button onclick="nextQuestion()">Next</button>' 
+    : '<button onclick="submitTest()">Submit</button>'}
+ `;
 }
 
 function selectAnswer(index){
-  userAnswers[currentQuestion]=index;
-  loadQuestion();
+ userAnswers[currentQuestion]=index;
+ loadQuestion();
 }
 
 function prevQuestion(){
-  currentQuestion--;
-  loadQuestion();
+ currentQuestion--;
+ loadQuestion();
 }
 
 function nextQuestion(){
-  currentQuestion++;
-  loadQuestion();
+ currentQuestion++;
+ loadQuestion();
+}
+
+function updateLiveScore(){
+
+ score=0;
+
+ quizQuestions.forEach((q,i)=>{
+   if(userAnswers[i]===q.correct){
+     score+=positive;
+   }
+   else if(userAnswers[i]!==null){
+     score-=negative;
+   }
+ });
+
+ document.getElementById("liveScore").innerText="Score: "+score;
 }
 
 function submitTest(){
 
-  score=0;
+ updateLiveScore();
+ clearInterval(timerInterval);
 
-  quizQuestions.forEach((q,i)=>{
-    if(userAnswers[i]===q.correct){
-      score++;
-    }
-  });
+ document.getElementById("result").innerHTML=`
+  <h2>Final Scorecard</h2>
+  <p>Total Questions: ${quizQuestions.length}</p>
+  <p>Final Score: ${score}</p>
+  <p>Total Time: ${formatTime(seconds)}</p>
+  <h3>Review Wrong Answers</h3>
+ `;
 
-  document.getElementById("scoreBox").innerHTML=
-    `Final Score: ${score} / ${quizQuestions.length}`;
+ let reviewHTML="";
 
-  showReview();
-}
+ quizQuestions.forEach((q,i)=>{
+   if(userAnswers[i]!==q.correct){
+     reviewHTML+=`
+      <div class="review-box">
+       <b>Q${i+1}:</b> ${q.question}<br>
+       Your Answer: ${q.options[userAnswers[i]] || "Not Attempted"}<br>
+       Correct Answer: ${q.options[q.correct]}
+      </div>
+     `;
+   }
+ });
 
-function showReview(){
+ document.getElementById("result").innerHTML+=
+   reviewHTML || "All Answers Correct 🎉";
 
-  let reviewHTML="";
-
-  quizQuestions.forEach((q,i)=>{
-    if(userAnswers[i]!==q.correct){
-      reviewHTML+=`
-        <div class="review-box">
-          <b>Q${i+1}:</b> ${q.question}<br>
-          Your Answer: ${q.options[userAnswers[i]] || "Not Attempted"}<br>
-          Correct Answer: ${q.options[q.correct]}
-        </div>
-      `;
-    }
-  });
-
-  document.getElementById("result").innerHTML=
-    `<h3>Review Wrong Answers</h3>
-     ${reviewHTML || "All Answers Correct 🎉"}`;
+ document.getElementById("quiz").innerHTML="";
+ document.getElementById("nav").innerHTML="";
 }
 
 </script>
