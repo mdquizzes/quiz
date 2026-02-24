@@ -1,9 +1,72 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>MD Quizzes</title>
+  <title>MD Quizzes - Human Physiology</title>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      font-family: Arial;
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+    }
+    .question {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    button {
+      display: block;
+      margin: 5px 0;
+      padding: 8px;
+      width: 100%;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-  <h1>MD Quizzes Working ✅</h1>
+
+<h1>Human Physiology Quiz</h1>
+
+<div id="quiz"></div>
+<div id="result"></div>
+
+<script src="human_physiology.js"></script>
+
+<script>
+let currentQuestion = 0;
+let score = 0;
+
+function loadQuestion() {
+  const q = questions[currentQuestion];
+  const quizDiv = document.getElementById("quiz");
+  quizDiv.innerHTML = `
+    <div class="question">${q.question}</div>
+    ${q.options.map((opt, i) => 
+      `<button onclick="checkAnswer(${i})">${opt}</button>`
+    ).join("")}
+  `;
+}
+
+function checkAnswer(index) {
+  if (index === questions[currentQuestion].correct) {
+    score++;
+  }
+  currentQuestion++;
+  if (currentQuestion < questions.length) {
+    loadQuestion();
+  } else {
+    document.getElementById("quiz").innerHTML = "";
+    document.getElementById("result").innerText =
+      "Quiz Finished! Score: " + score + "/" + questions.length;
+  }
+}
+
+loadQuestion();
+</script>
+
 </body>
 </html>
