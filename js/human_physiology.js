@@ -1,4 +1,4 @@
-const humanPhysiologyQuestions = [
+Questions = [
 
 {
 question: "Which hormone regulates basal metabolic rate in humans?",
