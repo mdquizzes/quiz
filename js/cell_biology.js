@@ -1,4 +1,4 @@
-questions = [
+window.chapterQuestions = [
 
 {
 question: "Who discovered the cell?",
