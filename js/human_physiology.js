@@ -1,4 +1,4 @@
-Questions = [
+window.chapterQuestions = [
 
 {
 question: "Which hormone regulates basal metabolic rate in humans?",
