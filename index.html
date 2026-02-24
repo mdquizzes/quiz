@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>MD Quizzes - Fixed Version</title>
+<title>MD Quizzes - Stable Final</title>
 
 <style>
 body{
@@ -15,17 +15,16 @@ body{
 
 h1{
   color:gold;
-  text-shadow:0 0 15px gold;
 }
 
 .container{
-  max-width:1000px;
+  max-width:900px;
   margin:auto;
   padding:20px;
 }
 
 button{
-  padding:8px;
+  padding:8px 12px;
   margin:6px;
   border-radius:6px;
   border:none;
@@ -40,57 +39,43 @@ button{
 .question-box{
   background:#002855;
   padding:20px;
-  border-radius:15px;
+  border-radius:10px;
   margin-top:20px;
-  box-shadow:0 0 15px #00bfff;
-  font-size:20px;
 }
 
 .options-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:15px;
-  margin-top:20px;
+  gap:10px;
+  margin-top:15px;
 }
 
 .option{
-  padding:12px;
+  padding:10px;
   background:#001d3d;
   border:2px solid #00bfff;
   color:white;
-  border-radius:15px;
+  border-radius:8px;
 }
 
 .option.selected{
   background:orange;
 }
 
-.correct{ background:green !important; }
-.wrong{ background:red !important; }
-
-.score-container{
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  margin:20px 0;
+.nav{
+  margin-top:20px;
 }
 
-.digit-box{
-  width:60px;
-  height:70px;
-  background:black;
-  border:2px solid gold;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:32px;
+.score-box{
+  margin-top:20px;
+  font-size:20px;
   color:gold;
-  font-weight:bold;
 }
+
 .review-box{
   background:#111;
-  padding:15px;
-  margin:10px;
+  padding:10px;
+  margin:10px 0;
   border:1px solid gold;
   text-align:left;
 }
@@ -99,7 +84,7 @@ button{
 
 <body>
 
-<h1>🎯 MD QUIZZES - STABLE MODE</h1>
+<h1>MD QUIZZES</h1>
 
 <div class="container">
 
@@ -111,150 +96,130 @@ button{
 
 <button class="start-btn" onclick="startQuiz()">Start Test</button>
 
-<div class="score-container">
-<div class="digit-box" id="d1">0</div>
-<div class="digit-box" id="d2">0</div>
-<div class="digit-box" id="d3">0</div>
-</div>
-
 <div id="quiz"></div>
-<div id="navButtons"></div>
+<div class="nav" id="nav"></div>
+<div class="score-box" id="scoreBox"></div>
 <div id="result"></div>
 
 </div>
 
 <script>
 
-let allQuestions=[];
-let questions=[];
+let originalQuestions=[];
+let quizQuestions=[];
 let userAnswers=[];
 let currentQuestion=0;
 let score=0;
 
 function loadScript(src,callback){
- let script=document.createElement("script");
- script.src=src;
- script.onload=callback;
- document.body.appendChild(script);
-}
+  let oldScript=document.getElementById("chapterScript");
+  if(oldScript) oldScript.remove();
 
-function shuffleArray(arr){
- return arr.sort(()=>Math.random()-0.5);
-}
-
-function updateScoreDisplay(){
- let formatted=Math.max(0,score).toString().padStart(3,'0');
- d1.innerText=formatted[0];
- d2.innerText=formatted[1];
- d3.innerText=formatted[2];
+  let script=document.createElement("script");
+  script.src=src;
+  script.id="chapterScript";
+  script.onload=callback;
+  document.body.appendChild(script);
 }
 
 function startQuiz(){
 
- const chapter=document.getElementById("chapterSelect").value;
- if(!chapter){ alert("Select chapter"); return; }
+  const chapter=document.getElementById("chapterSelect").value;
+  if(!chapter){ alert("Select chapter"); return; }
 
- loadScript(chapter,function(){
+  loadScript(chapter,function(){
 
-   allQuestions=[...questions];
-   shuffleArray(allQuestions);
+    if(typeof questions==="undefined"){
+      alert("Questions not loaded correctly.");
+      return;
+    }
 
-   questions=allQuestions;
+    originalQuestions=[...questions];
+    quizQuestions=originalQuestions.map(q=>({...q}));
+    userAnswers=new Array(quizQuestions.length).fill(null);
+    currentQuestion=0;
+    score=0;
 
-   questions.forEach(q=>{
-     let correctAnswer=q.options[q.correct];
-     shuffleArray(q.options);
-     q.correct=q.options.indexOf(correctAnswer);
-   });
-
-   userAnswers=new Array(questions.length).fill(null);
-   score=0;
-   updateScoreDisplay();
-   currentQuestion=0;
-   loadQuestion();
- });
+    loadQuestion();
+  });
 }
 
 function loadQuestion(){
 
- const q=questions[currentQuestion];
+  const q=quizQuestions[currentQuestion];
 
- let optionsHTML=q.options.map((opt,i)=>{
-   let selectedClass=userAnswers[currentQuestion]===i ? "selected" : "";
-   return `<button class="option ${selectedClass}" onclick="selectAnswer(${i})">${opt}</button>`;
- }).join("");
+  let optionsHTML=q.options.map((opt,i)=>{
+    let selected=userAnswers[currentQuestion]===i ? "selected" : "";
+    return `<button class="option ${selected}" onclick="selectAnswer(${i})">${opt}</button>`;
+  }).join("");
 
- quiz.innerHTML=`
-  <div class="question-box">
-   Q${currentQuestion+1}. ${q.question}
-  </div>
-  <div class="options-grid">${optionsHTML}</div>
- `;
+  document.getElementById("quiz").innerHTML=`
+    <div class="question-box">
+      Q${currentQuestion+1}. ${q.question}
+    </div>
+    <div class="options-grid">
+      ${optionsHTML}
+    </div>
+  `;
 
- navButtons.innerHTML=`
-  ${currentQuestion>0 ? '<button onclick="prevQuestion()">Previous</button>' : ''}
-  ${currentQuestion<questions.length-1 
-    ? '<button onclick="nextQuestion()">Next</button>' 
-    : '<button onclick="finishTest()">Submit</button>'}
- `;
+  document.getElementById("nav").innerHTML=`
+    ${currentQuestion>0 ? '<button onclick="prevQuestion()">Previous</button>' : ''}
+    ${currentQuestion<quizQuestions.length-1 
+      ? '<button onclick="nextQuestion()">Next</button>' 
+      : '<button onclick="submitTest()">Submit</button>'}
+  `;
 }
 
 function selectAnswer(index){
- userAnswers[currentQuestion]=index;
- loadQuestion();   // refresh to show selection
+  userAnswers[currentQuestion]=index;
+  loadQuestion();
 }
 
 function prevQuestion(){
- currentQuestion--;
- loadQuestion();
+  currentQuestion--;
+  loadQuestion();
 }
 
 function nextQuestion(){
- currentQuestion++;
- loadQuestion();
+  currentQuestion++;
+  loadQuestion();
 }
 
-function finishTest(){
+function submitTest(){
 
- score=0;
+  score=0;
 
- questions.forEach((q,i)=>{
-   if(userAnswers[i]===q.correct){
-     score++;
-   }
- });
+  quizQuestions.forEach((q,i)=>{
+    if(userAnswers[i]===q.correct){
+      score++;
+    }
+  });
 
- updateScoreDisplay();
- showScorecard();
+  document.getElementById("scoreBox").innerHTML=
+    `Final Score: ${score} / ${quizQuestions.length}`;
+
+  showReview();
 }
 
-function showScorecard(){
+function showReview(){
 
- let wrongHTML="";
+  let reviewHTML="";
 
- questions.forEach((q,i)=>{
-   if(userAnswers[i]!==q.correct){
-     wrongHTML+=`
-      <div class="review-box">
-       <b>Q${i+1}:</b> ${q.question}<br>
-       Your Answer: ${q.options[userAnswers[i]] || "Not Attempted"}<br>
-       Correct Answer: ${q.options[q.correct]}
-      </div>
-     `;
-   }
- });
+  quizQuestions.forEach((q,i)=>{
+    if(userAnswers[i]!==q.correct){
+      reviewHTML+=`
+        <div class="review-box">
+          <b>Q${i+1}:</b> ${q.question}<br>
+          Your Answer: ${q.options[userAnswers[i]] || "Not Attempted"}<br>
+          Correct Answer: ${q.options[q.correct]}
+        </div>
+      `;
+    }
+  });
 
- result.innerHTML=`
-  <h2>Scorecard</h2>
-  <p>Total Questions: ${questions.length}</p>
-  <p>Correct: ${score}</p>
-  <p>Wrong: ${questions.length-score}</p>
-  <h3>Review Wrong Answers</h3>
-  ${wrongHTML || "All Answers Correct 🎉"}
- `;
-
- quiz.innerHTML="";
- navButtons.innerHTML="";
+  document.getElementById("result").innerHTML=
+    `<h3>Review Wrong Answers</h3>
+     ${reviewHTML || "All Answers Correct 🎉"}`;
 }
 
 </script>
