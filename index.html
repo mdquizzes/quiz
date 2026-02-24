@@ -1,166 +1,256 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>MD Quizzes</title>
-  <meta charset="UTF-8">
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: radial-gradient(circle at center, #001f3f, #000814);
-      color: white;
-      text-align: center;
-    }
+<meta charset="UTF-8">
+<title>MD Quizzes - Exam Mode</title>
 
-    h1 {
-      margin-top: 20px;
-      font-size: 40px;
-      color: gold;
-      text-shadow: 0 0 15px gold;
-    }
+<style>
+body{
+  margin:0;
+  font-family:Segoe UI;
+  background: radial-gradient(circle,#001f3f,#000814);
+  color:white;
+  text-align:center;
+}
 
-    .container {
-      max-width: 800px;
-      margin: auto;
-      padding: 20px;
-    }
+h1{
+  color:gold;
+  text-shadow:0 0 15px gold;
+}
 
-    select, .start-btn {
-      padding: 10px;
-      font-size: 16px;
-      margin: 10px;
-      border-radius: 8px;
-      border: none;
-    }
+.container{
+  max-width:900px;
+  margin:auto;
+  padding:20px;
+}
 
-    .start-btn {
-      background: gold;
-      font-weight: bold;
-      cursor: pointer;
-    }
+select,button{
+  padding:8px;
+  margin:6px;
+  border-radius:6px;
+  border:none;
+}
 
-    .start-btn:hover {
-      background: orange;
-    }
+.start-btn{
+  background:gold;
+  font-weight:bold;
+  cursor:pointer;
+}
 
-    .question-box {
-      margin-top: 30px;
-      padding: 20px;
-      background: #002855;
-      border-radius: 15px;
-      box-shadow: 0 0 20px #00bfff;
-      font-size: 20px;
-    }
+.question-box{
+  background:#002855;
+  padding:20px;
+  border-radius:15px;
+  margin-top:20px;
+  box-shadow:0 0 15px #00bfff;
+  font-size:20px;
+}
 
-    .option {
-      display: block;
-      margin: 12px auto;
-      padding: 12px;
-      width: 80%;
-      background: #001d3d;
-      border: 2px solid #00bfff;
-      color: white;
-      border-radius: 25px;
-      cursor: pointer;
-      transition: 0.3s;
-      font-size: 16px;
-    }
+.option{
+  display:block;
+  margin:10px auto;
+  padding:10px;
+  width:80%;
+  background:#001d3d;
+  border:2px solid #00bfff;
+  color:white;
+  border-radius:25px;
+  cursor:pointer;
+  transition:0.3s;
+}
 
-    .option:hover {
-      background: #00bfff;
-      color: black;
-      transform: scale(1.05);
-    }
+.option:hover{
+  background:#00bfff;
+  color:black;
+}
 
-    #result {
-      margin-top: 30px;
-      font-size: 22px;
-      color: gold;
-      text-shadow: 0 0 10px gold;
-    }
-  </style>
+.correct{
+  background:green !important;
+}
+
+.wrong{
+  background:red !important;
+}
+
+#timer{
+  font-size:20px;
+  margin-top:10px;
+  color:yellow;
+}
+
+/* Speedometer */
+.speedometer{
+  width:200px;
+  height:200px;
+  border-radius:50%;
+  background:conic-gradient(gold 0deg, #222 0deg);
+  margin:20px auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+  font-weight:bold;
+  color:gold;
+  box-shadow:0 0 20px gold;
+}
+</style>
 </head>
 
 <body>
 
-<h1>🎯 MD QUIZZES</h1>
+<h1>🎯 MD QUIZZES - EXAM MODE</h1>
 
 <div class="container">
 
-  <h3>Select Chapter</h3>
+<select id="chapterSelect">
+<option value="">Select Chapter</option>
+<option value="js/human_physiology.js">Human Physiology</option>
+<option value="js/cell_biology.js">Cell Biology</option>
+</select>
 
-  <select id="chapterSelect">
-    <option value="">-- Select --</option>
-    <option value="js/human_physiology.js">Human Physiology</option>
-    <option value="js/cell_biology.js">Cell Biology</option>
-  </select>
+<br>
 
-  <br>
+Questions:
+<select id="questionCount">
+<option value="5">5</option>
+<option value="10">10</option>
+<option value="15">15</option>
+<option value="20">20</option>
+</select>
 
-  <button class="start-btn" onclick="startQuiz()">Start Quiz</button>
+Positive Marks:
+<select id="positiveMarks">
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+</select>
 
-  <div id="quiz"></div>
-  <div id="result"></div>
+Negative Marks:
+<select id="negativeMarks">
+<option value="0">0</option>
+<option value="1">1</option>
+<option value="2">2</option>
+</select>
+
+<br>
+<button class="start-btn" onclick="startQuiz()">Start Test</button>
+
+<div id="timer">Time: 00:00:00</div>
+
+<div class="speedometer" id="speedometer">0</div>
+
+<div id="quiz"></div>
+<div id="result"></div>
 
 </div>
 
 <script>
-let questions = [];
-let currentQuestion = 0;
-let score = 0;
 
-function loadScript(src, callback) {
-  let script = document.createElement("script");
-  script.src = src;
-  script.onload = callback;
+let questions=[];
+let currentQuestion=0;
+let score=0;
+let totalQuestions=0;
+let positive=1;
+let negative=0;
+let timerInterval;
+let seconds=0;
+
+function formatTime(sec){
+  let hrs=Math.floor(sec/3600);
+  let mins=Math.floor((sec%3600)/60);
+  let secs=sec%60;
+  return String(hrs).padStart(2,'0')+":"+
+         String(mins).padStart(2,'0')+":"+
+         String(secs).padStart(2,'0');
+}
+
+function startTimer(){
+  seconds=0;
+  timerInterval=setInterval(()=>{
+    seconds++;
+    document.getElementById("timer").innerText="Time: "+formatTime(seconds);
+  },1000);
+}
+
+function loadScript(src,callback){
+  let script=document.createElement("script");
+  script.src=src;
+  script.onload=callback;
   document.body.appendChild(script);
 }
 
-function startQuiz() {
-  const chapter = document.getElementById("chapterSelect").value;
-  if (!chapter) {
-    alert("Please select a chapter");
-    return;
-  }
+function startQuiz(){
+  const chapter=document.getElementById("chapterSelect").value;
+  if(!chapter){ alert("Select chapter"); return; }
 
-  document.getElementById("quiz").innerHTML = "";
-  document.getElementById("result").innerHTML = "";
+  positive=parseInt(document.getElementById("positiveMarks").value);
+  negative=parseInt(document.getElementById("negativeMarks").value);
+  totalQuestions=parseInt(document.getElementById("questionCount").value);
 
-  loadScript(chapter, function () {
-    currentQuestion = 0;
-    score = 0;
+  document.getElementById("result").innerHTML="";
+  document.getElementById("speedometer").innerText="0";
+
+  loadScript(chapter,function(){
+    questions=questions.slice(0,totalQuestions);
+    currentQuestion=0;
+    score=0;
+    startTimer();
     loadQuestion();
   });
 }
 
-function loadQuestion() {
-  const q = questions[currentQuestion];
-  const quizDiv = document.getElementById("quiz");
+function loadQuestion(){
+  const q=questions[currentQuestion];
+  const quizDiv=document.getElementById("quiz");
 
-  quizDiv.innerHTML = `
-    <div class="question-box">${q.question}</div>
-    ${q.options.map((opt, i) =>
-      `<button class="option" onclick="checkAnswer(${i})">${opt}</button>`
+  quizDiv.innerHTML=`
+    <div class="question-box">Q${currentQuestion+1}. ${q.question}</div>
+    ${q.options.map((opt,i)=>
+      `<button class="option" onclick="checkAnswer(${i},this)">${opt}</button>`
     ).join("")}
   `;
 }
 
-function checkAnswer(index) {
-  if (index === questions[currentQuestion].correct) {
-    score++;
-  }
-
-  currentQuestion++;
-
-  if (currentQuestion < questions.length) {
-    loadQuestion();
-  } else {
-    document.getElementById("quiz").innerHTML = "";
-    document.getElementById("result").innerText =
-      "🎉 Quiz Finished! Your Score: " + score + " / " + questions.length;
-  }
+function updateSpeedometer(){
+  let percentage=(score/(totalQuestions*positive))*360;
+  document.getElementById("speedometer").style.background=
+    `conic-gradient(gold ${percentage}deg, #222 0deg)`;
+  document.getElementById("speedometer").innerText=score;
 }
-</script>
 
+function checkAnswer(index,btn){
+  const correctIndex=questions[currentQuestion].correct;
+  const buttons=document.querySelectorAll(".option");
+
+  buttons.forEach(b=>b.disabled=true);
+
+  if(index===correctIndex){
+    btn.classList.add("correct");
+    score+=positive;
+  }else{
+    btn.classList.add("wrong");
+    buttons[correctIndex].classList.add("correct");
+    score-=negative;
+  }
+
+  updateSpeedometer();
+
+  setTimeout(()=>{
+    currentQuestion++;
+    if(currentQuestion<totalQuestions){
+      loadQuestion();
+    }else{
+      clearInterval(timerInterval);
+      document.getElementById("quiz").innerHTML="";
+      document.getElementById("result").innerHTML=
+      `<h2>Test Finished</h2>
+       <p>Final Score: ${score}</p>
+       <p>Total Time: ${formatTime(seconds)}</p>`;
+    }
+  },1000);
+}
+
+</script>
 </body>
 </html>
