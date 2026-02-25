@@ -14,9 +14,9 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
 
-/* ===========================
-   SIGNUP
-=========================== */
+/* ===================================
+   SIGNUP FUNCTION
+=================================== */
 
 window.signupUser = async function(){
 
@@ -38,7 +38,7 @@ window.signupUser = async function(){
       passVal
     );
 
-    // Create user document with UID as document ID
+    // Create Firestore user document with UID
     await setDoc(doc(db,"users",userCred.user.uid),{
       firstName: fName,
       lastName: lName,
@@ -46,7 +46,7 @@ window.signupUser = async function(){
       createdAt: Date.now()
     });
 
-    alert("Signup Successful. You can now login.");
+    alert("Signup Successful. Please login.");
 
   }
   catch(error){
@@ -55,7 +55,7 @@ window.signupUser = async function(){
       alert("This email is already registered. Please login.");
     }
     else if(error.code === "auth/weak-password"){
-      alert("Password should be at least 6 characters.");
+      alert("Password must be at least 6 characters.");
     }
     else{
       alert(error.message);
@@ -64,9 +64,9 @@ window.signupUser = async function(){
 };
 
 
-/* ===========================
-   LOGIN
-=========================== */
+/* ===================================
+   LOGIN FUNCTION
+=================================== */
 
 window.loginUser = async function(){
 
@@ -97,18 +97,18 @@ window.loginUser = async function(){
 };
 
 
-/* ===========================
-   LOGOUT
-=========================== */
+/* ===================================
+   LOGOUT FUNCTION
+=================================== */
 
 window.logoutUser = function(){
   signOut(auth);
 };
 
 
-/* ===========================
-   AUTH STATE CHANGE
-=========================== */
+/* ===================================
+   AUTH STATE LISTENER (AUTO FIX)
+=================================== */
 
 onAuthStateChanged(auth, async (user)=>{
 
@@ -117,22 +117,36 @@ onAuthStateChanged(auth, async (user)=>{
   if(user){
 
     try{
-      const snap = await getDoc(doc(db,"users",user.uid));
 
-      if(snap.exists()){
-        const data = snap.data();
-        statusEl.innerText =
-          "Welcome " + data.firstName + " " + data.lastName;
-      }
-      else{
-        statusEl.innerText = "Welcome " + user.email;
+      const userRef = doc(db,"users",user.uid);
+      let snap = await getDoc(userRef);
+
+      // 🔥 SELF HEALING LOGIC
+      // If Firestore document missing, create automatically
+      if(!snap.exists()){
+
+        await setDoc(userRef,{
+          firstName: "Student",
+          lastName: "",
+          totalScore: 0,
+          createdAt: Date.now()
+        });
+
+        snap = await getDoc(userRef);
       }
 
-    }catch(err){
+      const data = snap.data();
+
+      statusEl.innerText =
+        "Welcome " + (data.firstName || "") + " " + (data.lastName || "");
+
+    }
+    catch(err){
       statusEl.innerText = "Welcome " + user.email;
     }
 
-  }else{
+  }
+  else{
     statusEl.innerText = "Guest User";
   }
 
