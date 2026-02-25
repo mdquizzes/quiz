@@ -1,61 +1,70 @@
 import { auth, db } from "./firebase-config.js";
+
 import {
   collection,
-  addDoc,
-  doc,
-  updateDoc,
-  getDoc,
   query,
-  where,
   orderBy,
   limit,
   getDocs
 } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-window.saveOfficialScore = async function(officialScore, selectedChapter){
+import {
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
-  const user = auth.currentUser;
-  if(!user){
-    alert("Login required");
-    return;
-  }
-
-  await addDoc(collection(db,"quizResults"),{
-    uid:user.uid,
-    chapter:selectedChapter,
-    officialScore:officialScore,
-    date:Date.now()
-  });
-
-  const userRef = doc(db,"users",user.uid);
-  const snap = await getDoc(userRef);
-  const oldTotal = snap.data().totalScore || 0;
-
-  await updateDoc(userRef,{
-    totalScore: oldTotal + officialScore
-  });
-
-  alert("Score Saved");
-}
 
 window.loadMainLeaderboard = async function(){
 
-  const q = query(
-    collection(db,"users"),
-    orderBy("totalScore","desc"),
-    limit(20)
-  );
+  const leaderboardDiv = document.getElementById("leaderboard");
+  leaderboardDiv.innerHTML = "<h3>Loading...</h3>";
 
-  const snapshot = await getDocs(q);
+  try{
 
-  let html="<h3>Main Leaderboard</h3>";
-  let rank=1;
+    const q = query(
+      collection(db,"users"),
+      orderBy("totalScore","desc")
+    );
 
-  snapshot.forEach(doc=>{
-    const d=doc.data();
-    html+=`<p>#${rank} ${d.firstName} ${d.lastName} - ${d.totalScore}</p>`;
-    rank++;
-  });
+    const snapshot = await getDocs(q);
 
-  leaderboard.innerHTML=html;
-}
+    let users = [];
+    snapshot.forEach(doc=>{
+      users.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
+
+    let html = "<h2>🏆 Main Leaderboard</h2>";
+    html += "<h3>Top 10 Students</h3>";
+
+    // Top 10
+    for(let i=0; i<Math.min(10, users.length); i++){
+      html += `<p>#${i+1} ${users[i].firstName} ${users[i].lastName} - ${users[i].totalScore || 0}</p>`;
+    }
+
+    // Find current user rank
+    const currentUser = auth.currentUser;
+
+    if(currentUser){
+
+      let userRank = users.findIndex(u => u.id === currentUser.uid);
+
+      if(userRank !== -1){
+
+        html += "<hr>";
+        html += "<h3>Your Rank</h3>";
+        html += `<p>#${userRank+1} ${users[userRank].firstName} ${users[userRank].lastName} - ${users[userRank].totalScore || 0}</p>`;
+
+      }
+
+    }
+
+    leaderboardDiv.innerHTML = html;
+
+  }
+  catch(err){
+    leaderboardDiv.innerHTML = "<p>Error loading leaderboard.</p>";
+    console.error(err);
+  }
+};
