@@ -1,5 +1,5 @@
 /* ===================================
-   QUIZ ENGINE - MODULE SAFE VERSION
+   QUIZ ENGINE - FINAL PRODUCTION VERSION
 =================================== */
 
 let quizQuestions = [];
@@ -9,7 +9,7 @@ let customPositive = 4;
 let customNegative = 0;
 
 let practiceScore = 0;
-let officialScore = 0;
+let earningPoints = 0;
 
 let selectedChapter = "";
 
@@ -39,9 +39,12 @@ window.startQuiz = function(){
   selectedChapter = document.getElementById("chapterSelect").value;
 
   if(!selectedChapter){
-    alert("Select chapter");
+    alert("Select chapter first");
     return;
   }
+
+  // Clear old result
+  document.getElementById("result").innerHTML = "";
 
   customPositive = parseInt(
     document.getElementById("customPositiveSelect").value
@@ -52,16 +55,16 @@ window.startQuiz = function(){
   );
 
   practiceScore = 0;
-  officialScore = 0;
+  earningPoints = 0;
 
   loadScript(selectedChapter, function(){
 
     quizQuestions = [...window.chapterQuestions];
 
-    // Shuffle
+    // Shuffle questions
     quizQuestions.sort(() => Math.random() - 0.5);
 
-    // Limit 10
+    // Limit to 10 questions
     quizQuestions = quizQuestions.slice(0, 10);
 
     currentQuestion = 0;
@@ -104,11 +107,11 @@ window.checkAnswer = function(index){
 
   if(q.answers[index].correct){
     practiceScore += customPositive;
-    officialScore += 4;   // Fixed 4/-1 pattern
+    earningPoints += 4;      // FIXED NEET MODE
   }
   else{
     practiceScore -= customNegative;
-    officialScore -= 1;
+    earningPoints -= 1;      // FIXED NEET MODE
   }
 
   currentQuestion++;
@@ -131,19 +134,35 @@ function finishQuiz(){
 
   document.getElementById("result").innerHTML = `
     <div class="result-card">
-      <h2>Score: ${practiceScore}</h2>
-      <h3 id="totalPoints">
-        Total Points Earned (4/-1): Updating...
-      </h3>
-
-      <button onclick="loadMainLeaderboard()">
-        Main Leaderboard
-      </button>
+      <h2>🎯 Performance Card</h2>
+      <p><strong>Practice Score:</strong> ${practiceScore}</p>
+      <p><strong>Earning Points (4/-1):</strong> ${earningPoints}</p>
+      <p id="saveStatus">Saving score...</p>
     </div>
   `;
 
-  // 🔥 AUTO SAVE (if function exists)
+  // Auto Save Earning Points
   if(typeof window.saveOfficialScore === "function"){
-    window.saveOfficialScore(officialScore, selectedChapter);
+
+    const savePromise = window.saveOfficialScore(earningPoints, selectedChapter);
+
+    if(savePromise && typeof savePromise.then === "function"){
+      savePromise
+        .then(()=>{
+          document.getElementById("saveStatus").innerText =
+            "✅ Score Saved Successfully";
+        })
+        .catch(()=>{
+          document.getElementById("saveStatus").innerText =
+            "❌ Error Saving Score";
+        });
+    } else {
+      document.getElementById("saveStatus").innerText =
+        "Login to save your earning points";
+    }
+
+  } else {
+    document.getElementById("saveStatus").innerText =
+      "Login to save your earning points";
   }
 }
