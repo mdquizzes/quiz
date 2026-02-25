@@ -3,29 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <title>Login - MD QUIZZES</title>
+
 <style>
 body{
   font-family:Segoe UI;
   background:#000814;
   color:white;
   text-align:center;
-  padding-top:80px;
+  padding-top:100px;
 }
+
+.box{
+  background:#111;
+  padding:30px;
+  border-radius:12px;
+  display:inline-block;
+}
+
 input,button{
   padding:10px;
   margin:8px;
   border-radius:6px;
   border:none;
 }
+
 button{
   background:gold;
   cursor:pointer;
-}
-.box{
-  background:#111;
-  padding:20px;
-  border-radius:10px;
-  display:inline-block;
+  font-weight:bold;
 }
 </style>
 </head>
@@ -42,8 +47,6 @@ button{
 
 <button onclick="signupUser()">Sign Up</button>
 <button onclick="loginUser()">Login</button>
-<br><br>
-<button onclick="window.location.href='index.html'">Back to Quiz</button>
 </div>
 
 <script type="module" src="js/firebase-config.js"></script>
