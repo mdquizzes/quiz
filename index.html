@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>MD QUIZZES - Advanced Test Engine</title>
+<title>MD QUIZZES - Advanced Engine</title>
 
 <style>
 body{
@@ -34,20 +34,11 @@ select,button,input{
   cursor:pointer;
 }
 
-.auth-box{
-  background:#111;
-  padding:10px;
-  border-radius:10px;
-  margin-bottom:15px;
-}
-
 .question-box{
   background:#002855;
   padding:20px;
   border-radius:12px;
   margin-top:20px;
-  box-shadow:0 0 15px #00bfff;
-  font-size:18px;
   text-align:left;
 }
 
@@ -67,8 +58,8 @@ select,button,input{
   cursor:pointer;
 }
 
-.correct{ background:green !important; }
-.wrong{ background:red !important; }
+.correct{background:green !important;}
+.wrong{background:red !important;}
 
 .result-card{
   background:#111;
@@ -78,30 +69,11 @@ select,button,input{
   text-align:left;
 }
 
-.progress-bar{
-  width:100%;
-  height:20px;
-  background:#333;
-  border-radius:20px;
-  overflow:hidden;
-  margin-top:10px;
-}
-
-.progress-correct{ height:100%; background:green; float:left; }
-.progress-wrong{ height:100%; background:red; float:left; }
-
-.review-btn{
-  background:orange;
-  padding:10px 15px;
-  cursor:pointer;
-  font-weight:bold;
-}
-
 .leaderboard{
   background:#111;
   padding:15px;
-  margin-top:20px;
   border-radius:12px;
+  margin-top:20px;
   text-align:left;
 }
 </style>
@@ -113,9 +85,8 @@ select,button,input{
 
 <div class="container">
 
-<div class="auth-box">
-<span id="userStatus">Guest User</span>
-<br>
+<div>
+<span id="userStatus">Guest User</span><br>
 <input type="text" id="firstName" placeholder="First Name">
 <input type="text" id="lastName" placeholder="Last Name">
 <input type="email" id="email" placeholder="Email">
@@ -125,38 +96,57 @@ select,button,input{
 <button onclick="logoutUser()">Logout</button>
 </div>
 
+<hr>
+
 <select id="chapterSelect">
 <option value="">Select Chapter</option>
-<option value="js/biology_and_human_welfare.js">Biology & Human Welfare</option>
-<option value="js/biotechnology.js">Biotechnology</option>
-<option value="js/cell_biology.js">Cell Biology</option>
 <option value="js/human_physiology.js">Human Physiology</option>
-<option value="js/human_reproduction.js">Human Reproduction</option>
-<option value="js/molecular_basis_of_inheritance.js">Molecular Basis of Inheritance</option>
-<option value="js/neet_chemistry.js">NEET Chemistry</option>
-<option value="js/neet_physics.js">NEET Physics</option>
-<option value="js/plant_physiology.js">Plant Physiology</option>
-<option value="js/sexual_reproduction_flower.js">Sexual Reproduction in Flowering Plants</option>
+<option value="js/cell_biology.js">Cell Biology</option>
 </select>
 
 <br>
+
+Custom Scoring:
+<select id="customPositive">
+<option value="1">Right +1</option>
+<option value="2">Right +2</option>
+<option value="3">Right +3</option>
+<option value="4" selected>Right +4</option>
+</select>
+
+<select id="customNegative">
+<option value="0" selected>Wrong 0</option>
+<option value="1">Wrong -1</option>
+<option value="2">Wrong -2</option>
+</select>
+
+<br>
+
 <button class="start-btn" onclick="startQuiz()">Start Test</button>
 
 <div id="quiz"></div>
 <div id="result"></div>
+
+<button onclick="loadChapterLeaderboard()">🏆 Chapter Leaderboard</button>
+<button onclick="loadMainLeaderboard()">🌍 Main Leaderboard</button>
+
 <div id="leaderboard"></div>
 
 </div>
 
 <script>
+
 let quizQuestions=[];
 let currentQuestion=0;
-let score=0;
-let correctCount=0;
-let incorrectCount=0;
-let attempted=0;
-let wrongAnswers=[];
+
+let customPositive=4;
+let customNegative=0;
+
+let practiceScore=0;
+let officialScore=0;
+
 let selectedChapter="";
+let correctCount=0;
 
 function loadScript(src,callback){
  let old=document.getElementById("chapterScript");
@@ -172,7 +162,12 @@ function startQuiz(){
  selectedChapter=document.getElementById("chapterSelect").value;
  if(!selectedChapter){ alert("Select chapter"); return; }
 
- correctCount=0; incorrectCount=0; attempted=0; wrongAnswers=[]; score=0;
+ customPositive=parseInt(document.getElementById("customPositive").value);
+ customNegative=parseInt(document.getElementById("customNegative").value);
+
+ practiceScore=0;
+ officialScore=0;
+ correctCount=0;
 
  loadScript(selectedChapter,function(){
    quizQuestions=[...window.chapterQuestions];
@@ -187,7 +182,7 @@ function loadQuestion(){
  const q=quizQuestions[currentQuestion];
  document.getElementById("quiz").innerHTML=`
  <div class="question-box">
- Q${currentQuestion+1}. ${q.question}
+ ${q.question}
  </div>
  <div class="options-grid">
  ${q.answers.map((ans,i)=>
@@ -201,16 +196,16 @@ function checkAnswer(index,btn){
  const q=quizQuestions[currentQuestion];
  const buttons=document.querySelectorAll(".option");
  buttons.forEach(b=>b.disabled=true);
- attempted++;
 
  if(q.answers[index].correct){
    btn.classList.add("correct");
-   score+=4;
+   practiceScore+=customPositive;
+   officialScore+=4;
    correctCount++;
  }else{
    btn.classList.add("wrong");
-   incorrectCount++;
-   score-=1;
+   practiceScore-=customNegative;
+   officialScore-=1;
  }
 
  setTimeout(()=>{
@@ -220,24 +215,27 @@ function checkAnswer(index,btn){
    }else{
      finishQuiz();
    }
- },1000);
+ },800);
 }
 
 function finishQuiz(){
  document.getElementById("quiz").innerHTML="";
  document.getElementById("result").innerHTML=`
  <div class="result-card">
- <h2>Final Score: ${score}</h2>
- <button onclick="saveScore()">Save Score to Leaderboard</button>
+ <h2>Scorecard</h2>
+ <p><b>Points Earned (Your Selected Pattern):</b> ${practiceScore}</p>
+ <p><b>Official Score (4/-1 Pattern):</b> ${officialScore}</p>
+ <button onclick="saveScore()">Save Official Score</button>
  </div>`;
 }
+
 </script>
 
-<!-- FIREBASE -->
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, addDoc, collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, updateDoc, addDoc, getDoc, collection, query, where, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
 const firebaseConfig = {
  apiKey: "AIzaSyCODdCPvN4L96ye0YuxippaIUHnEUwnT90",
@@ -253,15 +251,11 @@ const auth=getAuth(app);
 const db=getFirestore(app);
 
 window.signupUser=async function(){
- const first=firstName.value;
- const last=lastName.value;
- const emailVal=email.value;
- const pass=password.value;
- const user=await createUserWithEmailAndPassword(auth,emailVal,pass);
- await setDoc(doc(db,"users",user.user.uid),{
-   firstName:first,
-   lastName:last,
-   email:emailVal
+ const userCred=await createUserWithEmailAndPassword(auth,email.value,password.value);
+ await setDoc(doc(db,"users",userCred.user.uid),{
+   firstName:firstName.value,
+   lastName:lastName.value,
+   totalScore:0
  });
  alert("Signup Successful");
 }
@@ -275,42 +269,70 @@ window.logoutUser=function(){
  signOut(auth);
 }
 
-window.saveScore=async function(){
- const user=auth.currentUser;
- if(!user){ alert("Login required"); return; }
-
- await addDoc(collection(db,"leaderboard"),{
-   uid:user.uid,
-   name:user.email,
-   chapter:selectedChapter,
-   score:score,
-   date:Date.now()
- });
-
- alert("Score Saved!");
- loadLeaderboard();
-}
-
-onAuthStateChanged(auth,(user)=>{
+onAuthStateChanged(auth, async (user)=>{
  if(user){
-   userStatus.innerText="Welcome "+user.email;
+   const snap=await getDoc(doc(db,"users",user.uid));
+   const data=snap.data();
+   userStatus.innerText="Welcome "+data.firstName+" "+data.lastName;
  }else{
    userStatus.innerText="Guest User";
  }
 });
 
-async function loadLeaderboard(){
- const q=query(collection(db,"leaderboard"),orderBy("score","desc"),limit(10));
- const snapshot=await getDocs(q);
- let html="<div class='leaderboard'><h3>🏆 Leaderboard</h3>";
- snapshot.forEach(doc=>{
-   html+=`<p>${doc.data().name} - ${doc.data().score}</p>`;
+window.saveScore=async function(){
+ const user=auth.currentUser;
+ if(!user){ alert("Login required"); return; }
+
+ await addDoc(collection(db,"quizResults"),{
+   uid:user.uid,
+   chapter:selectedChapter,
+   officialScore:officialScore,
+   date:Date.now()
  });
- html+="</div>";
- document.getElementById("leaderboard").innerHTML=html;
+
+ const userRef=doc(db,"users",user.uid);
+ const snap=await getDoc(userRef);
+ const oldTotal=snap.data().totalScore || 0;
+
+ await updateDoc(userRef,{
+   totalScore:oldTotal + officialScore
+ });
+
+ alert("Score Saved!");
 }
 
-loadLeaderboard();
+window.loadChapterLeaderboard=async function(){
+ const q=query(collection(db,"quizResults"),
+ where("chapter","==",selectedChapter),
+ orderBy("officialScore","desc"),
+ limit(10));
+ const snapshot=await getDocs(q);
+
+ let html="<div class='leaderboard'><h3>Chapter Leaderboard</h3>";
+ for(const docSnap of snapshot.docs){
+   const userSnap=await getDoc(doc(db,"users",docSnap.data().uid));
+   const name=userSnap.data().firstName+" "+userSnap.data().lastName;
+   html+=`<p>${name} - ${docSnap.data().officialScore}</p>`;
+ }
+ html+="</div>";
+ leaderboard.innerHTML=html;
+}
+
+window.loadMainLeaderboard=async function(){
+ const q=query(collection(db,"users"),
+ orderBy("totalScore","desc"),
+ limit(10));
+ const snapshot=await getDocs(q);
+
+ let html="<div class='leaderboard'><h3>Main Leaderboard</h3>";
+ snapshot.forEach(doc=>{
+   const d=doc.data();
+   html+=`<p>${d.firstName} ${d.lastName} - ${d.totalScore}</p>`;
+ });
+ html+="</div>";
+ leaderboard.innerHTML=html;
+}
+
 </script>
 
 </body>
