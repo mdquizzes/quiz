@@ -1,5 +1,5 @@
 /* ===================================
-   QUIZ ENGINE - FINAL PRODUCTION VERSION
+   QUIZ ENGINE - ARCHITECTURE V1 LOCK
 =================================== */
 
 let quizQuestions = [];
@@ -9,7 +9,7 @@ let customPositive = 4;
 let customNegative = 0;
 
 let practiceScore = 0;
-let earningPoints = 0;
+let officialScore = 0;
 
 let selectedChapter = "";
 
@@ -31,7 +31,7 @@ function loadScript(src, callback){
 }
 
 /* ===============================
-   START QUIZ (GLOBAL)
+   START QUIZ
 ================================= */
 
 window.startQuiz = function(){
@@ -43,7 +43,6 @@ window.startQuiz = function(){
     return;
   }
 
-  // Clear old result
   document.getElementById("result").innerHTML = "";
 
   customPositive = parseInt(
@@ -55,16 +54,14 @@ window.startQuiz = function(){
   );
 
   practiceScore = 0;
-  earningPoints = 0;
+  officialScore = 0;
 
   loadScript(selectedChapter, function(){
 
     quizQuestions = [...window.chapterQuestions];
 
-    // Shuffle questions
     quizQuestions.sort(() => Math.random() - 0.5);
 
-    // Limit to 10 questions
     quizQuestions = quizQuestions.slice(0, 10);
 
     currentQuestion = 0;
@@ -98,7 +95,7 @@ function loadQuestion(){
 }
 
 /* ===============================
-   CHECK ANSWER (GLOBAL)
+   CHECK ANSWER
 ================================= */
 
 window.checkAnswer = function(index){
@@ -107,11 +104,11 @@ window.checkAnswer = function(index){
 
   if(q.answers[index].correct){
     practiceScore += customPositive;
-    earningPoints += 4;      // FIXED NEET MODE
+    officialScore += 4;   // LOCKED NEET RULE
   }
   else{
     practiceScore -= customNegative;
-    earningPoints -= 1;      // FIXED NEET MODE
+    officialScore -= 1;   // LOCKED NEET RULE
   }
 
   currentQuestion++;
@@ -125,7 +122,7 @@ window.checkAnswer = function(index){
 };
 
 /* ===============================
-   FINISH QUIZ (AUTO SAVE)
+   FINISH QUIZ
 ================================= */
 
 function finishQuiz(){
@@ -136,30 +133,22 @@ function finishQuiz(){
     <div class="result-card">
       <h2>🎯 Performance Card</h2>
       <p><strong>Practice Score:</strong> ${practiceScore}</p>
-      <p><strong>Earning Points (4/-1):</strong> ${earningPoints}</p>
+      <p><strong>Earning Points (4/-1):</strong> ${officialScore}</p>
       <p id="saveStatus">Saving score...</p>
     </div>
   `;
 
-  // Auto Save Earning Points
   if(typeof window.saveOfficialScore === "function"){
 
-    const savePromise = window.saveOfficialScore(earningPoints, selectedChapter);
-
-    if(savePromise && typeof savePromise.then === "function"){
-      savePromise
-        .then(()=>{
-          document.getElementById("saveStatus").innerText =
-            "✅ Score Saved Successfully";
-        })
-        .catch(()=>{
-          document.getElementById("saveStatus").innerText =
-            "❌ Error Saving Score";
-        });
-    } else {
-      document.getElementById("saveStatus").innerText =
-        "Login to save your earning points";
-    }
+    window.saveOfficialScore(officialScore)
+      .then(()=>{
+        document.getElementById("saveStatus").innerText =
+          "✅ Score Saved Successfully";
+      })
+      .catch(()=>{
+        document.getElementById("saveStatus").innerText =
+          "❌ Error Saving Score";
+      });
 
   } else {
     document.getElementById("saveStatus").innerText =
