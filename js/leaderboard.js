@@ -1,70 +1,42 @@
-import { auth, db } from "./firebase-config.js";
+window.saveOfficialScore = async function(officialScore, selectedChapter){
 
-import {
-  collection,
-  query,
-  orderBy,
-  limit,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+  const user = auth.currentUser;
 
-import {
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-
-
-window.loadMainLeaderboard = async function(){
-
-  const leaderboardDiv = document.getElementById("leaderboard");
-  leaderboardDiv.innerHTML = "<h3>Loading...</h3>";
+  if(!user){
+    // Guest user — no save
+    document.getElementById("totalPoints").innerText =
+      "Login to accumulate Total Points.";
+    return;
+  }
 
   try{
 
-    const q = query(
-      collection(db,"users"),
-      orderBy("totalScore","desc")
-    );
-
-    const snapshot = await getDocs(q);
-
-    let users = [];
-    snapshot.forEach(doc=>{
-      users.push({
-        id: doc.id,
-        ...doc.data()
-      });
+    // Save attempt
+    await addDoc(collection(db,"quizResults"),{
+      uid:user.uid,
+      chapter:selectedChapter,
+      officialScore:officialScore,
+      date:Date.now()
     });
 
-    let html = "<h2>🏆 Main Leaderboard</h2>";
-    html += "<h3>Top 10 Students</h3>";
+    const userRef = doc(db,"users",user.uid);
+    const snap = await getDoc(userRef);
+    const oldTotal = snap.data().totalScore || 0;
 
-    // Top 10
-    for(let i=0; i<Math.min(10, users.length); i++){
-      html += `<p>#${i+1} ${users[i].firstName} ${users[i].lastName} - ${users[i].totalScore || 0}</p>`;
-    }
+    const newTotal = oldTotal + officialScore;
 
-    // Find current user rank
-    const currentUser = auth.currentUser;
+    await updateDoc(userRef,{
+      totalScore: newTotal
+    });
 
-    if(currentUser){
-
-      let userRank = users.findIndex(u => u.id === currentUser.uid);
-
-      if(userRank !== -1){
-
-        html += "<hr>";
-        html += "<h3>Your Rank</h3>";
-        html += `<p>#${userRank+1} ${users[userRank].firstName} ${users[userRank].lastName} - ${users[userRank].totalScore || 0}</p>`;
-
-      }
-
-    }
-
-    leaderboardDiv.innerHTML = html;
+    // 🔥 Update UI
+    document.getElementById("totalPoints").innerText =
+      "Total Points Earned (4/-1): " + newTotal;
 
   }
-  catch(err){
-    leaderboardDiv.innerHTML = "<p>Error loading leaderboard.</p>";
-    console.error(err);
+  catch(error){
+    console.error(error);
+    document.getElementById("totalPoints").innerText =
+      "Error updating score.";
   }
 };
