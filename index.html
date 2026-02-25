@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>MD QUIZZES - Advanced Engine</title>
+<title>MD QUIZZES</title>
 
 <style>
 body{
@@ -21,6 +21,25 @@ h1{ color:gold; }
   padding:20px;
 }
 
+.top-menu{
+  position:absolute;
+  right:20px;
+  top:20px;
+}
+
+.top-menu button{
+  margin-left:8px;
+  padding:6px 10px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-size:13px;
+}
+
+.login-btn{ background:gold; }
+.logout-btn{ background:red; color:white; }
+.profile-btn{ background:#00c896; color:white; }
+
 select,button{
   padding:8px 12px;
   margin:6px;
@@ -34,27 +53,6 @@ select,button{
   cursor:pointer;
 }
 
-.question-box{
-  background:#002855;
-  padding:20px;
-  border-radius:12px;
-  margin-top:20px;
-}
-
-.options-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:15px;
-  margin-top:20px;
-}
-
-.result-card{
-  background:#111;
-  padding:20px;
-  border-radius:12px;
-  margin-top:20px;
-}
-
 .leaderboard{
   background:#111;
   padding:15px;
@@ -66,14 +64,16 @@ select,button{
 
 <body>
 
+<div class="top-menu">
+  <span id="userStatus">Guest User</span>
+  <button id="loginBtn" class="login-btn" onclick="window.location.href='login.html'">Login</button>
+  <button id="profileBtn" class="profile-btn" style="display:none;" onclick="window.location.href='profile.html'">Profile</button>
+  <button id="logoutBtn" class="logout-btn" style="display:none;" onclick="logoutUser()">Logout</button>
+</div>
+
 <h1>🎯 MD QUIZZES</h1>
 
 <div class="container">
-
-<p id="userStatus">Guest User</p>
-<button onclick="window.location.href='login.html'">Login / Signup</button>
-
-<hr>
 
 <select id="chapterSelect">
 <option value="">Select Chapter</option>
@@ -83,18 +83,16 @@ select,button{
 
 <br>
 
-<label>Custom Scoring:</label><br>
-
 <select id="customPositiveSelect">
-<option value="1">Right +1</option>
-<option value="2">Right +2</option>
-<option value="3">Right +3</option>
 <option value="4" selected>Right +4</option>
+<option value="3">Right +3</option>
+<option value="2">Right +2</option>
+<option value="1">Right +1</option>
 </select>
 
 <select id="customNegativeSelect">
-<option value="0" selected>Wrong 0</option>
-<option value="1">Wrong -1</option>
+<option value="1" selected>Wrong -1</option>
+<option value="0">Wrong 0</option>
 <option value="2">Wrong -2</option>
 </select>
 
@@ -107,8 +105,9 @@ select,button{
 
 <hr>
 
+<p id="totalPoints"></p>
 <button onclick="loadMainLeaderboard()">🌍 Main Leaderboard</button>
-<div id="leaderboard"></div>
+<div id="leaderboard" class="leaderboard"></div>
 
 </div>
 
