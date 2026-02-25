@@ -1,42 +1,72 @@
-window.saveOfficialScore = async function(officialScore, selectedChapter){
+import { auth, db } from "./firebase-config.js";
+import {
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  doc,
+  runTransaction
+} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+/* SAVE OFFICIAL SCORE */
+
+window.saveOfficialScore = async function(points){
 
   const user = auth.currentUser;
+  if(!user) return Promise.reject("Not logged in");
 
-  if(!user){
-    // Guest user — no save
-    document.getElementById("totalPoints").innerText =
-      "Login to accumulate Total Points.";
-    return;
-  }
+  const userRef = doc(db,"users",user.uid);
 
-  try{
+  return runTransaction(db, async (transaction)=>{
 
-    // Save attempt
-    await addDoc(collection(db,"quizResults"),{
-      uid:user.uid,
-      chapter:selectedChapter,
-      officialScore:officialScore,
-      date:Date.now()
-    });
-
-    const userRef = doc(db,"users",user.uid);
-    const snap = await getDoc(userRef);
+    const snap = await transaction.get(userRef);
     const oldTotal = snap.data().totalScore || 0;
 
-    const newTotal = oldTotal + officialScore;
-
-    await updateDoc(userRef,{
-      totalScore: newTotal
+    transaction.update(userRef,{
+      totalScore: oldTotal + points
     });
+  });
+};
 
-    // 🔥 Update UI
-    document.getElementById("totalPoints").innerText =
-      "Total Points Earned (4/-1): " + newTotal;
 
+/* LOAD MAIN LEADERBOARD */
+
+window.loadMainLeaderboard = async function(){
+
+  const leaderboardDiv = document.getElementById("leaderboard");
+  leaderboardDiv.innerHTML = "Loading...";
+
+  const q = query(
+    collection(db,"users"),
+    orderBy("totalScore","desc")
+  );
+
+  const snapshot = await getDocs(q);
+
+  let html = "<h3>🏆 Top 10 (Earning Points)</h3>";
+
+  let rank = 1;
+  let currentUserRank = null;
+  const currentUser = auth.currentUser;
+
+  snapshot.forEach(docSnap=>{
+
+    const data = docSnap.data();
+
+    if(rank <= 10){
+      html += `<p>${rank}. ${data.firstName} - ${data.totalScore || 0}</p>`;
+    }
+
+    if(currentUser && docSnap.id === currentUser.uid){
+      currentUserRank = rank;
+    }
+
+    rank++;
+  });
+
+  if(currentUserRank){
+    html += `<hr><p>Your Current Rank: ${currentUserRank}</p>`;
   }
-  catch(error){
-    console.error(error);
-    document.getElementById("totalPoints").innerText =
-      "Error updating score.";
-  }
+
+  leaderboardDiv.innerHTML = html;
 };
