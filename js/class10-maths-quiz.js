@@ -1,4 +1,13 @@
 import { saveOfficialScore } from "./auth.js";
+.then(() => {
+    document.getElementById("saveStatus").innerText =
+      "✅ Score Saved Successfully";
+  })
+  .catch((error) => {
+    console.error(error);
+    document.getElementById("saveStatus").innerText =
+      "❌ Error Saving Score";
+  });
 
 const el = id => document.getElementById(id);
 
