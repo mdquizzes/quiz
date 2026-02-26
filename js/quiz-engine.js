@@ -138,17 +138,18 @@ function finishQuiz(){
     </div>
   `;
 
-  if(typeof window.saveOfficialScore === "function"){
-
-    window.saveOfficialScore(officialScore)
-      .then(()=>{
-        document.getElementById("saveStatus").innerText =
-          "✅ Score Saved Successfully";
-      })
-      .catch(()=>{
-        document.getElementById("saveStatus").innerText =
-          "❌ Error Saving Score";
-      });
+ 
+    import { saveOfficialScore } from "./auth.js";
+      saveOfficialScore(officialScore)
+  .then(() => {
+    document.getElementById("saveStatus").innerText =
+      "✅ Score Saved Successfully";
+  })
+  .catch((error) => {
+    console.error(error);
+    document.getElementById("saveStatus").innerText =
+      "❌ Error Saving Score";
+  });
 
   } else {
     document.getElementById("saveStatus").innerText =
