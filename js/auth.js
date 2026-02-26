@@ -1,30 +1,66 @@
-import { auth, db } from "./firebase-config.js";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { auth, db } from "./firebase-config.js";
+import { initializeApp } from 
+"https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 
-import { doc, updateDoc, increment } 
-from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getAuth,
+createUserWithEmailAndPassword,
+signInWithEmailAndPassword,
+onAuthStateChanged } 
+from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
-export async function saveOfficialScore(score){
+const firebaseConfig = {
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  appId: "YOUR_APP_ID"
+};
 
-  const user = auth.currentUser;
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-  if(!user){
-    throw new Error("User not logged in");
+const signupBtn = document.getElementById("signupBtn");
+const loginBtn = document.getElementById("loginBtn");
+
+if(signupBtn){
+signupBtn.addEventListener("click", async () => {
+
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  try{
+    await createUserWithEmailAndPassword(auth, email, password);
+    alert("Signup Successful");
+    window.location.href = "index.html";
+  }
+  catch(error){
+    alert(error.message);
   }
 
-  const userRef = doc(db, "users", user.uid);
-
-  await updateDoc(userRef, {
-    totalPoints: increment(score)
-  });
-
+});
 }
+
+if(loginBtn){
+loginBtn.addEventListener("click", async () => {
+
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  try{
+    await signInWithEmailAndPassword(auth, email, password);
+    alert("Login Successful");
+    window.location.href = "index.html";
+  }
+  catch(error){
+    alert(error.message);
+  }
+
+});
+}
+
+onAuthStateChanged(auth, (user)=>{
+  if(user){
+    window.location.href = "index.html";
+  }
+});
 
 /* SIGNUP */
 window.signupUser = async function(){
