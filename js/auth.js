@@ -5,7 +5,26 @@ import {
   signOut,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { auth, db } from "./firebase-config.js";
+
+import { doc, updateDoc, increment } 
+from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+export async function saveOfficialScore(score){
+
+  const user = auth.currentUser;
+
+  if(!user){
+    throw new Error("User not logged in");
+  }
+
+  const userRef = doc(db, "users", user.uid);
+
+  await updateDoc(userRef, {
+    totalPoints: increment(score)
+  });
+
+}
 
 /* SIGNUP */
 window.signupUser = async function(){
