@@ -15,7 +15,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyCODdCPvN4L96ye0YuxippaIUHnEUwnT90",
   authDomain: "mdquizzes-c255a.firebaseapp.com",
   projectId: "mdquizzes-c255a",
-  storageBucket: "mdquizzes-c255a.appspot.com",
+  storageBucket: "mdquizzes-c255a.firebasestorage.app",
   messagingSenderId: "510171455812",
   appId: "1:510171455812:web:dcead5207dc1272aa9b711"
 };
