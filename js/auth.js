@@ -1,33 +1,23 @@
-import { initializeApp } from 
-"https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+// 🔥 IMPORT FROM CONFIG FILE
+import { auth, db } from "./firebase-config.js";
 
-import { getAuth,
-createUserWithEmailAndPassword,
-signInWithEmailAndPassword,
-signOut,
-onAuthStateChanged } 
-from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
+} from 
+"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-import { getFirestore,
-doc,
-setDoc,
-getDoc,
-updateDoc,
-increment } 
-from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import {
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+  increment
+} from 
+"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-
-/* FIREBASE CONFIG */
-const firebaseConfig = {
-  apiKey: "YOUR_KEY",
-  authDomain: "YOUR_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  appId: "YOUR_APP_ID"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
 
 
 /* =========================
@@ -36,40 +26,41 @@ const db = getFirestore(app);
 
 const signupBtn = document.getElementById("signupBtn");
 
-if(signupBtn){
-signupBtn.addEventListener("click", async () => {
+if (signupBtn) {
+  signupBtn.addEventListener("click", async () => {
 
-  const fName = document.getElementById("firstName")?.value.trim();
-  const lName = document.getElementById("lastName")?.value.trim();
-  const emailVal = document.getElementById("email")?.value.trim();
-  const passVal = document.getElementById("password")?.value.trim();
+    const fName = document.getElementById("firstName")?.value.trim();
+    const lName = document.getElementById("lastName")?.value.trim();
+    const emailVal = document.getElementById("email")?.value.trim();
+    const passVal = document.getElementById("password")?.value.trim();
 
-  if(!fName || !lName || !emailVal || !passVal){
-    alert("Fill all fields");
-    return;
-  }
+    if (!fName || !lName || !emailVal || !passVal) {
+      alert("Fill all fields");
+      return;
+    }
 
-  try{
+    try {
 
-    const userCred = await createUserWithEmailAndPassword(auth,emailVal,passVal);
+      const userCred = await createUserWithEmailAndPassword(auth, emailVal, passVal);
 
-    await setDoc(doc(db,"users",userCred.user.uid),{
-      firstName:fName,
-      lastName:lName,
-      totalScore:0,
-      role:"student",
-      createdAt:Date.now()
-    });
+      await setDoc(doc(db, "users", userCred.user.uid), {
+        firstName: fName,
+        lastName: lName,
+        totalScore: 0,
+        role: "student",
+        createdAt: Date.now()
+      });
 
-    alert("Signup Successful");
-    window.location.href="index.html";
+      alert("Signup Successful");
+      window.location.href = "index.html";
 
-  }catch(error){
-    alert(error.message);
-  }
+    } catch (error) {
+      alert(error.message);
+    }
 
-});
+  });
 }
+
 
 
 /* =========================
@@ -78,78 +69,80 @@ signupBtn.addEventListener("click", async () => {
 
 const loginBtn = document.getElementById("loginBtn");
 
-if(loginBtn){
-loginBtn.addEventListener("click", async () => {
+if (loginBtn) {
+  loginBtn.addEventListener("click", async () => {
 
-  const emailVal = document.getElementById("email")?.value.trim();
-  const passVal = document.getElementById("password")?.value.trim();
+    const emailVal = document.getElementById("email")?.value.trim();
+    const passVal = document.getElementById("password")?.value.trim();
 
-  if(!emailVal || !passVal){
-    alert("Enter email & password");
-    return;
-  }
+    if (!emailVal || !passVal) {
+      alert("Enter email & password");
+      return;
+    }
 
-  try{
-    await signInWithEmailAndPassword(auth,emailVal,passVal);
-    alert("Login Successful");
-    window.location.href="index.html";
-  }
-  catch(error){
-    alert(error.message);
-  }
+    try {
+      await signInWithEmailAndPassword(auth, emailVal, passVal);
+      alert("Login Successful");
+      window.location.href = "index.html";
+    }
+    catch (error) {
+      alert(error.message);
+    }
 
-});
+  });
 }
+
 
 
 /* =========================
    LOGOUT
 ========================= */
 
-window.logoutUser = function(){
-  signOut(auth).then(()=>{
+window.logoutUser = function () {
+  signOut(auth).then(() => {
     window.location.reload();
   });
 };
+
 
 
 /* =========================
    AUTH STATE LISTENER
 ========================= */
 
-onAuthStateChanged(auth, async (user)=>{
+onAuthStateChanged(auth, async (user) => {
 
   const statusEl = document.getElementById("userStatus");
   const logoutBtn = document.getElementById("logoutBtn");
   const profileBtn = document.getElementById("profileBtn");
   const totalPoints = document.getElementById("totalPoints");
 
-  if(!statusEl) return;
+  if (!statusEl) return;
 
-  if(user){
+  if (user) {
 
-    const snap = await getDoc(doc(db,"users",user.uid));
+    const snap = await getDoc(doc(db, "users", user.uid));
     const data = snap.data();
 
     statusEl.innerText = "👤 " + (data?.firstName || "User");
 
-    if(logoutBtn) logoutBtn.style.display="inline-block";
-    if(profileBtn) profileBtn.style.display="inline-block";
+    if (logoutBtn) logoutBtn.style.display = "inline-block";
+    if (profileBtn) profileBtn.style.display = "inline-block";
 
-    if(totalPoints){
-      totalPoints.innerText = 
+    if (totalPoints) {
+      totalPoints.innerText =
         "Total Points: " + (data?.totalScore || 0);
     }
 
-  }else{
+  } else {
 
-    statusEl.innerText="Guest User";
+    statusEl.innerText = "Guest User";
 
-    if(logoutBtn) logoutBtn.style.display="none";
-    if(profileBtn) profileBtn.style.display="none";
+    if (logoutBtn) logoutBtn.style.display = "none";
+    if (profileBtn) profileBtn.style.display = "none";
 
-    if(totalPoints){
-      totalPoints.innerText=
+    if (totalPoints) {
+      totalPoints.innerText =
         "Login to accumulate Total Points";
     }
   }
@@ -157,19 +150,20 @@ onAuthStateChanged(auth, async (user)=>{
 });
 
 
+
 /* =========================
    SAVE OFFICIAL SCORE
 ========================= */
 
-export async function saveOfficialScore(score){
+export async function saveOfficialScore(score) {
 
   const user = auth.currentUser;
 
-  if(!user){
+  if (!user) {
     throw new Error("User not logged in");
   }
 
-  await updateDoc(doc(db,"users",user.uid),{
+  await updateDoc(doc(db, "users", user.uid), {
     totalScore: increment(score)
   });
 
