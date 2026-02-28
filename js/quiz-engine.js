@@ -44,6 +44,7 @@ window.startQuiz = function(){
   }
 
   document.getElementById("result").innerHTML = "";
+  document.getElementById("quizBox").innerHTML = "";
 
   customPositive = parseInt(
     document.getElementById("customPositiveSelect").value
@@ -78,8 +79,7 @@ function loadQuestion(){
 
   const q = quizQuestions[currentQuestion];
 
-document.getElementById("startBtn").addEventListener("click", startQuiz);
-innerHTML = `
+  document.getElementById("quizBox").innerHTML = `
     <div class="question-box">
       <b>Q${currentQuestion+1}.</b> ${q.question}
     </div>
@@ -128,32 +128,53 @@ window.checkAnswer = function(index){
 
 function finishQuiz(){
 
-  document.getElementById("quiz").innerHTML = "";
+  document.getElementById("quizBox").innerHTML = "";
 
   document.getElementById("result").innerHTML = `
     <div class="result-card">
       <h2>🎯 Performance Card</h2>
       <p><strong>Practice Score:</strong> ${practiceScore}</p>
       <p><strong>Earning Points (4/-1):</strong> ${officialScore}</p>
-      <p id="saveStatus">Saving score...</p>
+      <p id="saveStatus"></p>
     </div>
   `;
 
- 
-    import { saveOfficialScore } from "./auth.js";
-      saveOfficialScore(officialScore)
-  .then(() => {
+  /* ===== SAVE SCORE IF LOGGED IN ===== */
+
+  if(window.saveOfficialScore){
+
     document.getElementById("saveStatus").innerText =
-      "✅ Score Saved Successfully";
-  })
-  .catch((error) => {
-    console.error(error);
-    document.getElementById("saveStatus").innerText =
-      "❌ Error Saving Score";
-  });
+      "Saving score...";
+
+    window.saveOfficialScore(officialScore)
+      .then(() => {
+        document.getElementById("saveStatus").innerText =
+          "✅ Score Saved Successfully";
+      })
+      .catch((error) => {
+        console.error(error);
+        document.getElementById("saveStatus").innerText =
+          "❌ Error Saving Score";
+      });
 
   } else {
+
     document.getElementById("saveStatus").innerText =
       "Login to save your earning points";
+
   }
 }
+
+/* ===============================
+   BUTTON EVENT LISTENER
+================================= */
+
+document.addEventListener("DOMContentLoaded", function(){
+
+  const btn = document.getElementById("startBtn");
+
+  if(btn){
+    btn.addEventListener("click", startQuiz);
+  }
+
+});
