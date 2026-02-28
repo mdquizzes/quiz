@@ -78,7 +78,8 @@ function loadQuestion(){
 
   const q = quizQuestions[currentQuestion];
 
-  document.getElementById("quiz").innerHTML = `
+document.getElementById("startBtn").addEventListener("click", startQuiz);
+innerHTML = `
     <div class="question-box">
       <b>Q${currentQuestion+1}.</b> ${q.question}
     </div>
