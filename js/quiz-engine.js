@@ -105,11 +105,11 @@ window.checkAnswer = function(index){
 
   if(q.answers[index].correct){
     practiceScore += customPositive;
-    officialScore += 4;   // LOCKED NEET RULE
+    officialScore += 4;
   }
   else{
     practiceScore -= customNegative;
-    officialScore -= 1;   // LOCKED NEET RULE
+    officialScore -= 1;
   }
 
   currentQuestion++;
@@ -139,6 +139,31 @@ function finishQuiz(){
     </div>
   `;
 
+  /* ===== SAVE SCORE IF FIREBASE AVAILABLE ===== */
+
+  if (window.saveOfficialScore) {
+
+    document.getElementById("saveStatus").innerText = "Saving score...";
+
+    window.saveOfficialScore(officialScore)
+      .then(() => {
+        document.getElementById("saveStatus").innerText =
+          "✅ Score Saved Successfully";
+      })
+      .catch((error) => {
+        console.error(error);
+        document.getElementById("saveStatus").innerText =
+          "❌ Error Saving Score";
+      });
+
+  } else {
+
+    document.getElementById("saveStatus").innerText =
+      "Login to save your earning points";
+  }
+
+} // ✅ THIS WAS MISSING
+
 /* ===============================
    SAVE OFFICIAL SCORE (FIREBASE)
 ================================= */
@@ -153,6 +178,7 @@ window.saveOfficialScore = function(score){
     });
 
 };
+
 /* ===============================
    BUTTON EVENT LISTENER
 ================================= */
