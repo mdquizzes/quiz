@@ -163,8 +163,20 @@ export async function saveOfficialScore(score) {
     throw new Error("User not logged in");
   }
 
-  await updateDoc(doc(db, "users", user.uid), {
-    totalScore: increment(score)
-  });
+  try {
 
+    await updateDoc(
+      doc(db, "users", user.uid),
+      {
+        totalScore: increment(score)
+      }
+    );
+
+  } catch (error) {
+    console.error("Error updating score:", error);
+    throw error;
+  }
 }
+
+/* IMPORTANT: make it accessible to quiz-engine.js */
+window.saveOfficialScore = saveOfficialScore;
