@@ -139,32 +139,45 @@ function finishQuiz(){
     </div>
   `;
 
-  /* ===== SAVE SCORE IF LOGGED IN ===== */
+ /* ===============================
+   SAVE OFFICIAL SCORE (GLOBAL)
+================================= */
 
-  if(window.saveOfficialScore){
+window.saveOfficialScore = function(score){
 
-    document.getElementById("saveStatus").innerText =
-      "Saving score...";
+  return new Promise((resolve, reject) => {
 
-    window.saveOfficialScore(officialScore)
-      .then(() => {
-        document.getElementById("saveStatus").innerText =
-          "✅ Score Saved Successfully";
-      })
-      .catch((error) => {
-        console.error(error);
-        document.getElementById("saveStatus").innerText =
-          "❌ Error Saving Score";
-      });
+    fetch("save_score.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ score: score })
+    })
+    .then(response => {
 
-  } else {
+      if(!response.ok){
+        throw new Error("Network response not OK");
+      }
 
-    document.getElementById("saveStatus").innerText =
-      "Login to save your earning points";
+      return response.json();
+    })
+    .then(data => {
 
-  }
-}
+      if(data.success){
+        resolve();
+      } else {
+        reject(data.message || "Save failed");
+      }
 
+    })
+    .catch(error => {
+      reject(error);
+    });
+
+  });
+
+};
 /* ===============================
    BUTTON EVENT LISTENER
 ================================= */
