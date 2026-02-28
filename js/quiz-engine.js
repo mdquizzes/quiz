@@ -139,43 +139,18 @@ function finishQuiz(){
     </div>
   `;
 
- /* ===============================
-   SAVE OFFICIAL SCORE (GLOBAL)
+/* ===============================
+   SAVE OFFICIAL SCORE (FIREBASE)
 ================================= */
 
 window.saveOfficialScore = function(score){
 
-  return new Promise((resolve, reject) => {
-
-    fetch("save_score.php", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ score: score })
-    })
-    .then(response => {
-
-      if(!response.ok){
-        throw new Error("Network response not OK");
-      }
-
-      return response.json();
-    })
-    .then(data => {
-
-      if(data.success){
-        resolve();
-      } else {
-        reject(data.message || "Save failed");
-      }
-
-    })
-    .catch(error => {
-      reject(error);
+  return firebase.firestore()
+    .collection("scores")
+    .add({
+      score: score,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-
-  });
 
 };
 /* ===============================
