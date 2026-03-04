@@ -11,28 +11,57 @@ body{
 font-family:Segoe UI;
 background:#001d3d;
 color:white;
+margin:0;
+padding:40px;
 text-align:center;
-padding-top:80px;
+}
+
+h1{
+margin-bottom:30px;
+}
+
+.grid{
+
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
+max-width:900px;
+margin:auto;
+
 }
 
 .card{
 
 background:#111;
-display:inline-block;
-padding:40px;
+padding:25px;
 border-radius:12px;
+
+}
+
+h3{
+margin-top:0;
+}
+
+.stat{
+
+font-size:20px;
+margin:8px 0;
 
 }
 
 button{
 
 padding:12px 20px;
-margin-top:20px;
 border:none;
 background:gold;
 cursor:pointer;
 font-weight:bold;
+border-radius:6px;
 
+}
+
+.leaderboard p{
+margin:6px 0;
 }
 
 </style>
@@ -41,57 +70,82 @@ font-weight:bold;
 
 <body>
 
+<h1>📊 MD QUIZZES Dashboard</h1>
+
+<div class="grid">
+
+<!-- PROFILE -->
+
 <div class="card">
 
-<h2>Welcome <span id="userName"></span></h2>
+<h3>👤 Profile</h3>
 
-<p>Total Points : <span id="points"></span></p>
+<p id="userName">Loading...</p>
 
-<p>Rank : <span id="rank"></span></p>
+<p class="stat">
+⭐ Points: <span id="points">0</span>
+</p>
+
+<p class="stat">
+🏆 Rank: <span id="rank">...</span>
+</p>
+
+</div>
+
+
+<!-- QUIZ STATS -->
+
+<div class="card">
+
+<h3>📈 Quiz Statistics</h3>
+
+<p class="stat">
+Quizzes Attempted: <span id="attempts">0</span>
+</p>
+
+<p class="stat">
+Correct Answers: <span id="correct">0</span>
+</p>
+
+<p class="stat">
+Wrong Answers: <span id="wrong">0</span>
+</p>
+
+<p class="stat">
+Accuracy: <span id="accuracy">0%</span>
+</p>
+
+</div>
+
+
+<!-- CONTINUE -->
+
+<div class="card">
+
+<h3>🚀 Continue Learning</h3>
 
 <button onclick="location.href='index.html'">
-Continue →
+Start Quiz
 </button>
 
 </div>
 
-<script type="module">
 
-import { auth, db } from "./js/firebase-config.js";
+<!-- LEADERBOARD -->
 
-import {
-doc,
-getDoc
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<div class="card leaderboard">
 
-import {
-onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+<h3>🏆 Top Performers</h3>
 
+<div id="leaderboardPreview">
+Loading...
+</div>
 
-onAuthStateChanged(auth, async user=>{
+</div>
 
-if(!user){
+</div>
 
-location.href="login.html"
-return
-
-}
-
-const snap=await getDoc(doc(db,"users",user.uid))
-const data=snap.data()
-
-document.getElementById("userName").innerText=
-data.firstName+" "+data.lastName
-
-document.getElementById("points").innerText=
-data.totalScore || 0
-
-document.getElementById("rank").innerText="Calculating..."
-
-})
-
-</script>
+<script type="module" src="./js/dashboard.js"></script>
 
 </body>
 </html>
