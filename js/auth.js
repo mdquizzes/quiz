@@ -1,195 +1,188 @@
-// 🔥 IMPORT CONFIG
 import { auth, db } from "./firebase-config.js";
 
 import {
 createUserWithEmailAndPassword,
 signInWithEmailAndPassword,
 sendEmailVerification,
-signOut,
-onAuthStateChanged
+sendPasswordResetEmail,
+GoogleAuthProvider,
+signInWithPopup
 }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 import {
 doc,
-setDoc,
-getDoc,
-updateDoc,
-increment
+setDoc
 }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 
-/* =========================
-   SIGNUP
-========================= */
+/* SIGNUP */
 
-const signupBtn=document.getElementById("signupBtn");
+const signupBtn=document.getElementById("signupBtn")
 
 if(signupBtn){
 
 signupBtn.addEventListener("click",async()=>{
 
-const fName=document.getElementById("firstName")?.value.trim();
-const lName=document.getElementById("lastName")?.value.trim();
-const email=document.getElementById("emailSignup")?.value.trim();
-const pass=document.getElementById("passwordSignup")?.value.trim();
+const fName=document.getElementById("firstName").value
+const lName=document.getElementById("lastName").value
+const email=document.getElementById("emailSignup").value
+const pass=document.getElementById("passwordSignup").value
 
 try{
 
-const cred=await createUserWithEmailAndPassword(auth,email,pass);
+const cred=await createUserWithEmailAndPassword(auth,email,pass)
 
-await sendEmailVerification(cred.user);
+await sendEmailVerification(cred.user)
 
 await setDoc(doc(db,"users",cred.user.uid),{
-
 firstName:fName,
 lastName:lName,
 totalScore:0
-
-});
+})
 
 document.getElementById("msg").innerText=
-"Verification email sent. Please verify your email.";
+"Verification email sent."
+
+document.getElementById("verifyBox").style.display="block"
 
 }catch(e){
 
-document.getElementById("msg").innerText=e.message;
+if(e.code==="auth/email-already-in-use"){
+
+document.getElementById("msg").innerText=
+"Email already registered. Please login."
+
+}else{
+
+document.getElementById("msg").innerText=e.message
 
 }
 
-});
+}
+
+})
 
 }
 
 
-/* =========================
-   LOGIN
-========================= */
+/* LOGIN */
 
-const loginBtn=document.getElementById("loginBtn");
+const loginBtn=document.getElementById("loginBtn")
 
 if(loginBtn){
 
 loginBtn.addEventListener("click",async()=>{
 
-const email=document.getElementById("email")?.value.trim();
-const pass=document.getElementById("password")?.value.trim();
+const email=document.getElementById("email").value
+const pass=document.getElementById("password").value
 
 try{
 
-const cred=await signInWithEmailAndPassword(auth,email,pass);
+const cred=await signInWithEmailAndPassword(auth,email,pass)
+
+await cred.user.reload()
 
 if(!cred.user.emailVerified){
 
 document.getElementById("msg").innerText=
-"Please verify your email before login.";
+"Please verify your email first."
 
-return;
+return
 
 }
 
-location.href="dashboard.html";
+location.href="dashboard.html"
 
 }catch(e){
 
-document.getElementById("msg").innerText=e.message;
+document.getElementById("msg").innerText=e.message
 
 }
 
-});
+})
 
 }
 
 
-/* =========================
-   LOGOUT
-========================= */
+/* FORGOT PASSWORD */
 
-window.logoutUser=function(){
+const forgot=document.getElementById("forgotBtn")
 
-signOut(auth).then(()=>{
-location.reload();
-});
+if(forgot){
 
-};
+forgot.addEventListener("click",async()=>{
+
+const email=document.getElementById("email").value
+
+if(!email){
+
+document.getElementById("msg").innerText=
+"Enter email first."
+
+return
+
+}
+
+await sendPasswordResetEmail(auth,email)
+
+document.getElementById("msg").innerText=
+"Password reset email sent."
+
+})
+
+}
 
 
-/* =========================
-   AUTH STATE LISTENER
-========================= */
+/* RESEND VERIFICATION */
 
-onAuthStateChanged(auth,async(user)=>{
+const resend=document.getElementById("resendVerify")
 
-const statusEl=document.getElementById("userStatus");
-const totalPoints=document.getElementById("totalPoints");
+if(resend){
 
-if(!statusEl) return;
+resend.addEventListener("click",async()=>{
+
+const user=auth.currentUser
 
 if(user){
 
-const snap=await getDoc(doc(db,"users",user.uid));
-const data=snap.data();
+await sendEmailVerification(user)
 
-statusEl.innerText="👤 "+(data?.firstName || "User");
-
-if(totalPoints){
-
-totalPoints.innerText=
-"Total Points: "+(data?.totalScore || 0);
+document.getElementById("msg").innerText=
+"Verification email resent."
 
 }
 
-}else{
-
-statusEl.innerText="Guest User";
-
-if(totalPoints){
-
-totalPoints.innerText=
-"Login to accumulate points";
+})
 
 }
 
-}
 
-});
+/* GOOGLE LOGIN */
 
+const googleBtn=document.getElementById("googleLogin")
 
-/* =========================
-   SAVE OFFICIAL SCORE
-========================= */
+if(googleBtn){
 
-export async function saveOfficialScore(score){
+googleBtn.addEventListener("click",async()=>{
 
-const user=auth.currentUser;
+const provider=new GoogleAuthProvider()
 
-if(!user){
+const result=await signInWithPopup(auth,provider)
 
-throw new Error("User not logged in");
+const user=result.user
 
-}
+await setDoc(doc(db,"users",user.uid),{
 
-const userRef=doc(db,"users",user.uid);
-
-const snap=await getDoc(userRef);
-
-if(!snap.exists()){
-
-await setDoc(userRef,{
-firstName:"User",
+firstName:user.displayName,
 lastName:"",
-totalScore:score
-});
+totalScore:0
 
-}else{
+},{merge:true})
 
-await updateDoc(userRef,{
-totalScore:increment(score)
-});
+location.href="dashboard.html"
 
-}
+})
 
 }
-
-window.saveOfficialScore=saveOfficialScore;
