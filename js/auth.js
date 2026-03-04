@@ -155,28 +155,36 @@ onAuthStateChanged(auth, async (user) => {
    SAVE OFFICIAL SCORE
 ========================= */
 
-export async function saveOfficialScore(score) {
+export async function saveOfficialScore(score){
 
   const user = auth.currentUser;
 
-  if (!user) {
+  if(!user){
     throw new Error("User not logged in");
   }
 
-  try {
+  const userRef = doc(db,"users",user.uid);
 
-    await updateDoc(
-      doc(db, "users", user.uid),
-      {
-        totalScore: increment(score)
-      }
-    );
+  const snap = await getDoc(userRef);
 
-  } catch (error) {
-    console.error("Error updating score:", error);
-    throw error;
+  if(!snap.exists()){
+
+    // create document if missing
+    await setDoc(userRef,{
+      firstName:"User",
+      lastName:"",
+      totalScore: score
+    });
+
+  }else{
+
+    // update score
+    await updateDoc(userRef,{
+      totalScore: increment(score)
+    });
+
   }
+
 }
 
-/* IMPORTANT: make it accessible to quiz-engine.js */
 window.saveOfficialScore = saveOfficialScore;
