@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<title>Dashboard - MD QUIZZES</title>
+
+<style>
+
+body{
+font-family:Segoe UI;
+background:#001d3d;
+color:white;
+text-align:center;
+padding-top:80px;
+}
+
+.card{
+
+background:#111;
+display:inline-block;
+padding:40px;
+border-radius:12px;
+
+}
+
+button{
+
+padding:12px 20px;
+margin-top:20px;
+border:none;
+background:gold;
+cursor:pointer;
+font-weight:bold;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<h2>Welcome <span id="userName"></span></h2>
+
+<p>Total Points : <span id="points"></span></p>
+
+<p>Rank : <span id="rank"></span></p>
+
+<button onclick="location.href='index.html'">
+Continue →
+</button>
+
+</div>
+
+<script type="module">
+
+import { auth, db } from "./js/firebase-config.js";
+
+import {
+doc,
+getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+import {
+onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+
+onAuthStateChanged(auth, async user=>{
+
+if(!user){
+
+location.href="login.html"
+return
+
+}
+
+const snap=await getDoc(doc(db,"users",user.uid))
+const data=snap.data()
+
+document.getElementById("userName").innerText=
+data.firstName+" "+data.lastName
+
+document.getElementById("points").innerText=
+data.totalScore || 0
+
+document.getElementById("rank").innerText="Calculating..."
+
+})
+
+</script>
+
+</body>
+</html>
