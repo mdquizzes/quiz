@@ -1,5 +1,3 @@
-import { saveOfficialScore } from "./auth.js";
-
 const el=id=>document.getElementById(id);
 
 const settings=el('settings'),
@@ -31,8 +29,6 @@ let quizQs=[],idx=0,score=0;
 let POS=4,NEG=2,attempted=0,correctCount=0;
 
 let timerOn=true,totalTime=0,tInt=null;
-
-const STORE_KEY="class10MathHistory";
 
 /* START TEST */
 
@@ -171,7 +167,7 @@ renderQ();
 
 /* RESULT */
 
-async function showResult(){
+function showResult(){
 
 quiz.classList.add('hide');
 result.classList.remove('hide');
@@ -198,21 +194,17 @@ percent>=40?'Average':
 
 const saveStatus=document.getElementById("saveStatus");
 
-if(saveStatus) saveStatus.innerText="Saving score...";
+if(window.saveOfficialScore){
 
-try{
+saveStatus.innerText="Saving score...";
 
-await saveOfficialScore(Math.round(score));
-
-if(saveStatus)
-saveStatus.innerText="✅ Score Saved to Leaderboard";
-
-}catch(e){
-
-console.error(e);
-
-if(saveStatus)
-saveStatus.innerText="❌ Login required to save score";
+window.saveOfficialScore(Math.round(score))
+.then(()=>{
+saveStatus.innerText="Score saved to leaderboard";
+})
+.catch(()=>{
+saveStatus.innerText="Login required to save score";
+});
 
 }
 
