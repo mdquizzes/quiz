@@ -141,29 +141,26 @@ function finishQuiz(){
 
   /* ===== SAVE SCORE IF FIREBASE AVAILABLE ===== */
 
-  if (window.saveOfficialScore) {
+ if (window.saveOfficialScore) {
 
-    document.getElementById("saveStatus").innerText = "Saving score...";
+  document.getElementById("saveStatus").innerText = "Saving score...";
 
-    window.saveOfficialScore(officialScore)
-      .then(() => {
-        document.getElementById("saveStatus").innerText =
-          "✅ Score Saved Successfully";
-      })
-      .catch((error) => {
-        console.error(error);
-        document.getElementById("saveStatus").innerText =
-          "❌ Error Saving Score";
-      });
+  window.saveOfficialScore(officialScore)
+    .then(() => {
+      document.getElementById("saveStatus").innerText =
+        "✅ Score Saved Successfully";
+    })
+    .catch((error) => {
+      console.error(error);
+      document.getElementById("saveStatus").innerText =
+        "❌ Error Saving Score";
+    });
 
-  } else {
+} else {
 
-    document.getElementById("saveStatus").innerText =
-      "Login to save your earning points";
-  }
-
-} // ✅ THIS WAS MISSING
-
+  document.getElementById("saveStatus").innerText =
+    "Login to save your earning points";
+}
 /* ===============================
    BUTTON EVENT LISTENER
 ================================= */
