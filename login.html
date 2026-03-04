@@ -18,22 +18,46 @@ color:white;
 }
 
 .card{
-
 background:rgba(255,255,255,0.05);
 padding:40px;
 border-radius:14px;
-width:330px;
+width:350px;
 text-align:center;
 box-shadow:0 0 25px rgba(0,0,0,0.4);
 }
 
 h2{
 color:gold;
-margin-bottom:10px;
+margin-bottom:0;
+}
+
+.slogan{
+font-size:13px;
+opacity:0.8;
+margin-bottom:15px;
+}
+
+.tabs{
+display:flex;
+margin-bottom:15px;
+}
+
+.tabs button{
+flex:1;
+background:#222;
+color:white;
+border:none;
+padding:8px;
+cursor:pointer;
+}
+
+.tabs button.active{
+background:gold;
+color:black;
+font-weight:bold;
 }
 
 input{
-
 width:90%;
 padding:10px;
 margin:8px 0;
@@ -53,8 +77,11 @@ cursor:pointer;
 color:black;
 }
 
-button{
+.strength{
+font-size:12px;
+}
 
+button{
 width:100%;
 padding:12px;
 margin-top:10px;
@@ -64,20 +91,16 @@ font-weight:bold;
 cursor:pointer;
 }
 
-.tabs{
-display:flex;
-margin-bottom:15px;
-}
-
-.tabs button{
-flex:1;
-background:#222;
+.google{
+background:#4285F4;
 color:white;
 }
 
-.tabs button.active{
-background:gold;
-color:black;
+.link{
+font-size:13px;
+margin-top:8px;
+cursor:pointer;
+color:#ffd60a;
 }
 
 .msg{
@@ -86,7 +109,6 @@ color:#ffd60a;
 }
 
 </style>
-
 </head>
 
 <body>
@@ -94,12 +116,12 @@ color:#ffd60a;
 <div class="card">
 
 <h2>📐 MD QUIZZES</h2>
+<div class="slogan">Smart Practice for Smart Students</div>
 
 <div class="tabs">
 <button id="loginTab" class="active">Login</button>
 <button id="signupTab">Signup</button>
 </div>
-
 
 <!-- LOGIN -->
 
@@ -113,6 +135,14 @@ color:#ffd60a;
 </div>
 
 <button id="loginBtn">Login</button>
+
+<div class="link" id="forgotBtn">
+Forgot Password?
+</div>
+
+<button class="google" id="googleLogin">
+Login with Google
+</button>
 
 </div>
 
@@ -131,6 +161,8 @@ color:#ffd60a;
 <span class="eye" onclick="togglePassSignup()">👁</span>
 </div>
 
+<div class="strength" id="strength"></div>
+
 <button id="signupBtn">Create Account</button>
 
 </div>
@@ -148,38 +180,51 @@ const loginBox=document.getElementById("loginBox")
 const signupBox=document.getElementById("signupBox")
 
 loginTab.onclick=()=>{
-
 loginTab.classList.add("active")
 signupTab.classList.remove("active")
-
 loginBox.style.display="block"
 signupBox.style.display="none"
-
 }
 
 signupTab.onclick=()=>{
-
 signupTab.classList.add("active")
 loginTab.classList.remove("active")
-
 signupBox.style.display="block"
 loginBox.style.display="none"
-
 }
 
 function togglePass(){
-
 const p=document.getElementById("password")
 p.type=p.type==="password"?"text":"password"
-
 }
 
 function togglePassSignup(){
-
 const p=document.getElementById("passwordSignup")
 p.type=p.type==="password"?"text":"password"
+}
+
+/* PASSWORD STRENGTH */
+
+document.getElementById("passwordSignup").addEventListener("input",function(){
+
+const val=this.value
+const strength=document.getElementById("strength")
+
+if(val.length<6){
+
+strength.innerText="Weak password"
+
+}else if(val.match(/[A-Z]/) && val.match(/[0-9]/)){
+
+strength.innerText="Strong password"
+
+}else{
+
+strength.innerText="Medium password"
 
 }
+
+})
 
 </script>
 
