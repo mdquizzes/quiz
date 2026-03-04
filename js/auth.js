@@ -2,66 +2,91 @@
 import { auth, db } from "./firebase-config.js";
 
 import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged
-} from 
+createUserWithEmailAndPassword,
+signInWithEmailAndPassword,
+sendEmailVerification
+} from
 "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 import {
-  doc,
-  setDoc,
-  getDoc,
-  updateDoc,
-  increment
-} from 
+doc,
+setDoc
+} from
 "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+const signupBtn=document.getElementById("signupBtn")
 
+if(signupBtn){
 
-/* =========================
-   SIGNUP
-========================= */
+signupBtn.addEventListener("click",async()=>{
 
-const signupBtn = document.getElementById("signupBtn");
+const fName=document.getElementById("firstName").value
+const lName=document.getElementById("lastName").value
+const email=document.getElementById("emailSignup").value
+const pass=document.getElementById("passwordSignup").value
 
-if (signupBtn) {
-  signupBtn.addEventListener("click", async () => {
+try{
 
-    const fName = document.getElementById("firstName")?.value.trim();
-    const lName = document.getElementById("lastName")?.value.trim();
-    const emailVal = document.getElementById("email")?.value.trim();
-    const passVal = document.getElementById("password")?.value.trim();
+const cred=await createUserWithEmailAndPassword(auth,email,pass)
 
-    if (!fName || !lName || !emailVal || !passVal) {
-      alert("Fill all fields");
-      return;
-    }
+await sendEmailVerification(cred.user)
 
-    try {
+await setDoc(doc(db,"users",cred.user.uid),{
 
-      const userCred = await createUserWithEmailAndPassword(auth, emailVal, passVal);
+firstName:fName,
+lastName:lName,
+totalScore:0
 
-      await setDoc(doc(db, "users", userCred.user.uid), {
-        firstName: fName,
-        lastName: lName,
-        totalScore: 0,
-        role: "student",
-        createdAt: Date.now()
-      });
+})
 
-      alert("Signup Successful");
-      window.location.href = "index.html";
+document.getElementById("msg").innerText=
+"Verification email sent. Please verify."
 
-    } catch (error) {
-      alert(error.message);
-    }
+}catch(e){
 
-  });
+document.getElementById("msg").innerText=e.message
+
+}
+
+})
+
 }
 
 
+
+const loginBtn=document.getElementById("loginBtn")
+
+if(loginBtn){
+
+loginBtn.addEventListener("click",async()=>{
+
+const email=document.getElementById("email").value
+const pass=document.getElementById("password").value
+
+try{
+
+const cred=await signInWithEmailAndPassword(auth,email,pass)
+
+if(!cred.user.emailVerified){
+
+document.getElementById("msg").innerText=
+"Please verify your email first"
+
+return
+
+}
+
+location.href="dashboard.html"
+
+}catch(e){
+
+document.getElementById("msg").innerText=e.message
+
+}
+
+})
+
+}
 
 /* =========================
    LOGIN
