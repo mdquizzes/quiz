@@ -157,6 +157,7 @@ Login with Google
 <div id="signupBox" style="display:none">
 
 <input id="firstName" placeholder="First Name">
+
 <input id="lastName" placeholder="Last Name">
 
 <input id="emailSignup" type="email" placeholder="Email">
@@ -174,15 +175,14 @@ Login with Google
 
 <div class="msg" id="msg"></div>
 
-<!-- VERIFICATION BOX -->
+<!-- EMAIL VERIFICATION BOX -->
 
 <div class="verifyBox" id="verifyBox" style="display:none">
 
 <p>
 Verification email sent.<br>
-1️⃣ Open your email<br>
-2️⃣ Click verification link<br>
-3️⃣ Return here and login
+Please check your email and click verification link.<br>
+This page will automatically continue after verification.
 </p>
 
 <button id="resendVerify">
@@ -233,11 +233,17 @@ const val=this.value
 const strength=document.getElementById("strength")
 
 if(val.length<6){
+
 strength.innerText="Weak password"
+
 }else if(val.match(/[A-Z]/) && val.match(/[0-9]/)){
+
 strength.innerText="Strong password"
+
 }else{
+
 strength.innerText="Medium password"
+
 }
 
 })
