@@ -30,11 +30,16 @@ let POS=4,NEG=2,attempted=0,correctCount=0;
 
 let timerOn=true,totalTime=0,tInt=null;
 
-/* START TEST */
+/* START QUIZ */
 
 el('startBtn').onclick=()=>{
 
-const ALL=window.CLASS10_MATHS_QUESTIONS;
+const ALL=window.QUIZ_DATA;
+
+if(!ALL){
+alert("Quiz data not loaded");
+return;
+}
 
 const n=+qCountEl.value;
 
@@ -68,7 +73,7 @@ renderQ();
 
 };
 
-/* RENDER QUESTION */
+/* LOAD QUESTION */
 
 function renderQ(){
 
@@ -79,7 +84,6 @@ prevBtn.style.display=idx===0?'none':'inline-block';
 const q=quizQs[idx];
 
 progressEl.textContent=`Q ${idx+1}/${quizQs.length}`;
-
 scoreEl.textContent=`Score: ${score.toFixed(2)}`;
 
 qEl.textContent=q.question;
@@ -93,9 +97,7 @@ quizQs[idx]._shuffled=shuffled;
 shuffled.forEach(a=>{
 
 const d=document.createElement('div');
-
 d.className='opt';
-
 d.textContent=a.text;
 
 d.onclick=()=>select(a.correct,d);
@@ -106,7 +108,7 @@ optsEl.appendChild(d);
 
 }
 
-/* SELECT */
+/* SELECT ANSWER */
 
 function select(correct,elOpt){
 
@@ -115,21 +117,15 @@ if(!nextBtn.classList.contains('hide')) return;
 attempted++;
 
 if(correct){
-
 score+=POS;
 correctCount++;
-
 }else{
-
 score-=NEG;
-
 }
 
 Array.from(optsEl.children).forEach((o,i)=>{
-
 if(quizQs[idx]._shuffled[i].correct)
 o.classList.add('correct');
-
 });
 
 if(!correct) elOpt.classList.add('wrong');
@@ -140,13 +136,16 @@ nextBtn.classList.remove('hide');
 
 }
 
-/* NEXT */
+/* NEXT QUESTION */
 
 nextBtn.onclick=()=>{
 
 idx++;
 
-if(idx>=quizQs.length) return showResult();
+if(idx>=quizQs.length){
+showResult();
+return;
+}
 
 renderQ();
 
@@ -157,10 +156,8 @@ renderQ();
 prevBtn.onclick=()=>{
 
 if(idx>0){
-
 idx--;
 renderQ();
-
 }
 
 };
@@ -175,15 +172,12 @@ result.classList.remove('hide');
 const max=quizQs.length*POS;
 
 const percent=Math.max(0,(score/max)*100);
-
 const acc=attempted?(correctCount/attempted)*100:0;
 
 rName.textContent="Name: "+(userNameEl.value||"Guest");
 
 rScore.textContent=`Score: ${score.toFixed(2)} / ${max}`;
-
 rPercent.textContent=`Percentage: ${percent.toFixed(1)}%`;
-
 rAccuracy.textContent=`Accuracy: ${acc.toFixed(1)}%`;
 
 rGrade.textContent=
@@ -192,19 +186,11 @@ percent>=60?'Good':
 percent>=40?'Average':
 'Needs Improvement';
 
-const saveStatus=document.getElementById("saveStatus");
+/* SAVE LEADERBOARD */
 
 if(window.saveOfficialScore){
 
-saveStatus.innerText="Saving score...";
-
-window.saveOfficialScore(Math.round(score))
-.then(()=>{
-saveStatus.innerText="Score saved to leaderboard";
-})
-.catch(()=>{
-saveStatus.innerText="Login required to save score";
-});
+window.saveOfficialScore(Math.round(score));
 
 }
 
@@ -225,7 +211,6 @@ timerEl.textContent=`Time Left: ${totalTime}s`;
 if(totalTime<=0){
 
 clearInterval(tInt);
-
 showResult();
 
 }
@@ -241,7 +226,6 @@ function shuffle(a){
 for(let i=a.length-1;i>0;i--){
 
 const j=Math.floor(Math.random()*(i+1));
-
 [a[i],a[j]]=[a[j],a[i]];
 
 }
