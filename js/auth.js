@@ -8,8 +8,7 @@ sendEmailVerification,
 sendPasswordResetEmail,
 GoogleAuthProvider,
 signInWithPopup,
-signOut,
-onAuthStateChanged
+signOut
 }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
@@ -24,7 +23,7 @@ from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 
 /* =========================
-   AUTO EMAIL VERIFICATION DETECTION
+   AUTO EMAIL VERIFICATION
 ========================= */
 
 function startAutoVerification(){
@@ -58,7 +57,6 @@ location.href="dashboard.html";
 }
 
 
-
 /* =========================
    SIGNUP
 ========================= */
@@ -85,6 +83,9 @@ await setDoc(doc(db,"users",cred.user.uid),{
 firstName:fName,
 lastName:lName,
 totalScore:0,
+quizzesAttempted:0,
+correctAnswers:0,
+wrongAnswers:0,
 createdAt:Date.now()
 
 });
@@ -114,7 +115,6 @@ document.getElementById("msg").innerText=e.message;
 });
 
 }
-
 
 
 /* =========================
@@ -158,7 +158,6 @@ document.getElementById("msg").innerText=e.message;
 }
 
 
-
 /* =========================
    FORGOT PASSWORD
 ========================= */
@@ -190,7 +189,6 @@ document.getElementById("msg").innerText=
 }
 
 
-
 /* =========================
    RESEND VERIFICATION EMAIL
 ========================= */
@@ -217,7 +215,6 @@ document.getElementById("msg").innerText=
 }
 
 
-
 /* =========================
    GOOGLE LOGIN
 ========================= */
@@ -238,7 +235,10 @@ await setDoc(doc(db,"users",user.uid),{
 
 firstName:user.displayName,
 lastName:"",
-totalScore:0
+totalScore:0,
+quizzesAttempted:0,
+correctAnswers:0,
+wrongAnswers:0
 
 },{merge:true});
 
@@ -247,7 +247,6 @@ location.href="dashboard.html";
 });
 
 }
-
 
 
 /* =========================
@@ -265,10 +264,10 @@ location.reload();
 
 
 /* =========================
-   SAVE OFFICIAL SCORE
+   SAVE QUIZ SCORE + STATS
 ========================= */
 
-export async function saveOfficialScore(score){
+export async function saveOfficialScore(score, correct=0, wrong=0){
 
 const user = auth.currentUser;
 
@@ -285,13 +284,19 @@ if(!snap.exists()){
 await setDoc(userRef,{
 firstName:"User",
 lastName:"",
-totalScore:score
+totalScore:score,
+quizzesAttempted:1,
+correctAnswers:correct,
+wrongAnswers:wrong
 });
 
 }else{
 
 await updateDoc(userRef,{
-totalScore:increment(score)
+totalScore:increment(score),
+quizzesAttempted:increment(1),
+correctAnswers:increment(correct),
+wrongAnswers:increment(wrong)
 });
 
 }
