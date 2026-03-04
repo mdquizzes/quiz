@@ -21,19 +21,19 @@ color:white;
 background:rgba(255,255,255,0.05);
 padding:40px;
 border-radius:14px;
-width:350px;
+width:360px;
 text-align:center;
 box-shadow:0 0 25px rgba(0,0,0,0.4);
 }
 
 h2{
 color:gold;
-margin-bottom:0;
+margin-bottom:5px;
 }
 
 .slogan{
 font-size:13px;
-opacity:0.8;
+opacity:.8;
 margin-bottom:15px;
 }
 
@@ -44,10 +44,10 @@ margin-bottom:15px;
 
 .tabs button{
 flex:1;
+border:none;
+padding:10px;
 background:#222;
 color:white;
-border:none;
-padding:8px;
 cursor:pointer;
 }
 
@@ -98,8 +98,8 @@ color:white;
 
 .link{
 font-size:13px;
-margin-top:8px;
 cursor:pointer;
+margin-top:6px;
 color:#ffd60a;
 }
 
@@ -108,7 +108,13 @@ margin-top:10px;
 color:#ffd60a;
 }
 
+.verifyBox{
+margin-top:12px;
+font-size:13px;
+}
+
 </style>
+
 </head>
 
 <body>
@@ -146,7 +152,6 @@ Login with Google
 
 </div>
 
-
 <!-- SIGNUP -->
 
 <div id="signupBox" style="display:none">
@@ -168,6 +173,23 @@ Login with Google
 </div>
 
 <div class="msg" id="msg"></div>
+
+<!-- VERIFICATION BOX -->
+
+<div class="verifyBox" id="verifyBox" style="display:none">
+
+<p>
+Verification email sent.<br>
+1️⃣ Open your email<br>
+2️⃣ Click verification link<br>
+3️⃣ Return here and login
+</p>
+
+<button id="resendVerify">
+Resend Verification Email
+</button>
+
+</div>
 
 </div>
 
@@ -211,17 +233,11 @@ const val=this.value
 const strength=document.getElementById("strength")
 
 if(val.length<6){
-
 strength.innerText="Weak password"
-
 }else if(val.match(/[A-Z]/) && val.match(/[0-9]/)){
-
 strength.innerText="Strong password"
-
 }else{
-
 strength.innerText="Medium password"
-
 }
 
 })
