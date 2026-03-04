@@ -198,6 +198,8 @@ const percent=Math.max(0,(practiceScore/max)*100);
 
 const acc=attempted?(correctCount/attempted)*100:0;
 
+const wrongCount = attempted - correctCount;
+
 rName.textContent="User";
 
 rScore.textContent=`Practice Score : ${practiceScore.toFixed(2)} / ${max}`;
@@ -215,11 +217,16 @@ percent>=40?'Average':
 'Needs Improvement';
 
 
-/* SAVE LEADERBOARD SCORE */
+/* SAVE LEADERBOARD SCORE + STATS */
 
 if(window.saveOfficialScore){
 
-window.saveOfficialScore(officialScore)
+window.saveOfficialScore(
+officialScore,
+correctCount,
+wrongCount
+)
+
 .then(()=>{
 
 document.getElementById("saveStatus").innerText=
