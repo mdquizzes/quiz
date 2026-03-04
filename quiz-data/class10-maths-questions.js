@@ -1,4 +1,4 @@
-window.CLASS10_MATHS_QUESTIONS = [
+window.QUIZ_DATA = [
   {
   question: "Find HCF of 306 and 657 using Euclid’s division algorithm.",
   answers: [
