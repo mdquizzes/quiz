@@ -165,21 +165,6 @@ function finishQuiz(){
 } // ✅ THIS WAS MISSING
 
 /* ===============================
-   SAVE OFFICIAL SCORE (FIREBASE)
-================================= */
-
-window.saveOfficialScore = function(score){
-
-  return firebase.firestore()
-    .collection("scores")
-    .add({
-      score: score,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-};
-
-/* ===============================
    BUTTON EVENT LISTENER
 ================================= */
 
