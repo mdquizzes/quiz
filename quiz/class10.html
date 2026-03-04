@@ -1,89 +1,109 @@
 <!DOCTYPE html>
 <html>
 <head>
+
 <meta charset="UTF-8">
 <title>Class 10 Maths Quiz</title>
 
 <link rel="stylesheet" href="../css/quiz-style.css">
+
 </head>
+
 <body>
 
 <div class="quiz-wrap">
-  <h2>Smart Quiz Test</h2>
 
-  <div id="settings">
-    <div class="row">
-      <label>Your Name:</label>
-      <input id="userName" />
-    </div>
+<h2>Smart Quiz Test</h2>
 
-    <div class="row">
-      <label>No. of Questions:</label>
-      <select id="qCount">
-        <option value="20">20</option>
-        <option value="40">40</option>
-        <option value="80">80</option>
-        <option value="100">100</option>
-      </select>
-    </div>
+<div id="settings">
 
-    <div class="row">
-      <label>Marks for Correct (+):</label>
-      <select id="posMarks">
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option selected value="4">4</option>
-      </select>
-    </div>
+<div class="row">
+<label>Your Name:</label>
+<input id="userName">
+</div>
 
-    <div class="row">
-      <label>Negative Marks (−):</label>
-      <select id="negMarks">
-        <option value="0">0</option>
-        <option value="0.5">0.5</option>
-        <option value="1">1</option>
-        <option selected value="2">2</option>
-      </select>
-    </div>
+<div class="row">
+<label>No. of Questions:</label>
+<select id="qCount">
+<option value="20">20</option>
+<option value="40">40</option>
+<option value="80">80</option>
+<option value="100">100</option>
+</select>
+</div>
 
-    <div class="row">
-      <label>Timer:</label>
-      <select id="timerMode">
-        <option selected value="on">ON</option>
-        <option value="off">OFF</option>
-      </select>
-    </div>
+<div class="row">
+<label>Marks for Correct (+):</label>
+<select id="posMarks">
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option selected value="4">4</option>
+</select>
+</div>
 
-    <button class="btn" id="startBtn">Start Test</button>
-  </div>
+<div class="row">
+<label>Negative Marks (−):</label>
+<select id="negMarks">
+<option value="0">0</option>
+<option value="0.5">0.5</option>
+<option value="1">1</option>
+<option selected value="2">2</option>
+</select>
+</div>
 
-  <div class="hide" id="quiz">
-    <div class="hud">
-      <div id="progress"></div>
-      <div id="score"></div>
-      <div class="badge hide" id="timer"></div>
-    </div>
+<div class="row">
+<label>Timer:</label>
+<select id="timerMode">
+<option selected value="on">ON</option>
+<option value="off">OFF</option>
+</select>
+</div>
 
-    <div class="q" id="question"></div>
-    <div class="opts" id="options"></div>
+<button class="btn" id="startBtn">Start Test</button>
 
-    <div style="margin-top:10px;text-align:center;">
-      <button class="btn" id="prevBtn">Previous</button>
-      <button class="btn hide" id="nextBtn">Next</button>
-    </div>
-  </div>
+</div>
 
-  <div class="hide result" id="result">
-    <h3>Result</h3>
-    <span class="badge" id="rScore"></span>
-    <button class="btn" onclick="location.reload()">Restart</button>
-  </div>
+<div class="hide" id="quiz">
+
+<div class="hud">
+<div id="progress"></div>
+<div id="score"></div>
+<div class="badge hide" id="timer"></div>
+</div>
+
+<div class="q" id="question"></div>
+
+<div class="opts" id="options"></div>
+
+<div style="margin-top:10px;text-align:center;">
+<button class="btn" id="prevBtn">Previous</button>
+<button class="btn hide" id="nextBtn">Next</button>
+</div>
+
+</div>
+
+<div class="hide result" id="result">
+
+<h3>Result</h3>
+
+<p id="rName"></p>
+<p id="rScore"></p>
+<p id="rPercent"></p>
+<p id="rAccuracy"></p>
+<p id="rGrade"></p>
+
+<p id="saveStatus"></p>
+
+<button class="btn" onclick="location.reload()">Restart</button>
+
+</div>
 
 </div>
 
 <script src="../js/class10-maths-questions.js"></script>
-<script src="../js/class10-maths-quiz.js"></script>
+
+<script type="module" src="../js/class10-maths-quiz.js"></script>
 
 </body>
 </html>
