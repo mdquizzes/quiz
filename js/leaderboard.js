@@ -1,72 +1,49 @@
-import { auth, db } from "./firebase-config.js";
+import { db } from "./firebase-config.js";
+
 import {
-  collection,
-  getDocs,
-  query,
-  orderBy,
-  doc,
-  runTransaction
-} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+collection,
+getDocs,
+query,
+orderBy,
+limit
+}
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-/* SAVE OFFICIAL SCORE */
-
-window.saveOfficialScore = async function(points){
-
-  const user = auth.currentUser;
-  if(!user) return Promise.reject("Not logged in");
-
-  const userRef = doc(db,"users",user.uid);
-
-  return runTransaction(db, async (transaction)=>{
-
-    const snap = await transaction.get(userRef);
-    const oldTotal = snap.data().totalScore || 0;
-
-    transaction.update(userRef,{
-      totalScore: oldTotal + points
-    });
-  });
-};
-
-
-/* LOAD MAIN LEADERBOARD */
 
 window.loadMainLeaderboard = async function(){
 
-  const leaderboardDiv = document.getElementById("leaderboard");
-  leaderboardDiv.innerHTML = "Loading...";
+const leaderboardDiv = document.getElementById("leaderboard");
 
-  const q = query(
-    collection(db,"users"),
-    orderBy("totalScore","desc")
-  );
+if(!leaderboardDiv) return;
 
-  const snapshot = await getDocs(q);
+leaderboardDiv.innerHTML="Loading...";
 
-  let html = "<h3>🏆 Top 10 (Earning Points)</h3>";
+const q=query(
+collection(db,"users"),
+orderBy("totalScore","desc"),
+limit(10)
+);
 
-  let rank = 1;
-  let currentUserRank = null;
-  const currentUser = auth.currentUser;
+const snapshot=await getDocs(q);
 
-  snapshot.forEach(docSnap=>{
+let html="<h3>🏆 Top 10 (Earning Points)</h3>";
 
-    const data = docSnap.data();
+let rank=1;
 
-    if(rank <= 10){
-      html += `<p>${rank}. ${data.firstName} - ${data.totalScore || 0}</p>`;
-    }
+snapshot.forEach(docSnap=>{
 
-    if(currentUser && docSnap.id === currentUser.uid){
-      currentUserRank = rank;
-    }
+const data=docSnap.data();
 
-    rank++;
-  });
+html+=`
+<p>${rank}. ${data.firstName || "User"} — ${data.totalScore || 0}</p>
+`;
 
-  if(currentUserRank){
-    html += `<hr><p>Your Current Rank: ${currentUserRank}</p>`;
-  }
+rank++;
 
-  leaderboardDiv.innerHTML = html;
-};
+});
+
+leaderboardDiv.innerHTML=html;
+
+}
+
+document.addEventListener("DOMContentLoaded",loadMainLeaderboard);
