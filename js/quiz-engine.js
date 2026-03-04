@@ -161,6 +161,8 @@ function finishQuiz(){
   document.getElementById("saveStatus").innerText =
     "Login to save your earning points";
 }
+
+} // finishQuiz close
 /* ===============================
    BUTTON EVENT LISTENER
 ================================= */
