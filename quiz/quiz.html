@@ -98,7 +98,20 @@
 </div>
 
 
-<script src="../quiz-data/class10-maths.js"></script>
+<script>
+
+const params = new URLSearchParams(window.location.search);
+const quizName = params.get("quiz");
+
+if(quizName){
+
+  const script = document.createElement("script");
+  script.src = "../quiz-data/" + quizName + ".js";
+  document.body.appendChild(script);
+
+}
+
+</script>
 <script src="../js/uniquiz-engine.js"></script>
 
 </body>
