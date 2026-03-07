@@ -237,7 +237,7 @@ const correctAns=q.answers.find(a=>a.correct).text;
 
 reviewHTML+=`
 
-<div style="margin:15px 0;padding:10px;background:#111;border-radius:8px">
+<div class="review-card">
 
 <b>Q${i+1}. ${q.question}</b><br><br>
 
