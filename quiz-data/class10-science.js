@@ -1,4 +1,4 @@
-const QUIZ_DATA = [
+window.QUIZ_DATA = [
 {
 question: "A body moving with velocity 15 m/s is brought to rest in 5 seconds. Find its retardation.",
 answers: [
