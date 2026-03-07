@@ -245,8 +245,10 @@ Your Answer : <span style="color:${userAns===correctAns?'lime':'red'}">${userAns
 
 Correct Answer : <span style="color:lime">${correctAns}</span><br><br>
 
-<b>Solution:</b> ${q.solution || "No explanation"}
+<b>Solution:</b>
 
+<div class="solution">
+${q.solution || "No explanation"}
 </div>
 
 `;
