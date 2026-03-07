@@ -2,16 +2,18 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Class 10 Maths Quiz</title>
+
+<title>Smart Quiz</title>
 
 <link rel="stylesheet" href="../css/quiz-style.css">
 
 </head>
+
 <body>
 
 <div class="quiz-wrap">
 
-<h2>Class 10 Maths – Smart Mock Test</h2>
+<h2 id="quizTitle"></h2>
 
 <div id="settings">
 
@@ -98,8 +100,6 @@
 </div>
 
 
-<!-- AUTO LOAD QUIZ DATA -->
-
 <script>
 
 const params = new URLSearchParams(window.location.search);
@@ -111,6 +111,18 @@ alert("Quiz not specified in URL");
 
 }else{
 
+/* AUTO TITLE GENERATE */
+
+const title = quizName
+.replace(/-/g," ")
+.replace(/\b\w/g,c=>c.toUpperCase());
+
+document.getElementById("quizTitle").innerText =
+title + " – Smart Mock Test";
+
+
+/* LOAD QUESTION FILE */
+
 const script = document.createElement("script");
 
 script.src = "../quiz-data/" + quizName + ".js";
@@ -118,7 +130,9 @@ script.src = "../quiz-data/" + quizName + ".js";
 script.onload = function(){
 
 const engine = document.createElement("script");
+
 engine.src = "../js/uniquiz-engine.js";
+
 document.body.appendChild(engine);
 
 };
