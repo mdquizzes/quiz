@@ -35,6 +35,8 @@ let POS=4,NEG=2,attempted=0,correctCount=0;
 
 let timerOn=true,totalTime=0,tInt=null;
 
+/* NEW */
+let userAnswers=[];
 
 /* START QUIZ */
 
@@ -64,6 +66,7 @@ practiceScore=0;
 officialScore=0;
 attempted=0;
 correctCount=0;
+userAnswers=[];
 
 if(timerOn){
 
@@ -103,7 +106,7 @@ const shuffled=shuffle([...q.answers]);
 
 quizQs[idx]._shuffled=shuffled;
 
-shuffled.forEach(a=>{
+shuffled.forEach((a,i)=>{
 
 const d=document.createElement('div');
 
@@ -111,7 +114,7 @@ d.className='opt';
 
 d.textContent=a.text;
 
-d.onclick=()=>select(a.correct,d);
+d.onclick=()=>select(a.correct,d,i);
 
 optsEl.appendChild(d);
 
@@ -122,11 +125,14 @@ optsEl.appendChild(d);
 
 /* SELECT ANSWER */
 
-function select(correct,elOpt){
+function select(correct,elOpt,index){
 
 if(!nextBtn.classList.contains('hide')) return;
 
 attempted++;
+
+/* STORE USER ANSWER */
+userAnswers[idx]=index;
 
 if(correct){
 
@@ -217,7 +223,40 @@ percent>=40?'Average':
 'Needs Improvement';
 
 
-/* SAVE LEADERBOARD SCORE + STATS */
+/* REVIEW SECTION */
+
+let reviewHTML="<h3>Answer Review</h3>";
+
+quizQs.forEach((q,i)=>{
+
+const userIndex=userAnswers[i];
+
+const userAns=q._shuffled[userIndex]?.text || "Not Attempted";
+
+const correctAns=q.answers.find(a=>a.correct).text;
+
+reviewHTML+=`
+
+<div style="margin:15px 0;padding:10px;background:#111;border-radius:8px">
+
+<b>Q${i+1}. ${q.question}</b><br><br>
+
+Your Answer : <span style="color:${userAns===correctAns?'lime':'red'}">${userAns}</span><br>
+
+Correct Answer : <span style="color:lime">${correctAns}</span><br><br>
+
+<b>Solution:</b> ${q.solution || "No explanation"}
+
+</div>
+
+`;
+
+});
+
+document.getElementById("result").innerHTML+=reviewHTML;
+
+
+/* SAVE LEADERBOARD SCORE */
 
 if(window.saveOfficialScore){
 
