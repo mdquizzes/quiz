@@ -98,21 +98,36 @@
 </div>
 
 
+<!-- AUTO LOAD QUIZ DATA -->
+
 <script>
 
 const params = new URLSearchParams(window.location.search);
 const quizName = params.get("quiz");
 
-if(quizName){
+if(!quizName){
 
-  const script = document.createElement("script");
-  script.src = "../quiz-data/" + quizName + ".js";
-  document.body.appendChild(script);
+alert("Quiz not specified in URL");
+
+}else{
+
+const script = document.createElement("script");
+
+script.src = "../quiz-data/" + quizName + ".js";
+
+script.onload = function(){
+
+const engine = document.createElement("script");
+engine.src = "../js/uniquiz-engine.js";
+document.body.appendChild(engine);
+
+};
+
+document.body.appendChild(script);
 
 }
 
 </script>
-<script src="../js/uniquiz-engine.js"></script>
 
 </body>
 </html>
