@@ -1,4 +1,4 @@
-const ALL_QUESTIONS = [
+window.QUIZ_DATA = [
   {
     "id": 1,
     "chapter": "A Letter to God",
