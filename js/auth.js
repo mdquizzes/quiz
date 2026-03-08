@@ -8,7 +8,8 @@ sendEmailVerification,
 sendPasswordResetEmail,
 GoogleAuthProvider,
 signInWithPopup,
-signOut
+signOut,
+onAuthStateChanged
 }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
@@ -190,32 +191,6 @@ document.getElementById("msg").innerText=
 
 
 /* =========================
-   RESEND VERIFICATION EMAIL
-========================= */
-
-const resend = document.getElementById("resendVerify");
-
-if(resend){
-
-resend.addEventListener("click",async()=>{
-
-const user = auth.currentUser;
-
-if(user){
-
-await sendEmailVerification(user);
-
-document.getElementById("msg").innerText=
-"Verification email resent.";
-
-}
-
-});
-
-}
-
-
-/* =========================
    GOOGLE LOGIN
 ========================= */
 
@@ -261,6 +236,43 @@ location.reload();
 
 };
 
+
+/* =========================
+   AUTO LOGIN + HEADER NAME
+========================= */
+
+onAuthStateChanged(auth, async (user)=>{
+
+const status = document.getElementById("userStatus");
+const loginBtn = document.getElementById("loginLink");
+const logoutBtn = document.getElementById("logoutBtn");
+
+if(!status) return;
+
+if(user){
+
+const snap = await getDoc(doc(db,"users",user.uid));
+const data = snap.data();
+
+const name =
+(data?.firstName || "") + " " +
+(data?.lastName || "");
+
+status.innerText = "👤 " + name;
+
+if(loginBtn) loginBtn.style.display="none";
+if(logoutBtn) logoutBtn.style.display="inline-block";
+
+}else{
+
+status.innerText="Guest";
+
+if(loginBtn) loginBtn.style.display="inline-block";
+if(logoutBtn) logoutBtn.style.display="none";
+
+}
+
+});
 
 
 /* =========================
