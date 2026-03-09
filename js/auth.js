@@ -244,8 +244,9 @@ location.reload();
 onAuthStateChanged(auth, async (user)=>{
 
 const status = document.getElementById("userStatus");
-const loginBtn = document.getElementById("loginLink");
+const loginBtn = document.getElementById("loginBtn");
 const logoutBtn = document.getElementById("logoutBtn");
+const profileBtn = document.getElementById("profileBtn");
 
 if(!status) return;
 
