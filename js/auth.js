@@ -1,3 +1,4 @@
+document.addEventListener("DOMContentLoaded", function() {
 // IMPORT FIREBASE CONFIG
 import { auth, db } from "./firebase-config.js";
 
@@ -21,6 +22,11 @@ updateDoc,
 increment
 }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+}
+
+});
+
+});
 
 
 /* =========================
