@@ -17,15 +17,18 @@ height:auto;
 display:block;
 }
 
-.container{
-max-width:1000px;
+/* HEADER BANNER FIX */
+
+.header-banner{
+width:100%;
+max-width:1200px;
 margin:auto;
-padding:0 15px;
 }
 
-html,body{
+.header-banner img{
 width:100%;
-overflow-x:hidden;
+height:auto;
+display:block;
 }
 
 /* ===== TOPBAR ===== */
