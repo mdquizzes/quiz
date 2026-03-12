@@ -240,6 +240,10 @@ location.reload();
    AUTO LOGIN + HEADER NAME
 ========================= */
 
+/* =========================
+   AUTO LOGIN + HEADER NAME
+========================= */
+
 onAuthStateChanged(auth, async (user)=>{
 
 const status = document.getElementById("userStatus");
@@ -251,7 +255,12 @@ if(!status) return;
 
 if(user){
 
+try{
+
 const snap = await getDoc(doc(db,"users",user.uid));
+
+if(snap.exists()){
+
 const data = snap.data();
 
 const name =
@@ -259,6 +268,19 @@ const name =
 (data?.lastName || "");
 
 status.innerText = "👤 " + name;
+
+}else{
+
+status.innerText="👤 User";
+
+}
+
+}catch(err){
+
+console.log(err);
+status.innerText="👤 User";
+
+}
 
 if(loginBtn) loginBtn.style.display="none";
 if(logoutBtn) logoutBtn.style.display="inline-block";
@@ -273,7 +295,6 @@ if(logoutBtn) logoutBtn.style.display="none";
 }
 
 });
-
 
 /* =========================
    SAVE QUIZ SCORE + STATS
