@@ -1,1 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
 
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>MD Quizzes Topbar</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Segoe UI;
+background:#000814;
+}
+
+.topbar{
+
+display:flex;
+justify-content:space-between;
+align-items:center;
+
+padding:10px 20px;
+
+background:#000814;
+border-bottom:1px solid #1a1a1a;
+
+color:white;
+}
+
+.logo{
+
+font-size:18px;
+font-weight:700;
+color:#ffd60a;
+
+}
+
+.nav{
+
+display:flex;
+align-items:center;
+gap:18px;
+
+}
+
+.nav a{
+
+color:white;
+text-decoration:none;
+font-size:14px;
+opacity:.9;
+
+}
+
+.nav a:hover{
+
+color:#ffd60a;
+
+}
+
+.user-box{
+
+display:flex;
+align-items:center;
+gap:10px;
+
+}
+
+.avatar{
+
+width:30px;
+height:30px;
+
+border-radius:50%;
+
+background:#ffd60a;
+color:black;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+font-weight:bold;
+font-size:13px;
+
+}
+
+#userStatus{
+
+font-size:14px;
+
+}
+
+button{
+
+background:#ffd60a;
+border:none;
+padding:6px 12px;
+border-radius:6px;
+
+cursor:pointer;
+font-weight:600;
+
+}
+
+button:hover{
+
+background:#ffc300;
+
+}
+
+#logoutBtn{
+
+background:#ff4d4d;
+color:white;
+
+}
+
+#logoutBtn:hover{
+
+background:#ff2a2a;
+
+}
+
+/* mobile */
+
+@media(max-width:600px){
+
+.logo{
+
+font-size:15px;
+
+}
+
+.nav a{
+
+font-size:13px;
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="topbar">
+
+<div class="logo">
+
+📐 MD QUIZZES
+
+</div>
+
+<div class="nav">
+
+<a href="https://mdquizzes.blogspot.com">Home</a>
+
+<a href="https://mdquizzes.github.io/mdquizzes/leaderboard.html">
+Leaderboard
+</a>
+
+</div>
+
+<div class="user-box">
+
+<div class="avatar" id="avatar">G</div>
+
+<span id="userStatus">Guest</span>
+
+<button id="loginBtn"
+onclick="window.location.href='https://mdquizzes.github.io/mdquizzes/login.html'">
+Login
+</button>
+
+<button id="profileBtn"
+style="display:none"
+onclick="window.location.href='https://mdquizzes.github.io/mdquizzes/profile.html'">
+Profile
+</button>
+
+<button id="logoutBtn"
+style="display:none">
+Logout
+</button>
+
+</div>
+
+</div>
+
+<script type="module">
+
+import { auth, db } from "./js/firebase.js";
+
+import {
+onAuthStateChanged,
+signOut
+}
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import {
+doc,
+getDoc
+}
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const userStatus = document.getElementById("userStatus");
+const avatar = document.getElementById("avatar");
+
+const loginBtn = document.getElementById("loginBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const profileBtn = document.getElementById("profileBtn");
+
+onAuthStateChanged(auth, async (user)=>{
+
+if(user){
+
+const snap = await getDoc(doc(db,"users",user.uid));
+
+if(snap.exists()){
+
+const data = snap.data();
+
+const name =
+(data.firstName || "") + " " +
+(data.lastName || "");
+
+userStatus.innerText = name;
+
+avatar.innerText = data.firstName
+? data.firstName[0]
+: "U";
+
+}
+
+loginBtn.style.display="none";
+profileBtn.style.display="inline-block";
+logoutBtn.style.display="inline-block";
+
+}else{
+
+userStatus.innerText="Guest";
+avatar.innerText="G";
+
+loginBtn.style.display="inline-block";
+profileBtn.style.display="none";
+logoutBtn.style.display="none";
+
+}
+
+});
+
+logoutBtn.onclick=()=>{
+
+signOut(auth);
+
+};
+
+</script>
+
+</body>
+</html>
