@@ -3,6 +3,7 @@
 <head>
 
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MD QUIZZES</title>
 
 <style>
@@ -10,12 +11,15 @@
 body{
 margin:0;
 font-family:Segoe UI;
-background: radial-gradient(circle,#001f3f,#000814);
+background:radial-gradient(circle,#001f3f,#000814);
 color:white;
 text-align:center;
 }
 
-h1{color:gold;}
+h1{
+color:#ffd60a;
+margin-top:20px;
+}
 
 .container{
 max-width:1000px;
@@ -23,11 +27,14 @@ margin:auto;
 padding:20px;
 }
 
+/* TOPBAR */
+
 .topbar{
 display:flex;
 justify-content:flex-end;
+align-items:center;
 gap:10px;
-margin-bottom:10px;
+margin-bottom:20px;
 }
 
 .topbar span{
@@ -36,32 +43,41 @@ font-weight:bold;
 color:#ffd60a;
 }
 
+/* BUTTONS */
+
 button{
-padding:8px 12px;
+padding:8px 14px;
 border:none;
 border-radius:6px;
 cursor:pointer;
+font-weight:600;
 }
 
 .login-btn{background:#ffd60a;}
 .logout-btn{background:#ff3b3b;color:white;}
 .profile-btn{background:#00c896;color:white;}
+.start-btn{background:#ffd60a;font-size:15px;}
+
+/* SELECT */
 
 .select-box{
 margin:8px;
-padding:8px;
+padding:8px 12px;
 border-radius:6px;
 border:none;
+font-size:14px;
 }
 
-.start-btn{
-background:gold;
-font-weight:bold;
-margin-top:10px;
+/* OPTION BLOCK */
+
+.option-group{
+margin-top:20px;
 }
+
+/* QUIZ */
 
 .quiz-box{
-margin-top:20px;
+margin-top:30px;
 }
 
 .result-box{
@@ -70,10 +86,12 @@ font-size:18px;
 font-weight:bold;
 }
 
+/* LEADERBOARD */
+
 .leaderboard{
-background:#111;
-margin-top:30px;
-padding:15px;
+background:#0f172a;
+margin-top:40px;
+padding:20px;
 border-radius:12px;
 }
 
@@ -83,7 +101,7 @@ border-collapse:collapse;
 }
 
 th,td{
-padding:8px;
+padding:10px;
 border-bottom:1px solid #333;
 }
 
@@ -123,28 +141,29 @@ Logout
 
 </div>
 
+<!-- QUIZ SETTINGS -->
 
-<!-- QUIZ OPTIONS -->
+<div class="option-group">
 
 <select id="boardSelect" class="select-box">
-<option selected>Board : CBSE</option>
-<option>GSEB</option>
+<option value="cbse" selected>Board : CBSE</option>
+<option value="gseb">Board : GSEB</option>
 </select>
 
 <select id="mediumSelect" class="select-box">
-<option selected>Medium : English</option>
-<option>Gujarati</option>
+<option value="english" selected>Medium : English</option>
+<option value="gujarati">Medium : Gujarati</option>
 </select>
 
 <select id="classSelect" class="select-box">
-<option selected>Class : X</option>
-<option>IX</option>
-<option>VIII</option>
+<option value="class10" selected>Class : X</option>
+<option value="class9">Class : IX</option>
+<option value="class8">Class : VIII</option>
 </select>
 
-<br>
+</div>
 
-<!-- SUBJECT SELECT -->
+<div class="option-group">
 
 <select id="subjectSelect" class="select-box">
 
@@ -155,29 +174,26 @@ Logout
 
 </select>
 
+</div>
 
-<!-- FUTURE FEATURE PLACEHOLDER -->
+<!-- FUTURE CHAPTER SYSTEM -->
 
 <div style="margin-top:10px;font-size:13px;color:#bbb">
 
 <!--
 Future Feature:
-Dynamic chapter system will load here.
 
-Example structure:
-questionbank/board/medium/class/subject/chapter.js
+Dynamic chapter dropdown will be added here.
 
-Later we will create chapter dropdown
-based on selected subject.
+Example path:
+quiz-data/board/medium/class/subject/chapter.js
 -->
 
 </div>
 
-
-<!-- NUMBER OF QUESTIONS -->
+<div class="option-group">
 
 <select id="questionCountSelect" class="select-box">
-
 <option value="10" selected>10 Questions</option>
 <option value="20">20 Questions</option>
 <option value="40">40 Questions</option>
@@ -185,29 +201,28 @@ based on selected subject.
 <option value="80">80 Questions</option>
 <option value="100">100 Questions</option>
 <option value="180">180 Questions</option>
-
 </select>
-
-<select>
 
 <select id="customPositiveSelect" class="select-box">
-<option selected>4</option>
-<option>3</option>
-<option>2</option>
-<option>1</option>
-</select>
-<select>
-<select id="customNegativeSelect" class="select-box">
-<option selected>-1</option>
-<option>-2</option>
-<option>-0.5</option>
+<option value="4" selected>+4</option>
+<option value="3">+3</option>
+<option value="2">+2</option>
+<option value="1">+1</option>
 </select>
 
+<select id="customNegativeSelect" class="select-box">
+<option value="-1" selected>-1</option>
+<option value="-2">-2</option>
+<option value="-0.5">-0.5</option>
+</select>
+
+</div>
+
+<br>
 
 <button class="start-btn" id="startBtn">
 Start Quiz
 </button>
-
 
 <!-- QUIZ AREA -->
 
@@ -219,7 +234,6 @@ Start Quiz
 
 <p id="totalPoints"></p>
 
-
 <!-- GLOBAL LEADERBOARD -->
 
 <div class="leaderboard">
@@ -229,17 +243,14 @@ Start Quiz
 <table>
 
 <thead>
-
 <tr>
 <th>Rank</th>
 <th>Name</th>
 <th>Score</th>
 </tr>
-
 </thead>
 
 <tbody id="leaderboardTable">
-
 </tbody>
 
 </table>
@@ -248,13 +259,10 @@ Start Quiz
 
 </div>
 
-
 <!-- FIREBASE -->
 
 <script type="module" src="js/firebase-config.js"></script>
-
 <script type="module" src="js/auth.js"></script>
-
 <script type="module" src="js/leaderboard.js"></script>
 
 <!-- QUIZ ENGINE -->
