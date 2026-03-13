@@ -1,103 +1,99 @@
 <!DOCTYPE html>
 <html>
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>MD QUIZZES</title>
 
 <style>
+
 body{
-  margin:0;
-  font-family:Segoe UI;
-  background:radial-gradient(circle,#001f3f,#000814);
-  color:white;
-  text-align:center;
+margin:0;
+font-family:Segoe UI;
+background:radial-gradient(circle,#001f3f,#000814);
+color:white;
+text-align:center;
 }
 
-h1{
-  color:#ffd60a;
-  margin-top:20px;
-}
+h1{color:#ffd60a;margin-top:20px;}
 
 .container{
-  max-width:1000px;
-  margin:auto;
-  padding:20px;
+max-width:900px;
+margin:auto;
+padding:20px;
 }
 
-/* TOPBAR */
 .topbar{
-  display:flex;
-  justify-content:flex-end;
-  align-items:center;
-  gap:10px;
-  margin-bottom:20px;
+display:flex;
+justify-content:flex-end;
+align-items:center;
+gap:10px;
+margin-bottom:20px;
 }
 
 .topbar span{
-  margin-right:auto;
-  font-weight:bold;
-  color:#ffd60a;
+margin-right:auto;
+font-weight:bold;
+color:#ffd60a;
 }
 
-/* BUTTONS */
 button{
-  padding:8px 14px;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-  font-weight:600;
+padding:8px 14px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+font-weight:600;
 }
 
 .login-btn{background:#ffd60a;}
 .logout-btn{background:#ff3b3b;color:white;}
 .profile-btn{background:#00c896;color:white;}
-.start-btn{background:#ffd60a;font-size:15px;}
 
-/* SELECT */
+.start-btn{
+background:#ffd60a;
+font-size:16px;
+margin-top:10px;
+}
+
 .select-box{
-  margin:8px;
-  padding:8px 12px;
-  border-radius:6px;
-  border:none;
-  font-size:14px;
+margin:8px;
+padding:8px 12px;
+border-radius:6px;
+border:none;
 }
 
-/* OPTION BLOCK */
-.option-group{
-  margin-top:20px;
+.quiz-box{
+margin-top:30px;
 }
 
-/* SECOND USER STATUS AREA */
-.user-card{
-  margin-top:30px;
-  padding:15px;
-  background:#0f172a;
-  border-radius:10px;
+.option{
+display:block;
+margin:10px auto;
+padding:10px;
+width:260px;
+border:none;
+border-radius:6px;
+background:#1e293b;
+color:white;
+cursor:pointer;
 }
 
-/* LEADERBOARD */
-.leaderboard{
-  background:#0f172a;
-  margin-top:40px;
-  padding:20px;
-  border-radius:12px;
+.option:hover{
+background:#334155;
 }
 
-table{
-  width:100%;
-  border-collapse:collapse;
+.result{
+margin-top:20px;
 }
 
-th,td{
-  padding:10px;
-  border-bottom:1px solid #333;
+.hide{
+display:none;
 }
 
-th{
-  color:#ffd60a;
-}
 </style>
+
 </head>
 
 <body>
@@ -129,166 +125,226 @@ Logout
 </div>
 
 
-<!-- QUIZ SETTINGS -->
+<!-- QUIZ SETUP -->
 
-<div class="option-group">
+<div id="quizSetup">
 
 <select id="boardSelect" class="select-box">
-<option value="cbse" selected>Board : CBSE</option>
-<option value="gseb">Board : GSEB</option>
+<option value="cbse">CBSE</option>
+<option value="gseb">GSEB</option>
 </select>
 
 <select id="mediumSelect" class="select-box">
-<option value="english" selected>Medium : English</option>
-<option value="gujarati">Medium : Gujarati</option>
+<option value="english">English</option>
+<option value="gujarati">Gujarati</option>
 </select>
 
 <select id="classSelect" class="select-box">
-<option value="class10" selected>Class : X</option>
-<option value="class9">Class : IX</option>
-<option value="class8">Class : VIII</option>
+<option value="class10">Class X</option>
+<option value="class9">Class IX</option>
+<option value="class8">Class VIII</option>
 </select>
 
-</div>
-
-
-<div class="option-group">
+<br>
 
 <select id="subjectSelect" class="select-box">
-
-<option value="Mathematics" selected>Mathematics</option>
+<option value="Mathematics">Mathematics</option>
 <option value="Science">Science</option>
 <option value="English">English</option>
 <option value="NEET">NEET</option>
-
 </select>
 
-</div>
-
-
-<div class="option-group">
+<br>
 
 <select id="questionCountSelect" class="select-box">
-<option value="10" selected>10 Questions</option>
+<option value="10">10 Questions</option>
 <option value="20">20 Questions</option>
 <option value="40">40 Questions</option>
-<option value="60">60 Questions</option>
-<option value="80">80 Questions</option>
-<option value="100">100 Questions</option>
 </select>
 
 <select id="customPositiveSelect" class="select-box">
-<option value="4" selected>+4</option>
+<option value="4">+4</option>
 <option value="3">+3</option>
 <option value="2">+2</option>
 <option value="1">+1</option>
 </select>
 
 <select id="customNegativeSelect" class="select-box">
-<option value="-1" selected>-1</option>
+<option value="-1">-1</option>
 <option value="-2">-2</option>
 <option value="-0.5">-0.5</option>
 </select>
 
-</div>
-
 <br>
 
-<button class="start-btn" onclick="openQuiz()">
-🚀 Start Quiz
-</button>
-
-
-<!-- SECOND USER STATUS DISPLAY -->
-
-<div class="user-card">
-
-<h3>👤 Current User</h3>
-
-<p id="userStatus2">Guest</p>
+<button class="start-btn" onclick="startQuiz()">🚀 Start Quiz</button>
 
 </div>
 
 
-<!-- GLOBAL LEADERBOARD -->
+<!-- QUIZ AREA -->
 
-<div class="leaderboard">
+<div id="quizArea" class="hide">
 
-<h2>🌍 Global Leaderboard</h2>
+<h2 id="quizTitle"></h2>
 
-<table>
+<div id="quizBox"></div>
 
-<thead>
-<tr>
-<th>Rank</th>
-<th>Name</th>
-<th>Score</th>
-</tr>
-</thead>
+</div>
 
-<tbody id="leaderboardTable">
-</tbody>
 
-</table>
+<!-- RESULT -->
+
+<div class="hide result" id="result">
+
+<h3>Result Analysis</h3>
+
+<p id="rScore"></p>
+<p id="rPercent"></p>
+<p id="rAccuracy"></p>
+<p id="rGrade"></p>
+
+<button onclick="location.reload()">Restart Quiz</button>
 
 </div>
 
 </div>
 
-
-<!-- FIREBASE -->
-
-<script type="module" src="js/firebase-config.js"></script>
-<script type="module" src="js/auth.js"></script>
-<script type="module" src="js/leaderboard.js"></script>
-
-
-<!-- OPEN QUIZ PAGE -->
 
 <script>
 
-function openQuiz(){
+let quizQuestions=[];
+let currentQuestion=0;
+
+let practiceScore=0;
+let correctCount=0;
+let wrongCount=0;
+let totalQuestions=0;
+
+let positive=4;
+let negative=-1;
+
+function startQuiz(){
+
+document.getElementById("quizSetup").style.display="none";
+document.getElementById("quizArea").classList.remove("hide");
 
 const board=document.getElementById("boardSelect").value;
 const medium=document.getElementById("mediumSelect").value;
 const className=document.getElementById("classSelect").value;
 const subject=document.getElementById("subjectSelect").value;
 
-const q=document.getElementById("questionCountSelect").value;
-const p=document.getElementById("customPositiveSelect").value;
-const n=document.getElementById("customNegativeSelect").value;
+positive=parseFloat(
+document.getElementById("customPositiveSelect").value);
 
-const url=
-"quiz/mdquiz.html?"
-+
-"board="+board+
-"&medium="+medium+
-"&class="+className+
-"&subject="+subject+
-"&q="+q+
-"&p="+p+
-"&n="+n;
+negative=parseFloat(
+document.getElementById("customNegativeSelect").value);
 
-window.open(url,"_blank");
+const limit=parseInt(
+document.getElementById("questionCountSelect").value);
+
+const path=
+"quiz-data/"+board+"/"+medium+"/"+className+"/"+subject+".js";
+
+const script=document.createElement("script");
+
+script.src=path;
+
+script.onload=function(){
+
+quizQuestions=[...window.QUIZ_DATA];
+
+quizQuestions.sort(()=>Math.random()-0.5);
+
+quizQuestions=quizQuestions.slice(0,limit);
+
+totalQuestions=quizQuestions.length;
+
+loadQuestion();
+
+};
+
+document.body.appendChild(script);
 
 }
 
 
-/* COPY USER STATUS TO SECOND AREA */
+function loadQuestion(){
 
-setInterval(()=>{
+const q=quizQuestions[currentQuestion];
 
-const status=document.getElementById("userStatus");
+document.getElementById("quizBox").innerHTML=
 
-const status2=document.getElementById("userStatus2");
+"<div class='question-box'>"+
+"Q"+(currentQuestion+1)+". "+q.question+
+"</div>"+
 
-if(status && status2){
+q.answers.map((a,i)=>
 
-status2.innerText=status.innerText;
+"<button class='option' onclick='checkAnswer("+i+")'>"+
+a.text+
+"</button>"
+
+).join("");
 
 }
 
-},1000);
+
+function checkAnswer(i){
+
+const q=quizQuestions[currentQuestion];
+
+if(q.answers[i].correct){
+
+practiceScore+=positive;
+correctCount++;
+
+}else{
+
+practiceScore+=negative;
+wrongCount++;
+
+}
+
+currentQuestion++;
+
+if(currentQuestion<quizQuestions.length){
+
+loadQuestion();
+
+}else{
+
+finishQuiz();
+
+}
+
+}
+
+
+function finishQuiz(){
+
+document.getElementById("quizArea").style.display="none";
+
+let percent=Math.round((correctCount/totalQuestions)*100);
+
+let accuracy=Math.round((correctCount/(correctCount+wrongCount))*100);
+
+let grade="C";
+
+if(percent>=90) grade="A+";
+else if(percent>=75) grade="A";
+else if(percent>=60) grade="B";
+else if(percent>=40) grade="C";
+else grade="D";
+
+document.getElementById("result").classList.remove("hide");
+
+document.getElementById("rScore").innerText="Score : "+practiceScore;
+document.getElementById("rPercent").innerText="Percentage : "+percent+"%";
+document.getElementById("rAccuracy").innerText="Accuracy : "+accuracy+"%";
+document.getElementById("rGrade").innerText="Grade : "+grade;
+
+}
 
 </script>
 
