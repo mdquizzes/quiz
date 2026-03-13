@@ -1,5 +1,5 @@
 /* ===================================
-   QUIZ ENGINE - ARCHITECTURE V1 LOCK
+   QUIZ ENGINE - ARCHITECTURE V2
 =================================== */
 
 let quizQuestions = [];
@@ -11,24 +11,24 @@ let customNegative = 0;
 let practiceScore = 0;
 let officialScore = 0;
 
-let selectedChapter = "";
 
 /* ===============================
-   LOAD CHAPTER SCRIPT
+   LOAD QUIZ FILE
 ================================= */
 
-function loadScript(src, callback){
+function loadQuizFile(src, callback){
 
-  let old = document.getElementById("chapterScript");
+  let old = document.getElementById("quizScript");
   if(old) old.remove();
 
   let script = document.createElement("script");
   script.src = src;
-  script.id = "chapterScript";
+  script.id = "quizScript";
   script.onload = callback;
 
   document.body.appendChild(script);
 }
+
 
 /* ===============================
    START QUIZ
@@ -36,40 +36,64 @@ function loadScript(src, callback){
 
 window.startQuiz = function(){
 
-  selectedChapter = document.getElementById("chapterSelect").value;
+  const board =
+  document.getElementById("boardSelect").value;
 
-  if(!selectedChapter){
-    alert("Select chapter first");
-    return;
-  }
+  const medium =
+  document.getElementById("mediumSelect").value;
 
-  document.getElementById("result").innerHTML = "";
-  document.getElementById("quizBox").innerHTML = "";
+  const className =
+  document.getElementById("classSelect").value;
 
-  customPositive = parseInt(
-    document.getElementById("customPositiveSelect").value
+  const subject =
+  document.getElementById("subjectSelect").value;
+
+  const path =
+  "quiz-data/" +
+  board + "/" +
+  medium + "/" +
+  className + "/" +
+  subject + ".js";
+
+  document.getElementById("quizBox").innerHTML="";
+  document.getElementById("result").innerHTML="";
+
+  customPositive = parseFloat(
+  document.getElementById("customPositiveSelect").value
   );
 
-  customNegative = parseInt(
-    document.getElementById("customNegativeSelect").value
+  customNegative = parseFloat(
+  document.getElementById("customNegativeSelect").value
   );
 
-  practiceScore = 0;
-  officialScore = 0;
+  practiceScore=0;
+  officialScore=0;
 
-  loadScript(selectedChapter, function(){
+  loadQuizFile(path,function(){
 
-    quizQuestions = [...window.chapterQuestions];
+    if(!window.QUIZ_DATA){
+      alert("Quiz file not found.");
+      return;
+    }
 
-    quizQuestions.sort(() => Math.random() - 0.5);
+    quizQuestions=[...window.QUIZ_DATA];
 
-    quizQuestions = quizQuestions.slice(0, 10);
+    quizQuestions.sort(()=>Math.random()-0.5);
 
-    currentQuestion = 0;
+    const limit = parseInt(
+      document.getElementById("questionCountSelect").value
+    );
+
+    quizQuestions=quizQuestions.slice(0,limit);
+
+    currentQuestion=0;
 
     loadQuestion();
+
   });
+
 };
+
 
 /* ===============================
    LOAD QUESTION
@@ -77,50 +101,68 @@ window.startQuiz = function(){
 
 function loadQuestion(){
 
-  const q = quiz-data[currentQuestion];
+  const q=quizQuestions[currentQuestion];
 
-  document.getElementById("quizBox").innerHTML = `
-    <div class="question-box">
-      <b>Q${currentQuestion+1}.</b> ${q.question}
-    </div>
+  document.getElementById("quizBox").innerHTML=`
 
-    <div class="options-grid">
-      ${q.answers.map((ans, i) =>
-        `<button class="option"
-          onclick="checkAnswer(${i})">
-          ${ans.text}
-        </button>`
-      ).join("")}
-    </div>
+  <div class="question-box">
+  <b>Q${currentQuestion+1}.</b> ${q.question}
+  </div>
+
+  <div class="options-grid">
+
+  ${q.answers.map((ans,i)=>`
+
+  <button class="option"
+  onclick="checkAnswer(${i})">
+  ${ans.text}
+  </button>
+
+  `).join("")}
+
+  </div>
+
   `;
+
 }
+
 
 /* ===============================
    CHECK ANSWER
 ================================= */
 
-window.checkAnswer = function(index){
+window.checkAnswer=function(index){
 
-  const q = quizQuestions[currentQuestion];
+  const q=quizQuestions[currentQuestion];
 
   if(q.answers[index].correct){
-    practiceScore += customPositive;
-    officialScore += 4;
+
+    practiceScore+=customPositive;
+    officialScore+=4;
+
   }
   else{
-    practiceScore -= customNegative;
-    officialScore -= 1;
+
+    practiceScore-=customNegative;
+    officialScore-=1;
+
   }
 
   currentQuestion++;
 
-  if(currentQuestion < quizQuestions.length){
+  if(currentQuestion<quizQuestions.length){
+
     loadQuestion();
+
   }
   else{
+
     finishQuiz();
+
   }
+
 };
+
 
 /* ===============================
    FINISH QUIZ
@@ -128,51 +170,66 @@ window.checkAnswer = function(index){
 
 function finishQuiz(){
 
-  document.getElementById("quizBox").innerHTML = "";
+  document.getElementById("quizBox").innerHTML="";
 
-  document.getElementById("result").innerHTML = `
-    <div class="result-card">
-      <h2>🎯 Performance Card</h2>
-      <p><strong>Practice Score:</strong> ${practiceScore}</p>
-      <p><strong>Earning Points (4/-1):</strong> ${officialScore}</p>
-      <p id="saveStatus"></p>
-    </div>
+  document.getElementById("result").innerHTML=`
+
+  <div class="result-card">
+
+  <h2>🎯 Performance Card</h2>
+
+  <p><strong>Practice Score:</strong> ${practiceScore}</p>
+
+  <p><strong>Earning Points (4/-1):</strong> ${officialScore}</p>
+
+  <p id="saveStatus"></p>
+
+  </div>
+
   `;
 
-  /* ===== SAVE SCORE IF FIREBASE AVAILABLE ===== */
+  if(window.saveOfficialScore){
 
- if (window.saveOfficialScore) {
+    document.getElementById("saveStatus").innerText=
+    "Saving score...";
 
-  document.getElementById("saveStatus").innerText = "Saving score...";
+    window.saveOfficialScore(officialScore)
 
-  window.saveOfficialScore(officialScore)
-    .then(() => {
-      document.getElementById("saveStatus").innerText =
-        "✅ Score Saved Successfully";
+    .then(()=>{
+
+      document.getElementById("saveStatus").innerText=
+      "✅ Score Saved Successfully";
+
     })
-    .catch((error) => {
-      console.error(error);
-      document.getElementById("saveStatus").innerText =
-        "❌ Error Saving Score";
+
+    .catch(()=>{
+
+      document.getElementById("saveStatus").innerText=
+      "❌ Error Saving Score";
+
     });
 
-} else {
+  }
+  else{
 
-  document.getElementById("saveStatus").innerText =
+    document.getElementById("saveStatus").innerText=
     "Login to save your earning points";
+
+  }
+
 }
 
-} // finishQuiz close
+
 /* ===============================
-   BUTTON EVENT LISTENER
+   BUTTON EVENT
 ================================= */
 
-document.addEventListener("DOMContentLoaded", function(){
+document.addEventListener("DOMContentLoaded",function(){
 
-  const btn = document.getElementById("startBtn");
+  const btn=document.getElementById("startBtn");
 
   if(btn){
-    btn.addEventListener("click", startQuiz);
+    btn.addEventListener("click",startQuiz);
   }
 
 });
