@@ -37,14 +37,16 @@ limit(10)
 
 const snapshot=await getDocs(q);
 
-let html=`
-<div class="leaderboard-card">
-<h2>🏆 Global Leaderboard</h2>
-`;
+if(snapshot.empty){
+leaderboardDiv.innerHTML="No leaderboard data yet.";
+return;
+}
+
+let html=`<h2>🏆 Global Leaderboard</h2>`;
 
 let rank=1;
 
-snapshot.forEach(docSnap=>{
+snapshot.forEach((docSnap)=>{
 
 const data=docSnap.data();
 
@@ -67,7 +69,10 @@ rowClass="bronze";
 html+=`
 
 <div class="leader-row ${rowClass}">
-<div class="rank">${medal || "#"+rank}</div>
+
+<div class="rank">
+${medal || "#"+rank}
+</div>
 
 <div class="player">
 
@@ -89,8 +94,6 @@ rank++;
 
 });
 
-html+="</div>";
-
 leaderboardDiv.innerHTML=html;
 
 };
@@ -101,7 +104,7 @@ leaderboardDiv.innerHTML=html;
    CURRENT USER RANK
 ========================= */
 
-window.loadUserRank = async function(){
+window.loadUserRank = function(){
 
 const userRankDiv=document.getElementById("userRank");
 
@@ -126,7 +129,7 @@ const snapshot=await getDocs(q);
 let rank=1;
 let foundRank=null;
 
-snapshot.forEach(docSnap=>{
+snapshot.forEach((docSnap)=>{
 
 if(docSnap.id===user.uid){
 foundRank=rank;
@@ -139,6 +142,7 @@ rank++;
 if(foundRank){
 
 userRankDiv.innerHTML=`
+
 <div class="my-rank-card">
 
 <h3>🏅 Your Ranking</h3>
@@ -146,6 +150,7 @@ userRankDiv.innerHTML=`
 <p>Rank : #${foundRank}</p>
 
 </div>
+
 `;
 
 }else{
@@ -180,6 +185,12 @@ return;
 }
 
 const snap=await getDoc(doc(db,"users",user.uid));
+
+if(!snap.exists()){
+profileDiv.innerHTML="Profile not found.";
+return;
+}
+
 const data=snap.data();
 
 profileDiv.innerHTML=`
@@ -188,7 +199,7 @@ profileDiv.innerHTML=`
 
 <h2>👤 Your Profile</h2>
 
-<p><b>Name:</b> ${data.firstName || ""}</p>
+<p><b>Name:</b> ${data.firstName || ""} ${data.lastName || ""}</p>
 
 <p><b>Total Points:</b> ${data.totalScore || 0}</p>
 
