@@ -1,38 +1,42 @@
 <!DOCTYPE html>
 <html>
 <head>
+
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>MD QUIZZES - Main Leaderboard</title>
+
 <style>
 
 body{
-
 font-family:Segoe UI;
 background:#0f172a;
 color:white;
 margin:0;
 padding:20px;
+text-align:center;
+}
 
+h1{
+color:#ffd60a;
+margin-bottom:20px;
 }
 
 .leaderboard-card{
-
 background:#111827;
 padding:20px;
 border-radius:12px;
 max-width:700px;
 margin:auto;
-
 }
 
 .leader-row{
-
 display:flex;
 justify-content:space-between;
 align-items:center;
 padding:12px;
 border-bottom:1px solid #333;
-
 }
 
 .rank{
@@ -43,60 +47,53 @@ width:60px;
 
 .player{
 flex:1;
+text-align:left;
 }
 
 .score{
 font-weight:bold;
 }
 
-.gold{
-background:#1f2937;
-}
-
-.silver{
-background:#1e293b;
-}
-
-.bronze{
-background:#172554;
-}
+.gold{background:#1f2937;}
+.silver{background:#1e293b;}
+.bronze{background:#172554;}
 
 .my-rank-card{
-
 background:#1e293b;
 padding:20px;
 border-radius:12px;
 margin-top:20px;
-
 }
 
 .profile-card{
-
 background:#020617;
 padding:20px;
 border-radius:12px;
 margin-top:20px;
 }
+
 </style>
+
 </head>
 
 <body>
 
 <h1>🏆 Main Leaderboard</h1>
 
-<div id="leaderboard" class="leaderboard"></div>
+<div class="leaderboard-card">
+
+<div id="leaderboard"></div>
+
+</div>
 
 <div id="userRank"></div>
+
 <div id="profileCard"></div>
+
+<!-- Firebase -->
 
 <script type="module" src="js/firebase-config.js"></script>
 <script type="module" src="js/leaderboard.js"></script>
- 
-<script>
-  window.onload = function(){
-    loadMainLeaderboard();
-  };
-</script>
 
 </body>
 </html>
