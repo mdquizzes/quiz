@@ -1,65 +1,98 @@
 <!DOCTYPE html>
 <html>
 <head>
+
 <meta charset="UTF-8">
 <title>MD QUIZZES</title>
 
 <style>
+
 body{
-  margin:0;
-  font-family:Segoe UI;
-  background: radial-gradient(circle,#001f3f,#000814);
-  color:white;
-  text-align:center;
+margin:0;
+font-family:Segoe UI;
+background: radial-gradient(circle,#001f3f,#000814);
+color:white;
+text-align:center;
 }
 
-h1{ color:gold; }
+h1{color:gold;}
 
 .container{
-  max-width:950px;
-  margin:auto;
-  padding:20px;
+max-width:1000px;
+margin:auto;
+padding:20px;
 }
 
-.top-menu{
-  position:absolute;
-  right:20px;
-  top:20px;
+.topbar{
+display:flex;
+justify-content:flex-end;
+gap:10px;
+margin-bottom:10px;
 }
 
-.top-menu button{
-  margin-left:8px;
-  padding:6px 10px;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-  font-size:13px;
+.topbar span{
+margin-right:auto;
+font-weight:bold;
+color:#ffd60a;
 }
 
-.login-btn{ background:gold; }
-.logout-btn{ background:red; color:white; }
-.profile-btn{ background:#00c896; color:white; }
+button{
+padding:8px 12px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+}
 
-select,button{
-  padding:8px 12px;
-  margin:6px;
-  border-radius:6px;
-  border:none;
+.login-btn{background:#ffd60a;}
+.logout-btn{background:#ff3b3b;color:white;}
+.profile-btn{background:#00c896;color:white;}
+
+.select-box{
+margin:8px;
+padding:8px;
+border-radius:6px;
+border:none;
 }
 
 .start-btn{
-  background:gold;
-  font-weight:bold;
-  cursor:pointer;
+background:gold;
+font-weight:bold;
+margin-top:10px;
+}
+
+.quiz-box{
+margin-top:20px;
+}
+
+.result-box{
+margin-top:20px;
+font-size:18px;
+font-weight:bold;
 }
 
 .leaderboard{
-  background:#111;
-  padding:15px;
-  border-radius:12px;
-  margin-top:20px;
+background:#111;
+margin-top:30px;
+padding:15px;
+border-radius:12px;
 }
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th,td{
+padding:8px;
+border-bottom:1px solid #333;
+}
+
+th{
+color:#ffd60a;
+}
+
 </style>
+
 </head>
 
 <body>
@@ -68,48 +101,146 @@ select,button{
 
 <div class="container">
 
-<select id="chapterSelect">
+<!-- TOPBAR -->
+
+<div class="topbar">
+
+<span id="userStatus">Guest</span>
+
+<button class="login-btn" id="loginBtn"
+onclick="window.location.href='login.html'">
+Login
+</button>
+
+<button class="profile-btn" id="profileBtn" style="display:none"
+onclick="window.location.href='profile.html'">
+Profile
+</button>
+
+<button class="logout-btn" id="logoutBtn" style="display:none">
+Logout
+</button>
+
+</div>
+
+
+<!-- QUIZ OPTIONS -->
+
+<select id="boardSelect" class="select-box">
+<option selected>Board : CBSE</option>
+<option>GSEB</option>
+</select>
+
+<select id="mediumSelect" class="select-box">
+<option selected>Medium : English</option>
+<option>Gujarati</option>
+</select>
+
+<select id="classSelect" class="select-box">
+<option selected>Class : X</option>
+<option>IX</option>
+<option>VIII</option>
+</select>
+
+<br>
+
+<select id="subjectSelect" class="select-box">
+<option selected>Mathematics</option>
+<option>Science</option>
+<option>English</option>
+<option>NEET</option>
+</select>
+
+<select id="chapterSelect" class="select-box">
 <option value="">Select Chapter</option>
 <option value="js/human_physiology.js">Human Physiology</option>
 <option value="js/cell_biology.js">Cell Biology</option>
-</select>  
-
-<br>
-
-<select id="customPositiveSelect">
-<option value="4" selected>Right +4</option>
-<option value="3">Right +3</option>
-<option value="2">Right +2</option>
-<option value="1">Right +1</option>
-</select>
-
-<select id="customNegativeSelect">
-<option value="1" selected>Wrong -1</option>
-<option value="0">Wrong 0</option>
-<option value="2">Wrong -2</option>
 </select>
 
 <br>
 
-<!-- ❌ onclick removed -->
-<button class="start-btn" id="startBtn">Start Test</button>
+<select id="questionCountSelect" class="select-box">
+<option selected>10</option>
+<option>20</option>
+<option>40</option>
+<option>60</option>
+<option>80</option>
+<option>100</option>
+<option>180</option>
+</select>
 
-<!-- ✅ IMPORTANT: id changed to quizBox -->
-<div id="quizBox"></div>
-<div id="result"></div>
+<br>
+
+<select id="customPositiveSelect" class="select-box">
+<option selected>4</option>
+<option>3</option>
+<option>2</option>
+<option>1</option>
+</select>
+
+<select id="customNegativeSelect" class="select-box">
+<option selected>-1</option>
+<option>-2</option>
+<option>-0.5</option>
+</select>
+
+<br>
+
+<button class="start-btn" id="startBtn">
+Start Test
+</button>
+
+
+<!-- QUIZ AREA -->
+
+<div class="quiz-box" id="quizBox"></div>
+
+<div class="result-box" id="result"></div>
 
 <hr>
 
 <p id="totalPoints"></p>
 
+
+<!-- GLOBAL LEADERBOARD -->
+
+<div class="leaderboard">
+
+<h2>🌍 Global Leaderboard</h2>
+
+<table>
+
+<thead>
+
+<tr>
+<th>Rank</th>
+<th>Name</th>
+<th>Score</th>
+</tr>
+
+</thead>
+
+<tbody id="leaderboardTable">
+
+</tbody>
+
+</table>
+
 </div>
 
-<!-- Firebase Modules -->
+</div>
+
+
+<!-- FIREBASE -->
+
 <script type="module" src="js/firebase-config.js"></script>
+
 <script type="module" src="js/auth.js"></script>
+
 <script type="module" src="js/leaderboard.js"></script>
 
-<!-- Quiz Engine (Normal Script, NOT module) -->
+<!-- QUIZ ENGINE -->
+
 <script src="js/quiz-engine.js"></script>
 
 </body>
