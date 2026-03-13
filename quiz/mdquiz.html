@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>MD QUIZ TEST</title>
+
+<style>
+body{
+font-family:Segoe UI;
+background:#000814;
+color:white;
+text-align:center;
+margin:0;
+padding:20px;
+}
+
+h1{color:#ffd60a;}
+
+.question-box{
+margin:20px;
+font-size:20px;
+}
+
+.option{
+display:block;
+margin:10px auto;
+padding:10px;
+width:220px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+background:#1e293b;
+color:white;
+}
+
+.option:hover{
+background:#334155;
+}
+
+.result-card{
+margin-top:20px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>📚 MD QUIZ</h1>
+
+<div id="quizBox"></div>
+<div id="result"></div>
+
+<script>
+
+let quizQuestions=[];
+let currentQuestion=0;
+
+let practiceScore=0;
+
+const params =
+new URLSearchParams(window.location.search);
+
+const board=params.get("board");
+const medium=params.get("medium");
+const className=params.get("class");
+const subject=params.get("subject");
+
+const questionLimit=parseInt(params.get("q"));
+const positive=parseFloat(params.get("p"));
+const negative=parseFloat(params.get("n"));
+
+const path =
+"quiz-data/"+board+"/"+medium+"/"+className+"/"+subject+".js";
+
+function loadQuiz(){
+
+const script=document.createElement("script");
+script.src=path;
+
+script.onload=function(){
+
+quizQuestions=[...window.QUIZ_DATA];
+
+quizQuestions.sort(()=>Math.random()-0.5);
+
+quizQuestions=quizQuestions.slice(0,questionLimit);
+
+loadQuestion();
+
+};
+
+document.body.appendChild(script);
+
+}
+
+function loadQuestion(){
+
+const q=quizQuestions[currentQuestion];
+
+document.getElementById("quizBox").innerHTML=
+
+"<div class='question-box'>"+
+"Q"+(currentQuestion+1)+". "+q.question+
+"</div>"+
+
+q.answers.map((a,i)=>
+
+"<button class='option' onclick='checkAnswer("+i+")'>"+
+a.text+
+"</button>"
+
+).join("");
+
+}
+
+function checkAnswer(i){
+
+const q=quizQuestions[currentQuestion];
+
+if(q.answers[i].correct){
+
+practiceScore+=positive;
+
+}else{
+
+practiceScore+=negative;
+
+}
+
+currentQuestion++;
+
+if(currentQuestion<quizQuestions.length){
+
+loadQuestion();
+
+}else{
+
+finishQuiz();
+
+}
+
+}
+
+function finishQuiz(){
+
+document.getElementById("quizBox").innerHTML="";
+
+document.getElementById("result").innerHTML=
+
+"<div class='result-card'>"+
+"<h2>🎯 Quiz Finished</h2>"+
+"<p>Score : "+practiceScore+"</p>"+
+"</div>";
+
+}
+
+loadQuiz();
+
+</script>
+
+</body>
+</html>
