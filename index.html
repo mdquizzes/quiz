@@ -7,37 +7,95 @@
 
 <style>
 body{
-margin:0;
-font-family:Segoe UI;
-background:radial-gradient(circle,#001f3f,#000814);
-color:white;
-text-align:center;
+  margin:0;
+  font-family:Segoe UI;
+  background:radial-gradient(circle,#001f3f,#000814);
+  color:white;
+  text-align:center;
 }
 
-h1{color:#ffd60a;margin-top:20px;}
+h1{
+  color:#ffd60a;
+  margin-top:20px;
+}
 
 .container{
-max-width:800px;
-margin:auto;
-padding:20px;
+  max-width:1000px;
+  margin:auto;
+  padding:20px;
 }
 
+/* TOPBAR */
+.topbar{
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  gap:10px;
+  margin-bottom:20px;
+}
+
+.topbar span{
+  margin-right:auto;
+  font-weight:bold;
+  color:#ffd60a;
+}
+
+/* BUTTONS */
+button{
+  padding:8px 14px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.login-btn{background:#ffd60a;}
+.logout-btn{background:#ff3b3b;color:white;}
+.profile-btn{background:#00c896;color:white;}
+.start-btn{background:#ffd60a;font-size:15px;}
+
+/* SELECT */
 .select-box{
-margin:8px;
-padding:8px 12px;
-border-radius:6px;
-border:none;
-font-size:14px;
+  margin:8px;
+  padding:8px 12px;
+  border-radius:6px;
+  border:none;
+  font-size:14px;
 }
 
-.start-btn{
-background:#ffd60a;
-border:none;
-padding:10px 18px;
-border-radius:6px;
-cursor:pointer;
-font-weight:bold;
-margin-top:10px;
+/* OPTION BLOCK */
+.option-group{
+  margin-top:20px;
+}
+
+/* SECOND USER STATUS AREA */
+.user-card{
+  margin-top:30px;
+  padding:15px;
+  background:#0f172a;
+  border-radius:10px;
+}
+
+/* LEADERBOARD */
+.leaderboard{
+  background:#0f172a;
+  margin-top:40px;
+  padding:20px;
+  border-radius:12px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th,td{
+  padding:10px;
+  border-bottom:1px solid #333;
+}
+
+th{
+  color:#ffd60a;
 }
 </style>
 </head>
@@ -48,86 +106,160 @@ margin-top:10px;
 
 <div class="container">
 
+<!-- TOPBAR -->
+
+<div class="topbar">
+
+<span id="userStatus">Guest</span>
+
+<button class="login-btn" id="loginBtn"
+onclick="window.location.href='login.html'">
+Login
+</button>
+
+<button class="profile-btn" id="profileBtn" style="display:none"
+onclick="window.location.href='profile.html'">
+Profile
+</button>
+
+<button class="logout-btn" id="logoutBtn" style="display:none">
+Logout
+</button>
+
+</div>
+
+
+<!-- QUIZ SETTINGS -->
+
+<div class="option-group">
+
 <select id="boardSelect" class="select-box">
-<option value="cbse">CBSE</option>
-<option value="gseb">GSEB</option>
+<option value="cbse" selected>Board : CBSE</option>
+<option value="gseb">Board : GSEB</option>
 </select>
 
 <select id="mediumSelect" class="select-box">
-<option value="english">English</option>
-<option value="gujarati">Gujarati</option>
+<option value="english" selected>Medium : English</option>
+<option value="gujarati">Medium : Gujarati</option>
 </select>
 
 <select id="classSelect" class="select-box">
-<option value="class10">Class X</option>
-<option value="class9">Class IX</option>
-<option value="class8">Class VIII</option>
+<option value="class10" selected>Class : X</option>
+<option value="class9">Class : IX</option>
+<option value="class8">Class : VIII</option>
 </select>
 
-<br>
+</div>
+
+
+<div class="option-group">
 
 <select id="subjectSelect" class="select-box">
-<option value="Mathematics">Mathematics</option>
+
+<option value="Mathematics" selected>Mathematics</option>
 <option value="Science">Science</option>
 <option value="English">English</option>
 <option value="NEET">NEET</option>
+
 </select>
 
-<br>
+</div>
+
+
+<div class="option-group">
 
 <select id="questionCountSelect" class="select-box">
-<option value="10">10 Questions</option>
+<option value="10" selected>10 Questions</option>
 <option value="20">20 Questions</option>
 <option value="40">40 Questions</option>
 <option value="60">60 Questions</option>
+<option value="80">80 Questions</option>
+<option value="100">100 Questions</option>
 </select>
 
 <select id="customPositiveSelect" class="select-box">
-<option value="4">+4</option>
+<option value="4" selected>+4</option>
 <option value="3">+3</option>
 <option value="2">+2</option>
 <option value="1">+1</option>
 </select>
 
 <select id="customNegativeSelect" class="select-box">
-<option value="-1">-1</option>
+<option value="-1" selected>-1</option>
 <option value="-2">-2</option>
 <option value="-0.5">-0.5</option>
 </select>
 
+</div>
+
 <br>
 
-<button class="start-btn" onclick="openQuiz()">🚀 Start Quiz</button>
+<button class="start-btn" onclick="openQuiz()">
+🚀 Start Quiz
+</button>
+
+
+<!-- SECOND USER STATUS DISPLAY -->
+
+<div class="user-card">
+
+<h3>👤 Current User</h3>
+
+<p id="userStatus2">Guest</p>
 
 </div>
+
+
+<!-- GLOBAL LEADERBOARD -->
+
+<div class="leaderboard">
+
+<h2>🌍 Global Leaderboard</h2>
+
+<table>
+
+<thead>
+<tr>
+<th>Rank</th>
+<th>Name</th>
+<th>Score</th>
+</tr>
+</thead>
+
+<tbody id="leaderboardTable">
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+
+<!-- FIREBASE -->
+
+<script type="module" src="js/firebase-config.js"></script>
+<script type="module" src="js/auth.js"></script>
+<script type="module" src="js/leaderboard.js"></script>
+
+
+<!-- OPEN QUIZ PAGE -->
 
 <script>
 
 function openQuiz(){
 
-const board =
-document.getElementById("boardSelect").value;
+const board=document.getElementById("boardSelect").value;
+const medium=document.getElementById("mediumSelect").value;
+const className=document.getElementById("classSelect").value;
+const subject=document.getElementById("subjectSelect").value;
 
-const medium =
-document.getElementById("mediumSelect").value;
+const q=document.getElementById("questionCountSelect").value;
+const p=document.getElementById("customPositiveSelect").value;
+const n=document.getElementById("customNegativeSelect").value;
 
-const className =
-document.getElementById("classSelect").value;
-
-const subject =
-document.getElementById("subjectSelect").value;
-
-const q =
-document.getElementById("questionCountSelect").value;
-
-const p =
-document.getElementById("customPositiveSelect").value;
-
-const n =
-document.getElementById("customNegativeSelect").value;
-
-const url =
-"mdquiz.html?"
+const url=
+"quiz/mdquiz.html?"
 +
 "board="+board+
 "&medium="+medium+
@@ -140,6 +272,23 @@ const url =
 window.open(url,"_blank");
 
 }
+
+
+/* COPY USER STATUS TO SECOND AREA */
+
+setInterval(()=>{
+
+const status=document.getElementById("userStatus");
+
+const status2=document.getElementById("userStatus2");
+
+if(status && status2){
+
+status2.innerText=status.innerText;
+
+}
+
+},1000);
 
 </script>
 
