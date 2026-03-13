@@ -144,20 +144,37 @@ Logout
 
 <br>
 
+<!-- SUBJECT SELECT -->
+
 <select id="subjectSelect" class="select-box">
-<option selected>Mathematics</option>
-<option>Science</option>
-<option>English</option>
-<option>NEET</option>
+
+<option value="mathematics" selected>Mathematics</option>
+<option value="science">Science</option>
+<option value="english">English</option>
+<option value="neet">NEET</option>
+
 </select>
 
-<select id="chapterSelect" class="select-box">
-<option value="">Select Chapter</option>
-<option value="js/human_physiology.js">Human Physiology</option>
-<option value="js/cell_biology.js">Cell Biology</option>
-</select>
 
-<br>
+<!-- FUTURE FEATURE PLACEHOLDER -->
+
+<div style="margin-top:10px;font-size:13px;color:#bbb">
+
+<!--
+Future Feature:
+Dynamic chapter system will load here.
+
+Example structure:
+questionbank/board/medium/class/subject/chapter.js
+
+Later we will create chapter dropdown
+based on selected subject.
+-->
+
+</div>
+
+
+<select>
 
 <select id="questionCountSelect" class="select-box">
 <option selected>10</option>
@@ -184,7 +201,6 @@ Logout
 <option>-0.5</option>
 </select>
 
-<br>
 
 <button class="start-btn" id="startBtn">
 Start Test
