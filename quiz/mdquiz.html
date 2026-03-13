@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
+
 <meta charset="UTF-8">
-<title>MD QUIZ TEST</title>
+<title>MD QUIZ</title>
 
 <style>
+
 body{
 font-family:Segoe UI;
 background:#000814;
@@ -25,7 +27,7 @@ font-size:20px;
 display:block;
 margin:10px auto;
 padding:10px;
-width:220px;
+width:240px;
 border:none;
 border-radius:6px;
 cursor:pointer;
@@ -37,126 +39,42 @@ color:white;
 background:#334155;
 }
 
-.result-card{
+.result{
 margin-top:20px;
 }
+
+.hide{
+display:none;
+}
+
 </style>
+
 </head>
 
 <body>
 
-<h1>📚 MD QUIZ</h1>
+<h1 id="quizTitle">MD Quiz</h1>
 
 <div id="quizBox"></div>
-<div id="result"></div>
 
-<script>
+<div class="hide result" id="result">
 
-let quizQuestions=[];
-let currentQuestion=0;
+<h3>Result Analysis</h3>
 
-let practiceScore=0;
+<p id="rScore"></p>
+<p id="rPercent"></p>
+<p id="rAccuracy"></p>
+<p id="rGrade"></p>
 
-const params =
-new URLSearchParams(window.location.search);
+<p id="officialScore"></p>
+<p id="saveStatus"></p>
 
-const board=params.get("board");
-const medium=params.get("medium");
-const className=params.get("class");
-const subject=params.get("subject");
+<button onclick="location.reload()">Restart Quiz</button>
 
-const questionLimit=parseInt(params.get("q"));
-const positive=parseFloat(params.get("p"));
-const negative=parseFloat(params.get("n"));
+</div>
 
-const path =
-"quiz-data/"+board+"/"+medium+"/"+className+"/"+subject+".js";
 
-function loadQuiz(){
-
-const script=document.createElement("script");
-script.src=path;
-
-script.onload=function(){
-
-quizQuestions=[...window.QUIZ_DATA];
-
-quizQuestions.sort(()=>Math.random()-0.5);
-
-quizQuestions=quizQuestions.slice(0,questionLimit);
-
-loadQuestion();
-
-};
-
-document.body.appendChild(script);
-
-}
-
-function loadQuestion(){
-
-const q=quizQuestions[currentQuestion];
-
-document.getElementById("quizBox").innerHTML=
-
-"<div class='question-box'>"+
-"Q"+(currentQuestion+1)+". "+q.question+
-"</div>"+
-
-q.answers.map((a,i)=>
-
-"<button class='option' onclick='checkAnswer("+i+")'>"+
-a.text+
-"</button>"
-
-).join("");
-
-}
-
-function checkAnswer(i){
-
-const q=quizQuestions[currentQuestion];
-
-if(q.answers[i].correct){
-
-practiceScore+=positive;
-
-}else{
-
-practiceScore+=negative;
-
-}
-
-currentQuestion++;
-
-if(currentQuestion<quizQuestions.length){
-
-loadQuestion();
-
-}else{
-
-finishQuiz();
-
-}
-
-}
-
-function finishQuiz(){
-
-document.getElementById("quizBox").innerHTML="";
-
-document.getElementById("result").innerHTML=
-
-"<div class='result-card'>"+
-"<h2>🎯 Quiz Finished</h2>"+
-"<p>Score : "+practiceScore+"</p>"+
-"</div>";
-
-}
-
-loadQuiz();
-
-</script>
+<script src="js/quiz-engine.js"></script>
 
 </body>
 </html>
