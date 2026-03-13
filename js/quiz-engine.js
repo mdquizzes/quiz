@@ -77,7 +77,7 @@ window.startQuiz = function(){
 
 function loadQuestion(){
 
-  const q = quizQuestions[currentQuestion];
+  const q = quiz-data[currentQuestion];
 
   document.getElementById("quizBox").innerHTML = `
     <div class="question-box">
