@@ -1,98 +1,72 @@
 /* ===================================
-   QUIZ ENGINE - ARCHITECTURE V2
+   MD QUIZ ENGINE
 =================================== */
 
-let quizQuestions = [];
-let currentQuestion = 0;
+let quizQuestions=[];
+let currentQuestion=0;
 
-let customPositive = 4;
-let customNegative = 0;
+let customPositive=4;
+let customNegative=-1;
 
-let practiceScore = 0;
-let officialScore = 0;
+let practiceScore=0;
+let officialScore=0;
+
+let correctCount=0;
+let wrongCount=0;
+let totalQuestions=0;
+
+
+/* ===============================
+   READ PARAMETERS
+================================= */
+
+const params=new URLSearchParams(window.location.search);
+
+const board=params.get("board");
+const medium=params.get("medium");
+const className=params.get("class");
+const subject=params.get("subject");
+
+const questionLimit=parseInt(params.get("q"));
+customPositive=parseFloat(params.get("p"));
+customNegative=parseFloat(params.get("n"));
+
+const quizName=params.get("quiz");
 
 
 /* ===============================
    LOAD QUIZ FILE
 ================================= */
 
-function loadQuizFile(src, callback){
+const path =
+"../quiz-data/"
++board+"/"
++medium+"/"
++className+"/"
++subject+".js";
 
-  let old = document.getElementById("quizScript");
-  if(old) old.remove();
+console.log("Loading:",path);
 
-  let script = document.createElement("script");
-  script.src = src;
-  script.id = "quizScript";
-  script.onload = callback;
+const script=document.createElement("script");
 
-  document.body.appendChild(script);
-}
+script.src=path;
 
+script.onload=function(){
 
-/* ===============================
-   START QUIZ
-================================= */
+quizQuestions=[...window.QUIZ_DATA];
 
-window.startQuiz = function(){
+quizQuestions.sort(()=>Math.random()-0.5);
 
-  const board =
-  document.getElementById("boardSelect").value;
+quizQuestions=quizQuestions.slice(0,questionLimit);
 
-  const medium =
-  document.getElementById("mediumSelect").value;
+totalQuestions=quizQuestions.length;
 
-  const className =
-  document.getElementById("classSelect").value;
-
-  const subject =
-  document.getElementById("subjectSelect").value;
-
-  const path =
-  "quiz-data/" +
-  board + "/" +
-  medium + "/" +
-  className + "/" +
-  subject + ".js";
-
-  document.getElementById("quizBox").innerHTML="";
-  document.getElementById("result").innerHTML="";
-
-  customPositive = parseFloat(
-  document.getElementById("customPositiveSelect").value
-  );
-
-  customNegative = parseFloat(
-  document.getElementById("customNegativeSelect").value
-  );
-
-  practiceScore=0;
-  officialScore=0;
-
-  loadQuizFile(path,function(){
-
-    if(!window.QUIZ_DATA){
-      alert("Quiz file not found.");
-      return;
-    }
-
-    quizQuestions=[...window.QUIZ_DATA];
-
-    quizQuestions.sort(()=>Math.random()-0.5);
-
-    const limit = parseInt(
-      document.getElementById("questionCountSelect").value
-    );
-
-    quizQuestions=quizQuestions.slice(0,limit);
-
-    currentQuestion=0;
-
-    loadQuestion();
-
-  });
+loadQuestion();
 
 };
+
+document.body.appendChild(script);
+
 
 
 /* ===============================
@@ -101,67 +75,62 @@ window.startQuiz = function(){
 
 function loadQuestion(){
 
-  const q=quizQuestions[currentQuestion];
+const q=quizQuestions[currentQuestion];
 
-  document.getElementById("quizBox").innerHTML=`
+document.getElementById("quizBox").innerHTML=
 
-  <div class="question-box">
-  <b>Q${currentQuestion+1}.</b> ${q.question}
-  </div>
+"<div class='question-box'>"+
+"Q"+(currentQuestion+1)+". "+q.question+
+"</div>"+
 
-  <div class="options-grid">
+q.answers.map((a,i)=>
 
-  ${q.answers.map((ans,i)=>`
+"<button class='option' onclick='checkAnswer("+i+")'>"+
+a.text+
+"</button>"
 
-  <button class="option"
-  onclick="checkAnswer(${i})">
-  ${ans.text}
-  </button>
-
-  `).join("")}
-
-  </div>
-
-  `;
+).join("");
 
 }
+
 
 
 /* ===============================
    CHECK ANSWER
 ================================= */
 
-window.checkAnswer=function(index){
+function checkAnswer(i){
 
-  const q=quizQuestions[currentQuestion];
+const q=quizQuestions[currentQuestion];
 
-  if(q.answers[index].correct){
+if(q.answers[i].correct){
 
-    practiceScore+=customPositive;
-    officialScore+=4;
+practiceScore+=customPositive;
+officialScore+=4;
+correctCount++;
 
-  }
-  else{
+}else{
 
-    practiceScore-=customNegative;
-    officialScore-=1;
+practiceScore+=customNegative;
+officialScore-=1;
+wrongCount++;
 
-  }
+}
 
-  currentQuestion++;
+currentQuestion++;
 
-  if(currentQuestion<quizQuestions.length){
+if(currentQuestion<quizQuestions.length){
 
-    loadQuestion();
+loadQuestion();
 
-  }
-  else{
+}else{
 
-    finishQuiz();
+finishQuiz();
 
-  }
+}
 
-};
+}
+
 
 
 /* ===============================
@@ -170,66 +139,37 @@ window.checkAnswer=function(index){
 
 function finishQuiz(){
 
-  document.getElementById("quizBox").innerHTML="";
+document.getElementById("quizBox").innerHTML="";
 
-  document.getElementById("result").innerHTML=`
+let percent=
+Math.round((correctCount/totalQuestions)*100);
 
-  <div class="result-card">
+let accuracy=
+Math.round((correctCount/(correctCount+wrongCount))*100);
 
-  <h2>🎯 Performance Card</h2>
+let grade="C";
 
-  <p><strong>Practice Score:</strong> ${practiceScore}</p>
+if(percent>=90) grade="A+";
+else if(percent>=75) grade="A";
+else if(percent>=60) grade="B";
+else if(percent>=40) grade="C";
+else grade="D";
 
-  <p><strong>Earning Points (4/-1):</strong> ${officialScore}</p>
+document.getElementById("result").classList.remove("hide");
 
-  <p id="saveStatus"></p>
+document.getElementById("rScore").innerText=
+"Score : "+practiceScore;
 
-  </div>
+document.getElementById("rPercent").innerText=
+"Percentage : "+percent+"%";
 
-  `;
+document.getElementById("rAccuracy").innerText=
+"Accuracy : "+accuracy+"%";
 
-  if(window.saveOfficialScore){
+document.getElementById("rGrade").innerText=
+"Grade : "+grade;
 
-    document.getElementById("saveStatus").innerText=
-    "Saving score...";
-
-    window.saveOfficialScore(officialScore)
-
-    .then(()=>{
-
-      document.getElementById("saveStatus").innerText=
-      "✅ Score Saved Successfully";
-
-    })
-
-    .catch(()=>{
-
-      document.getElementById("saveStatus").innerText=
-      "❌ Error Saving Score";
-
-    });
-
-  }
-  else{
-
-    document.getElementById("saveStatus").innerText=
-    "Login to save your earning points";
-
-  }
+document.getElementById("officialScore").innerText=
+"Earning Points : "+officialScore;
 
 }
-
-
-/* ===============================
-   BUTTON EVENT
-================================= */
-
-document.addEventListener("DOMContentLoaded",function(){
-
-  const btn=document.getElementById("startBtn");
-
-  if(btn){
-    btn.addEventListener("click",startQuiz);
-  }
-
-});
