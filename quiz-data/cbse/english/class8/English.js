@@ -1,4 +1,4 @@
-window.chapterQuestions = [
+window.QUIZ_DATA = [
 
 {
 question: "Choose the correct synonym of 'Brave': (Q1)",
