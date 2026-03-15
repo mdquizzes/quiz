@@ -1,4 +1,4 @@
-window.chapterQuestions = [
+window.QUIZ_DATA = [
 
 {
 question: "The value of 7 × 8 is: (Q1)",
