@@ -243,44 +243,94 @@ const subject=document.getElementById("subjectSelect").value;
 positive=parseFloat(document.getElementById("customPositiveSelect").value);
 negative=parseFloat(document.getElementById("customNegativeSelect").value);
 
-const limit=parseInt(document.getElementById("questionCountSelect").value);
-
 quizQuestions=[];
 
-/* CDN BASE PATH */
-
-const baseURL="https://cdn.jsdelivr.net/gh/mdquizzes/mdquizzes/quiz-data/";
+const baseURL="https://cdn.jsdelivr.net/gh/mdquizzes/mdquizzes@main/quiz-data/";
 
 if(subject==="Full"){
 
-const subjects=["Chemistry","Physics","Biology"];
 let loaded=0;
 
-subjects.forEach(sub=>{
+let bioQuestions=[];
+let phyQuestions=[];
+let chemQuestions=[];
 
-const script=document.createElement("script");
+/* BIOLOGY */
 
-script.src=baseURL+board+"/"+medium+"/"+sub+".js";
+const bioScript=document.createElement("script");
+bioScript.src=baseURL+board+"/"+medium+"/Biology.js";
 
-script.onload=function(){
+bioScript.onload=function(){
 
-quizQuestions.push(...window.QUIZ_DATA);
-
+bioQuestions=[...window.QUIZ_DATA];
 loaded++;
 
-if(loaded===subjects.length){
-
-prepareQuiz(limit);
-
-}
+if(loaded===3) buildFullQuiz();
 
 };
 
-document.body.appendChild(script);
+document.body.appendChild(bioScript);
 
-});
+
+/* PHYSICS */
+
+const phyScript=document.createElement("script");
+phyScript.src=baseURL+board+"/"+medium+"/Physics.js";
+
+phyScript.onload=function(){
+
+phyQuestions=[...window.QUIZ_DATA];
+loaded++;
+
+if(loaded===3) buildFullQuiz();
+
+};
+
+document.body.appendChild(phyScript);
+
+
+/* CHEMISTRY */
+
+const chemScript=document.createElement("script");
+chemScript.src=baseURL+board+"/"+medium+"/Chemistry.js";
+
+chemScript.onload=function(){
+
+chemQuestions=[...window.QUIZ_DATA];
+loaded++;
+
+if(loaded===3) buildFullQuiz();
+
+};
+
+document.body.appendChild(chemScript);
+
+
+/* BUILD FULL QUIZ */
+
+function buildFullQuiz(){
+
+bioQuestions.sort(()=>Math.random()-0.5);
+phyQuestions.sort(()=>Math.random()-0.5);
+chemQuestions.sort(()=>Math.random()-0.5);
+
+quizQuestions=[
+...bioQuestions.slice(0,90),
+...phyQuestions.slice(0,45),
+...chemQuestions.slice(0,45)
+];
+
+quizQuestions.sort(()=>Math.random()-0.5);
+
+totalQuestions=quizQuestions.length;
+
+loadQuestion();
+
+}
 
 }else{
+
+const limit=parseInt(document.getElementById("questionCountSelect").value);
 
 const script=document.createElement("script");
 
@@ -290,21 +340,6 @@ script.onload=function(){
 
 quizQuestions=[...window.QUIZ_DATA];
 
-prepareQuiz(limit);
-
-};
-
-document.body.appendChild(script);
-
-}
-
-}
-
-
-/* PREPARE QUIZ */
-
-function prepareQuiz(limit){
-
 quizQuestions.sort(()=>Math.random()-0.5);
 
 quizQuestions=quizQuestions.slice(0,limit);
@@ -313,8 +348,13 @@ totalQuestions=quizQuestions.length;
 
 loadQuestion();
 
+};
+
+document.body.appendChild(script);
+
 }
 
+}
 
 /* LOAD QUESTION */
 
