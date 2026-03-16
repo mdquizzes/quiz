@@ -1,4 +1,4 @@
-window.chapterQuestions = [
+window.QUIZ_DATA = [
 
 {
 question: "The hybridization of carbon in methane (CH4) is: (Q1)",
