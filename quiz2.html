@@ -238,7 +238,6 @@ document.getElementById("quizArea").classList.remove("hide");
 
 const board=document.getElementById("boardSelect").value;
 const medium=document.getElementById("mediumSelect").value;
-const className=document.getElementById("classSelect").value;
 const subject=document.getElementById("subjectSelect").value;
 
 positive=parseFloat(document.getElementById("customPositiveSelect").value);
@@ -250,7 +249,7 @@ quizQuestions=[];
 
 /* CDN BASE PATH */
 
-const baseURL="https://cdn.jsdelivr.net/gh/mdquizzes/mdquizzes/quiz-data/";
+const baseURL="https://cdn.jsdelivr.net/gh/mdquizzes/mdquizzes/quiz-data/neet/english/";
 
 if(subject==="Full"){
 
@@ -261,7 +260,7 @@ subjects.forEach(sub=>{
 
 const script=document.createElement("script");
 
-script.src=baseURL+board+"/"+medium+"/"+className+"/"+sub+".js";
+script.src=baseURL+board+"/"+medium+"/"+sub+".js";
 
 script.onload=function(){
 
@@ -285,7 +284,7 @@ document.body.appendChild(script);
 
 const script=document.createElement("script");
 
-script.src=baseURL+board+"/"+medium+"/"+className+"/"+subject+".js";
+script.src=baseURL+board+"/"+medium+"/"+subject+".js";
 
 script.onload=function(){
 
