@@ -1,4 +1,4 @@
-window.chapterQuestions = [
+window.QUIZ_DATA = [
 
 {
 question: "A body moving with velocity 20 m/s is brought to rest in 4 s. Find retardation: (Q1)",
