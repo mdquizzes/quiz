@@ -1,4 +1,4 @@
-window.chapterQuestions = [
+window.QUIZ_DATA = [
 
 {
 question: "Which hormone regulates basal metabolic rate in humans?",
