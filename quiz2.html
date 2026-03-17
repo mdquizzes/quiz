@@ -112,8 +112,6 @@ text-align:left;
 <button class="logout-btn" style="display:none">Logout</button>
 </div>
 
-<!-- SETTINGS -->
-
 <div id="quizSetup">
 
 <select id="boardSelect" class="select-box">
@@ -163,14 +161,10 @@ text-align:left;
 
 </div>
 
-<!-- QUIZ -->
-
 <div id="quizArea" class="hide">
 <h2 id="quizTitle"></h2>
 <div id="quizBox"></div>
 </div>
-
-<!-- RESULT -->
 
 <div class="hide result" id="result">
 <h3>Result Analysis</h3>
@@ -184,7 +178,19 @@ text-align:left;
 
 </div>
 
-<script>
+<!-- ✅ FIREBASE LOAD -->
+<script type="module" src="js/firebase-config.js"></script>
+
+<script type="module">
+
+import { db, auth } from "./js/firebase-config.js";
+import {
+doc,
+getDoc,
+setDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* VARIABLES */
 
 let quizQuestions=[];
 let currentQuestion=0;
@@ -196,9 +202,9 @@ let positive=4;
 let negative=-1;
 let userAnswers=[];
 
-/* 🔥 QUESTION CONTROL */
+/* QUESTION CONTROL */
 
-function updateQuestionOptions(){
+window.updateQuestionOptions=function(){
 
 const subject=document.getElementById("subjectSelect").value;
 const qSelect=document.getElementById("questionCountSelect");
@@ -232,7 +238,7 @@ qSelect.options[i].disabled=false;
 
 /* START QUIZ */
 
-function startQuiz(){
+window.startQuiz=function(){
 
 document.getElementById("quizSetup").style.display="none";
 document.getElementById("quizArea").classList.remove("hide");
@@ -326,7 +332,7 @@ q.answers.map((a,i)=>
 
 /* ANSWER */
 
-function checkAnswer(i){
+window.checkAnswer=function(i){
 
 const q=quizQuestions[currentQuestion];
 userAnswers.push(i);
@@ -346,6 +352,30 @@ loadQuestion();
 }else{
 finishQuiz();
 }
+
+}
+
+/* 🔥 SAVE SCORE */
+
+async function saveUserScore(){
+
+const user = auth.currentUser;
+
+if(!user) return;
+
+const ref = doc(db,"users",user.uid);
+
+const snap = await getDoc(ref);
+
+let prev = 0;
+
+if(snap.exists()){
+prev = snap.data().totalScore || 0;
+}
+
+await setDoc(ref,{
+totalScore: prev + practiceScore
+},{merge:true});
 
 }
 
@@ -372,6 +402,9 @@ document.getElementById("rScore").innerText="Score : "+practiceScore;
 document.getElementById("rPercent").innerText="Percentage : "+percent+"%";
 document.getElementById("rAccuracy").innerText="Accuracy : "+accuracy+"%";
 document.getElementById("rGrade").innerText="Grade : "+grade;
+
+/* ✅ SAVE TO LEADERBOARD */
+saveUserScore();
 
 }
 
