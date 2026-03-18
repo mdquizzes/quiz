@@ -4,45 +4,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CBSE Paper Generator | MD Quizzes</title>
+<title>MD QUIZZES - Paper Builder</title>
 
-<link rel="stylesheet" href="paper.css">
+<style>
+body{font-family:Arial;background:#001d3d;color:white;padding:20px}
+.panel{background:#003566;padding:15px;border-radius:10px;margin-bottom:15px}
+button{padding:8px 12px;margin:5px;cursor:pointer}
+.sectionBox{border:1px solid #ccc;padding:10px;margin-top:10px}
+</style>
+
 </head>
 
 <body>
 
-<h1 style="text-align:center;">📄 CBSE Paper Generator</h1>
+<h2>📄 Smart Paper Builder</h2>
 
-<div class="container">
+<!-- STEP 1 -->
 
 <div class="panel">
+<h3>Select</h3>
 
-<h3>Select Chapter</h3>
+<select id="classSelect">
+<option>Class 10</option>
+</select>
 
-<label><input type="checkbox" class="chapter" value="Light"> Light</label> <label><input type="checkbox" class="chapter" value="Electricity"> Electricity</label>
-
-</div>
-
-<!-- QUESTION SELECT AREA -->
-
-<div id="questionSelectArea"></div>
-
-<div style="text-align:center;margin-top:10px;">
-<button onclick="prevPage()">⬅ Prev</button>
-<button onclick="nextPage()">Next ➡</button>
-</div>
-
-<br>
-
-<button onclick="generatePaper()">🚀 Generate Paper</button>
-
-<hr>
-
-<div id="paperContainer"></div>
+<select id="subjectSelect">
+<option>Science</option>
+</select>
 
 </div>
 
-<!-- DATA -->
+<!-- STEP 2 -->
+
+<div class="panel">
+<h3>Select Section</h3>
+
+<button onclick="openSection('A')">Section A</button> <button onclick="openSection('B')">Section B</button> <button onclick="openSection('C')">Section C</button> <button onclick="openSection('D')">Section D</button>
+
+<div id="chapterArea"></div>
+
+</div>
+
+<!-- QUESTION SELECT -->
+
+<div id="questionArea"></div>
+
+<!-- GENERATED PAPER -->
+
+<div class="panel">
+<h3>📄 Your Paper</h3>
+<div id="paperOutput"></div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/gh/mdquizzes/mdquizzes@main/quiz-data/paper/sectionA.js"></script>
 
@@ -54,106 +66,97 @@
 
 <script>
 
-// ===== MERGE DATA =====
-const ALL_QUESTIONS = [
-...(window.SECTION_A || []).map(q => ({...q, section:"A"})),
-...(window.SECTION_B || []).map(q => ({...q, section:"B"})),
-...(window.SECTION_C || []).map(q => ({...q, section:"C"})),
-...(window.SECTION_D || []).map(q => ({...q, section:"D"}))
+// ===== DATA =====
+const ALL = [
+...(window.SECTION_A||[]).map(q=>({...q,section:"A"})),
+...(window.SECTION_B||[]).map(q=>({...q,section:"B"})),
+...(window.SECTION_C||[]).map(q=>({...q,section:"C"})),
+...(window.SECTION_D||[]).map(q=>({...q,section:"D"}))
 ];
 
-let filtered = [];
-let currentPage = 0;
-const perPage = 10;
-let selectedQuestions = new Set();
+let currentSection = "";
+let selectedQuestions = [];
 
-// ===== CHAPTER CHANGE =====
-document.querySelectorAll(".chapter").forEach(cb=>{
-cb.addEventListener("change", loadQuestions);
+// ===== STEP 2 =====
+function openSection(sec){
+
+currentSection = sec;
+
+// GET CHAPTERS
+let chapters = [...new Set(ALL
+.filter(q=>q.section===sec)
+.map(q=>q.chapter))];
+
+let html = "<h4>Select Chapter</h4>";
+
+chapters.forEach(ch=>{
+html += `<label><input type="checkbox" onchange="loadQuestions('${ch}')"> ${ch}</label><br>`;
 });
 
-function loadQuestions(){
-
-let selectedChapters = [...document.querySelectorAll(".chapter:checked")]
-.map(cb=>cb.value);
-
-filtered = ALL_QUESTIONS.filter(q =>
-selectedChapters.includes(q.chapter)
-);
-
-currentPage = 0;
-renderQuestions();
+document.getElementById("chapterArea").innerHTML = html;
 }
 
-// ===== RENDER =====
-function renderQuestions(){
+// ===== LOAD QUESTIONS =====
+function loadQuestions(chapter){
 
-let start = currentPage * perPage;
-let pageData = filtered.slice(start, start + perPage);
+let data = ALL.filter(q =>
+q.section===currentSection && q.chapter===chapter
+);
+
+let html = "<h4>Select Questions</h4>";
+
+data.slice(0,10).forEach((q,i)=>{
+html += `
+<div>
+<button onclick="addQuestion(${i})">➕</button>
+${q.question}
+</div>`;
+});
+
+window.currentList = data;
+
+document.getElementById("questionArea").innerHTML = html;
+}
+
+// ===== ADD QUESTION =====
+function addQuestion(i){
+
+let q = window.currentList[i];
+
+selectedQuestions.push(q);
+
+renderPaper();
+}
+
+// ===== DELETE =====
+function removeQuestion(index){
+selectedQuestions.splice(index,1);
+renderPaper();
+}
+
+// ===== RENDER PAPER =====
+function renderPaper(){
 
 let html = "";
+let marks = 0;
 
-pageData.forEach((q,i)=>{
+selectedQuestions.forEach((q,i)=>{
 
-let index = start + i;
+let mark = q.section==="A"?1:q.section==="B"?2:q.section==="C"?3:5;
+marks += mark;
 
 html += `
-<div style="border:1px solid #ccc;margin:10px;padding:10px;">
-<label>
-<input type="checkbox" ${selectedQuestions.has(index) ? "checked":""}
-onclick="toggleSelect(${index})">
-<b>${index+1}. ${q.question}</b>
-</label>
+<div class="sectionBox">
+<b>${i+1}. ${q.question}</b>
+<button onclick="removeQuestion(${i})">❌</button>
 </div>
 `;
 
 });
 
-document.getElementById("questionSelectArea").innerHTML = html;
-}
+html += `<h3>Total Marks: ${marks}</h3>`;
 
-// ===== SELECT =====
-function toggleSelect(i){
-if(selectedQuestions.has(i)){
-selectedQuestions.delete(i);
-}else{
-selectedQuestions.add(i);
-}
-}
-
-// ===== PAGINATION =====
-function nextPage(){
-if((currentPage+1)*perPage < filtered.length){
-currentPage++;
-renderQuestions();
-}
-}
-
-function prevPage(){
-if(currentPage > 0){
-currentPage--;
-renderQuestions();
-}
-}
-
-// ===== GENERATE PAPER =====
-function generatePaper(){
-
-let selected = [...selectedQuestions].map(i=>filtered[i]);
-
-if(selected.length === 0){
-alert("Select questions first!");
-return;
-}
-
-let html = "<h2>Generated Paper</h2>";
-
-selected.forEach((q,i)=>{
-html += `<p><b>${i+1}. ${q.question}</b></p>`;
-});
-
-document.getElementById("paperContainer").innerHTML = html;
-
+document.getElementById("paperOutput").innerHTML = html;
 }
 
 </script>
