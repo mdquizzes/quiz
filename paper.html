@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 
@@ -7,38 +8,32 @@
 
 <title>CBSE Paper Generator | MD Quizzes</title>
 
-<!-- CSS -->
 <link rel="stylesheet" href="paper.css">
-
-<!-- Google Font -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 </head>
 
 <body>
 
-<!-- ===== HEADER ===== -->
 <header class="header">
 <h1>📄 CBSE Paper Generator</h1>
 <p>Create Real Exam Papers Instantly</p>
 </header>
 
-<!-- ===== MAIN CONTAINER ===== -->
 <div class="container">
 
-<!-- ===== CONTROL PANEL ===== -->
 <div class="panel">
 
 <h2>⚙️ Generate Paper</h2>
 
-<label>Class</label>
-<select id="classSelect">
-<option value="10">Class 10</option>
+<label>Class</label> <select>
+
+<option>Class 10</option>
 </select>
 
-<label>Subject</label>
-<select id="subjectSelect">
-<option value="science">Science</option>
+<label>Subject</label> <select>
+
+<option>Science</option>
 </select>
 
 <hr>
@@ -62,144 +57,33 @@
 
 </div>
 
-<!-- ===== ACTION BUTTONS ===== -->
 <div class="actions">
-
 <button id="printBtn">🖨 Print</button>
 <button id="pdfBtn">📥 Download PDF</button>
 <button id="regenerateBtn">🔁 Regenerate</button>
+</div>
+
+<div id="paperContainer" class="paper-container"></div>
 
 </div>
 
-<!-- ===== PAPER OUTPUT ===== -->
-<div id="paperContainer" class="paper-container">
+<!-- LIBRARY -->
 
-<!-- Generated paper will appear here -->
-
-</div>
-
-</div>
-
-<!-- ===== LIBRARIES ===== -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-<!-- ===== YOUR QUESTION FILE ===== -->
-<script src="https://raw.githubusercontent.com/mdquizzes/mdquizzes/main/quiz-data/paper/questions.js"></script>
+<!-- ✅ LOAD SECTION FILES (VERY IMPORTANT) -->
 
+<script src="sectionA.js"></script>
 
-<!-- ===== MAIN SCRIPT ===== -->
-<script>
+<script src="sectionB.js"></script>
 
-// ===== GLOBAL DATA =====
-const ALL_QUESTIONS = window.QUIZ_DATA || [];
+<script src="sectionC.js"></script>
 
-// ===== EVENT LISTENERS =====
-document.getElementById("generateBtn").addEventListener("click", generatePaper);
-document.getElementById("printBtn").addEventListener("click", () => window.print());
-document.getElementById("pdfBtn").addEventListener("click", downloadPDF);
-document.getElementById("regenerateBtn").addEventListener("click", generatePaper);
+<script src="sectionD.js"></script>
 
-// ===== SHUFFLE =====
-function shuffle(arr){
-return arr.sort(() => Math.random() - 0.5);
-}
+<!-- ✅ MAIN LOGIC -->
 
-// ===== FILTER ENGINE =====
-function getFilteredQuestions(){
-
-let difficulty = document.getElementById("difficultySelect").value;
-
-return ALL_QUESTIONS.filter(q=>{
-return difficulty === "all" || q.difficulty === difficulty;
-});
-
-}
-
-// ===== PAPER GENERATOR =====
-function generatePaper(){
-
-let count = parseInt(document.getElementById("questionCount").value);
-
-let questions = shuffle(getFilteredQuestions()).slice(0, count);
-
-if(questions.length === 0){
-alert("No questions found! Check your data.");
-return;
-}
-
-let html = `
-
-<div class="paper">
-
-<div class="paper-header">
-<h2>CBSE SAMPLE QUESTION PAPER</h2>
-<p><b>Class:</b> X | <b>Subject:</b> Science</p>
-<p><b>Time:</b> 3 Hours | <b>Max Marks:</b> 80</p>
-</div>
-
-<hr>
-
-<!-- SECTION A -->
-<div class="section">
-<h3>Section A (MCQ)</h3>
-`;
-
-questions.forEach((q,i)=>{
-
-html += `<div class="question">
-<p><b>${i+1}. ${q.question}</b></p>`;
-
-q.answers.forEach((opt,j)=>{
-html += `<p class="option">(${String.fromCharCode(97+j)}) ${opt.text}</p>`;
-});
-
-html += `</div>`;
-
-});
-
-html += `</div>`;
-
-// ===== ANSWER KEY =====
-html += `
-<div class="section answer-key">
-<h3>Answer Key</h3>
-`;
-
-questions.forEach((q,i)=>{
-let correct = q.answers.find(a=>a.correct)?.text || "";
-html += `<p>${i+1}. ${correct}</p>`;
-});
-
-html += `</div></div>`;
-
-document.getElementById("paperContainer").innerHTML = html;
-
-}
-
-// ===== PDF DOWNLOAD =====
-function downloadPDF(){
-
-const element = document.getElementById("paperContainer");
-
-if(!element.innerHTML){
-alert("Generate paper first!");
-return;
-}
-
-let opt = {
-margin: 0.5,
-filename: 'CBSE_Paper.pdf',
-image: { type: 'jpeg', quality: 0.98 },
-html2canvas: { scale: 2 },
-jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-};
-
-html2pdf().set(opt).from(element).save();
-
-}
-
-</script>
-<script src="questions.js"></script>
 <script src="paper.js"></script>
+
 </body>
 </html>
