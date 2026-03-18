@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MD QUIZZES - Paper Builder</title>
+<title>MD QUIZZES - CBSE Paper Builder</title>
 
 <style>
 body{font-family:Segoe UI;background:#001d3d;color:white;padding:20px}
@@ -16,7 +16,15 @@ border-radius:10px;
 margin-bottom:15px;
 }
 
-button{padding:6px 10px;margin:5px;cursor:pointer}
+button{
+padding:8px 12px;
+margin:5px;
+cursor:pointer;
+border:none;
+border-radius:6px;
+background:#ffd60a;
+font-weight:bold;
+}
 
 .questionBox{
 background:#012a4a;
@@ -25,22 +33,18 @@ margin:5px;
 border-radius:6px;
 }
 
-/* PAPER STYLE */
+/* PAPER */
 .paper{
 background:white;
 color:black;
 padding:20px;
 border-radius:10px;
-margin-top:20px;
 }
 
-.section{
-margin-top:15px;
-}
+.section{margin-top:15px;}
+.section h3{border-bottom:1px solid black;}
 
-.section h3{
-border-bottom:1px solid black;
-}
+.actions{text-align:center;margin-top:10px;}
 
 </style>
 
@@ -50,40 +54,38 @@ border-bottom:1px solid black;
 
 <h2>📄 Smart CBSE Paper Builder</h2>
 
-<!-- STEP 1 -->
-
 <div class="panel">
-<select>
-<option>Class 10</option>
-</select>
-
-<select>
-<option>Science</option>
-</select>
+<select><option>Class 10</option></select>
+<select><option>Science</option></select>
 </div>
-
-<!-- STEP 2 -->
 
 <div class="panel">
 <h3>Select Section</h3>
-
-<button onclick="openSection('A')">Section A</button> <button onclick="openSection('B')">Section B</button> <button onclick="openSection('C')">Section C</button> <button onclick="openSection('D')">Section D</button>
+<button onclick="openSection('A')">Section A</button>
+<button onclick="openSection('B')">Section B</button>
+<button onclick="openSection('C')">Section C</button>
+<button onclick="openSection('D')">Section D</button>
 
 <div id="chapterArea"></div>
 </div>
 
-<!-- QUESTION AREA -->
-
 <div id="questionArea"></div>
-
-<!-- PAPER -->
 
 <div class="panel">
 <h3>📄 Generated Paper</h3>
-<div id="paperOutput"></div>
+
+<div class="actions">
+<button onclick="printPaper()">🖨 Print</button>
+<button onclick="downloadPDF()">📥 Download PDF</button>
+<button onclick="toggleAnswer()">🧠 Answer Key</button>
+<button onclick="downloadAnswerPDF()">📄 Answer PDF</button>
 </div>
 
-<!-- DATA -->
+<div id="paperOutput"></div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/gh/mdquizzes/mdquizzes@main/quiz-data/paper/sectionA.js"></script>
 
@@ -95,7 +97,6 @@ border-bottom:1px solid black;
 
 <script>
 
-// ===== DATA =====
 const ALL = [
 ...(window.SECTION_A||[]).map(q=>({...q,section:"A"})),
 ...(window.SECTION_B||[]).map(q=>({...q,section:"B"})),
@@ -104,9 +105,10 @@ const ALL = [
 ];
 
 let currentSection = "";
-let selectedMap = new Map(); // unique store
+let selectedMap = new Map();
+let showAnswer = false;
 
-// ===== OPEN SECTION =====
+// SECTION
 function openSection(sec){
 
 currentSection = sec;
@@ -128,119 +130,145 @@ document.getElementById("chapterArea").innerHTML = html;
 document.getElementById("questionArea").innerHTML = "";
 }
 
-// ===== LOAD QUESTIONS =====
-function loadQuestions(chapter, checkbox){
+// LOAD QUESTIONS
+function loadQuestions(ch, cb){
 
-if(!checkbox.checked){
-document.getElementById("questionArea").innerHTML = "";
+if(!cb.checked){
+document.getElementById("questionArea").innerHTML="";
 return;
 }
 
-let data = ALL.filter(q =>
-q.section===currentSection && q.chapter===chapter
-);
+let data = ALL.filter(q=>q.section===currentSection && q.chapter===ch);
 
 window.currentList = data;
 
-let html = "<h4>Select Questions</h4>";
+let html="<h4>Select Questions</h4>";
 
 data.slice(0,10).forEach((q,i)=>{
 
-let key = currentSection + "_" + chapter + "_" + i;
+let key=currentSection+"_"+ch+"_"+i;
 
-html += `
+html+=`
 <div class="questionBox">
 <label>
 <input type="checkbox"
-${selectedMap.has(key) ? "checked":""}
-onchange="toggleQuestion('${key}', ${i})">
+${selectedMap.has(key)?"checked":""}
+onchange="toggleQ('${key}',${i})">
 ${q.question}
 </label>
-</div>
-`;
-
+</div>`;
 });
 
-document.getElementById("questionArea").innerHTML = html;
+document.getElementById("questionArea").innerHTML=html;
 }
 
-// ===== TOGGLE =====
-function toggleQuestion(key, i){
+// TOGGLE
+function toggleQ(key,i){
 
-let q = window.currentList[i];
+let q=window.currentList[i];
 
 if(selectedMap.has(key)){
 selectedMap.delete(key);
 }else{
-selectedMap.set(key, q);
+selectedMap.set(key,q);
 }
 
 renderPaper();
 }
 
-// ===== RENDER PAPER =====
+// RENDER
 function renderPaper(){
 
-let sections = {A:[],B:[],C:[],D:[]};
+let sections={A:[],B:[],C:[],D:[]};
 
-selectedMap.forEach(q=>{
-sections[q.section].push(q);
-});
+selectedMap.forEach(q=>sections[q.section].push(q));
 
-let marks = 0;
+let marks=0;
 
-let html = `
-<div class="paper">
+let html=`<div class="paper">`;
 
+let date=new Date().toLocaleDateString();
+
+html+=`
 <h2 style="text-align:center;">MD QUIZZES</h2>
-<p><b>Class:</b> X | <b>Subject:</b> Science</p>
-<hr>
+<p><b>Date:</b> ${date}</p>
 `;
 
-// SECTION A
-if(sections.A.length){
-html += `<div class="section"><h3>Section A (1 mark each)</h3>`;
-sections.A.forEach((q,i)=>{
-marks += 1;
-html += `<p>${i+1}. ${q.question}</p>`;
-});
-html += `</div>`;
+Object.keys(sections).forEach(sec=>{
+
+if(sections[sec].length){
+
+let m = sec==="A"?1:sec==="B"?2:sec==="C"?3:5;
+
+html+=`<div class="section"><h3>Section ${sec}</h3>`;
+
+sections[sec].forEach((q,i)=>{
+marks+=m;
+
+html+=`<p>${i+1}. ${q.question}
+${!showAnswer?`<button onclick="removeQ('${sec}',${i})">❌</button>`:""}
+</p>`;
+
+if(showAnswer && q.answers){
+let ans=q.answers.find(a=>a.correct)?.text;
+html+=`<p><i>Ans: ${ans}</i></p>`;
 }
 
-// SECTION B
-if(sections.B.length){
-html += `<div class="section"><h3>Section B (2 marks each)</h3>`;
-sections.B.forEach((q,i)=>{
-marks += 2;
-html += `<p>${i+1}. ${q.question}</p>`;
 });
-html += `</div>`;
+
+html+=`</div>`;
 }
 
-// SECTION C
-if(sections.C.length){
-html += `<div class="section"><h3>Section C (3 marks each)</h3>`;
-sections.C.forEach((q,i)=>{
-marks += 3;
-html += `<p>${i+1}. ${q.question}</p>`;
 });
-html += `</div>`;
+
+let time=Math.ceil(marks*1.5);
+
+html=html.replace("</h2>",`</h2>
+<p><b>Time:</b> ${time} min | <b>Max Marks:</b> ${marks}</p>
+`);
+
+html+=`</div>`;
+
+document.getElementById("paperOutput").innerHTML=html;
 }
 
-// SECTION D
-if(sections.D.length){
-html += `<div class="section"><h3>Section D (5 marks each)</h3>`;
-sections.D.forEach((q,i)=>{
-marks += 5;
-html += `<p>${i+1}. ${q.question}</p>`;
+// REMOVE
+function removeQ(sec,index){
+
+let arr=[...selectedMap.values()].filter(q=>q.section===sec);
+
+let q=arr[index];
+
+selectedMap.forEach((val,key)=>{
+if(val===q) selectedMap.delete(key);
 });
-html += `</div>`;
+
+renderPaper();
 }
 
-html += `<h3>Total Marks: ${marks}</h3>`;
-html += `</div>`;
+// PRINT
+function printPaper(){
+window.print();
+}
 
-document.getElementById("paperOutput").innerHTML = html;
+// PDF
+function downloadPDF(){
+html2pdf().from(document.getElementById("paperOutput")).save("paper.pdf");
+}
+
+// ANSWER TOGGLE
+function toggleAnswer(){
+showAnswer=!showAnswer;
+renderPaper();
+}
+
+// ANSWER PDF
+function downloadAnswerPDF(){
+showAnswer=true;
+renderPaper();
+html2pdf().from(document.getElementById("paperOutput")).save("answer-key.pdf");
+showAnswer=false;
+renderPaper();
 }
 
 </script>
