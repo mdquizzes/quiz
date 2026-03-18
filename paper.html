@@ -7,31 +7,59 @@
 <title>MD QUIZZES - Paper Builder</title>
 
 <style>
-body{font-family:Arial;background:#001d3d;color:white;padding:20px}
-.panel{background:#003566;padding:15px;border-radius:10px;margin-bottom:15px}
-button{padding:8px 12px;margin:5px;cursor:pointer}
-.sectionBox{border:1px solid #ccc;padding:10px;margin-top:10px}
+body{font-family:Segoe UI;background:#001d3d;color:white;padding:20px}
+
+.panel{
+background:#003566;
+padding:15px;
+border-radius:10px;
+margin-bottom:15px;
+}
+
+button{padding:6px 10px;margin:5px;cursor:pointer}
+
+.questionBox{
+background:#012a4a;
+padding:8px;
+margin:5px;
+border-radius:6px;
+}
+
+/* PAPER STYLE */
+.paper{
+background:white;
+color:black;
+padding:20px;
+border-radius:10px;
+margin-top:20px;
+}
+
+.section{
+margin-top:15px;
+}
+
+.section h3{
+border-bottom:1px solid black;
+}
+
 </style>
 
 </head>
 
 <body>
 
-<h2>📄 Smart Paper Builder</h2>
+<h2>📄 Smart CBSE Paper Builder</h2>
 
 <!-- STEP 1 -->
 
 <div class="panel">
-<h3>Select</h3>
-
-<select id="classSelect">
+<select>
 <option>Class 10</option>
 </select>
 
-<select id="subjectSelect">
+<select>
 <option>Science</option>
 </select>
-
 </div>
 
 <!-- STEP 2 -->
@@ -42,19 +70,20 @@ button{padding:8px 12px;margin:5px;cursor:pointer}
 <button onclick="openSection('A')">Section A</button> <button onclick="openSection('B')">Section B</button> <button onclick="openSection('C')">Section C</button> <button onclick="openSection('D')">Section D</button>
 
 <div id="chapterArea"></div>
-
 </div>
 
-<!-- QUESTION SELECT -->
+<!-- QUESTION AREA -->
 
 <div id="questionArea"></div>
 
-<!-- GENERATED PAPER -->
+<!-- PAPER -->
 
 <div class="panel">
-<h3>📄 Your Paper</h3>
+<h3>📄 Generated Paper</h3>
 <div id="paperOutput"></div>
 </div>
+
+<!-- DATA -->
 
 <script src="https://cdn.jsdelivr.net/gh/mdquizzes/mdquizzes@main/quiz-data/paper/sectionA.js"></script>
 
@@ -75,86 +104,141 @@ const ALL = [
 ];
 
 let currentSection = "";
-let selectedQuestions = [];
+let selectedMap = new Map(); // unique store
 
-// ===== STEP 2 =====
+// ===== OPEN SECTION =====
 function openSection(sec){
 
 currentSection = sec;
 
-// GET CHAPTERS
-let chapters = [...new Set(ALL
-.filter(q=>q.section===sec)
-.map(q=>q.chapter))];
+let chapters = [...new Set(
+ALL.filter(q=>q.section===sec).map(q=>q.chapter)
+)];
 
 let html = "<h4>Select Chapter</h4>";
 
 chapters.forEach(ch=>{
-html += `<label><input type="checkbox" onchange="loadQuestions('${ch}')"> ${ch}</label><br>`;
+html += `<label>
+<input type="checkbox" onchange="loadQuestions('${ch}', this)">
+${ch}
+</label><br>`;
 });
 
 document.getElementById("chapterArea").innerHTML = html;
+document.getElementById("questionArea").innerHTML = "";
 }
 
 // ===== LOAD QUESTIONS =====
-function loadQuestions(chapter){
+function loadQuestions(chapter, checkbox){
+
+if(!checkbox.checked){
+document.getElementById("questionArea").innerHTML = "";
+return;
+}
 
 let data = ALL.filter(q =>
 q.section===currentSection && q.chapter===chapter
 );
 
+window.currentList = data;
+
 let html = "<h4>Select Questions</h4>";
 
 data.slice(0,10).forEach((q,i)=>{
-html += `
-<div>
-<button onclick="addQuestion(${i})">➕</button>
-${q.question}
-</div>`;
-});
 
-window.currentList = data;
+let key = currentSection + "_" + chapter + "_" + i;
+
+html += `
+<div class="questionBox">
+<label>
+<input type="checkbox"
+${selectedMap.has(key) ? "checked":""}
+onchange="toggleQuestion('${key}', ${i})">
+${q.question}
+</label>
+</div>
+`;
+
+});
 
 document.getElementById("questionArea").innerHTML = html;
 }
 
-// ===== ADD QUESTION =====
-function addQuestion(i){
+// ===== TOGGLE =====
+function toggleQuestion(key, i){
 
 let q = window.currentList[i];
 
-selectedQuestions.push(q);
-
-renderPaper();
+if(selectedMap.has(key)){
+selectedMap.delete(key);
+}else{
+selectedMap.set(key, q);
 }
 
-// ===== DELETE =====
-function removeQuestion(index){
-selectedQuestions.splice(index,1);
 renderPaper();
 }
 
 // ===== RENDER PAPER =====
 function renderPaper(){
 
-let html = "";
-let marks = 0;
+let sections = {A:[],B:[],C:[],D:[]};
 
-selectedQuestions.forEach((q,i)=>{
-
-let mark = q.section==="A"?1:q.section==="B"?2:q.section==="C"?3:5;
-marks += mark;
-
-html += `
-<div class="sectionBox">
-<b>${i+1}. ${q.question}</b>
-<button onclick="removeQuestion(${i})">❌</button>
-</div>
-`;
-
+selectedMap.forEach(q=>{
+sections[q.section].push(q);
 });
 
+let marks = 0;
+
+let html = `
+<div class="paper">
+
+<h2 style="text-align:center;">MD QUIZZES</h2>
+<p><b>Class:</b> X | <b>Subject:</b> Science</p>
+<hr>
+`;
+
+// SECTION A
+if(sections.A.length){
+html += `<div class="section"><h3>Section A (1 mark each)</h3>`;
+sections.A.forEach((q,i)=>{
+marks += 1;
+html += `<p>${i+1}. ${q.question}</p>`;
+});
+html += `</div>`;
+}
+
+// SECTION B
+if(sections.B.length){
+html += `<div class="section"><h3>Section B (2 marks each)</h3>`;
+sections.B.forEach((q,i)=>{
+marks += 2;
+html += `<p>${i+1}. ${q.question}</p>`;
+});
+html += `</div>`;
+}
+
+// SECTION C
+if(sections.C.length){
+html += `<div class="section"><h3>Section C (3 marks each)</h3>`;
+sections.C.forEach((q,i)=>{
+marks += 3;
+html += `<p>${i+1}. ${q.question}</p>`;
+});
+html += `</div>`;
+}
+
+// SECTION D
+if(sections.D.length){
+html += `<div class="section"><h3>Section D (5 marks each)</h3>`;
+sections.D.forEach((q,i)=>{
+marks += 5;
+html += `<p>${i+1}. ${q.question}</p>`;
+});
+html += `</div>`;
+}
+
 html += `<h3>Total Marks: ${marks}</h3>`;
+html += `</div>`;
 
 document.getElementById("paperOutput").innerHTML = html;
 }
