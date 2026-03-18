@@ -26,44 +26,94 @@ return difficulty === "all" || q.difficulty === difficulty;
 // ===== GENERATE PAPER =====
 function generatePaper(){
 
-let count = parseInt(document.getElementById("questionCount").value);
+let selectedChapters = [...document.querySelectorAll(".chapter:checked")]
+.map(cb => cb.value);
 
-let questions = shuffle(getFilteredQuestions()).slice(0,count);
-
-if(questions.length === 0){
-alert("No questions found!");
+if(selectedChapters.length === 0){
+alert("Select at least one chapter!");
 return;
 }
+
+// FILTER QUESTIONS
+let questions = ALL_QUESTIONS.filter(q =>
+selectedChapters.includes(q.chapter)
+);
+
+// GROUP BY SECTION
+let sectionA = questions.filter(q => q.section === "A");
+let sectionB = questions.filter(q => q.section === "B");
+let sectionC = questions.filter(q => q.section === "C");
+let sectionD = questions.filter(q => q.section === "D");
+
+// AUTO MARKS
+let totalMarks =
+(sectionA.length * 1) +
+(sectionB.length * 2) +
+(sectionC.length * 3) +
+(sectionD.length * 5);
+
+// AUTO TIME (simple logic)
+let totalTime = Math.ceil(totalMarks * 1.5);
+
+// DATE
+let date = new Date().toLocaleDateString();
 
 let html = `
 <div class="paper">
 
 <div class="paper-header">
-<h2>CBSE SAMPLE QUESTION PAPER</h2>
+<h2>MD QUIZZES</h2>
 <p><b>Class:</b> X | <b>Subject:</b> Science</p>
-<p><b>Time:</b> 3 Hours | <b>Max Marks:</b> 80</p>
+<p><b>Date:</b> ${date}</p>
+<p><b>Time:</b> ${totalTime} Minutes | <b>Max Marks:</b> ${totalMarks}</p>
 </div>
 
 <hr>
-
-<div class="section">
-<h3>Section A (MCQ)</h3>
 `;
 
-questions.forEach((q,i)=>{
-
-html += `<div class="question">
-<p><b>${i+1}. ${q.question}</b></p>`;
-
+// SECTION A
+if(sectionA.length){
+html += `<div class="section"><h3>Section A (MCQ)</h3>`;
+sectionA.forEach((q,i)=>{
+html += `<p><b>${i+1}. ${q.question}</b></p>`;
 q.answers.forEach((opt,j)=>{
-html += `<p class="option">(${String.fromCharCode(97+j)}) ${opt.text}</p>`;
+html += `<p>(${String.fromCharCode(97+j)}) ${opt.text}</p>`;
 });
+});
+html += `</div>`;
+}
+
+// SECTION B
+if(sectionB.length){
+html += `<div class="section"><h3>Section B</h3>`;
+sectionB.forEach((q,i)=>{
+html += `<p><b>${i+1}. ${q.question}</b></p>`;
+});
+html += `</div>`;
+}
+
+// SECTION C
+if(sectionC.length){
+html += `<div class="section"><h3>Section C</h3>`;
+sectionC.forEach((q,i)=>{
+html += `<p><b>${i+1}. ${q.question}</b></p>`;
+});
+html += `</div>`;
+}
+
+// SECTION D
+if(sectionD.length){
+html += `<div class="section"><h3>Section D</h3>`;
+sectionD.forEach((q,i)=>{
+html += `<p><b>${i+1}. ${q.question}</b></p>`;
+});
+html += `</div>`;
+}
 
 html += `</div>`;
 
-});
-
-html += `</div>`;
+document.getElementById("paperContainer").innerHTML = html;
+}
 
 // ANSWER KEY
 html += `<div class="section answer-key"><h3>Answer Key</h3>`;
