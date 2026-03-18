@@ -31,39 +31,32 @@
 
 <h2>⚙️ Generate Paper</h2>
 
-<div class="form-group">
-
 <label>Class</label>
 <select id="classSelect">
 <option value="10">Class 10</option>
-<option value="9">Class 9</option>
 </select>
 
 <label>Subject</label>
 <select id="subjectSelect">
 <option value="science">Science</option>
-<option value="maths">Maths</option>
 </select>
 
-<label>Difficulty</label>
-<select id="difficultySelect">
-<option value="all">All</option>
-<option value="easy">Easy</option>
-<option value="medium">Medium</option>
-<option value="hard">Hard</option>
-</select>
+<hr>
 
-<label>Number of Questions</label>
-<input type="number" id="questionCount" value="20" min="5" max="100">
+<h3>Section A (MCQ)</h3>
+<label><input type="checkbox" class="chapter" value="Light"> Light</label>
+<label><input type="checkbox" class="chapter" value="Electricity"> Electricity</label>
 
-<label>Paper Type</label>
-<select id="paperType">
-<option value="mcq">MCQ Only</option>
-<option value="mixed">Mixed (Future)</option>
-<option value="cbse">Full CBSE Pattern</option>
-</select>
+<h3>Section B (Short)</h3>
+<label><input type="checkbox" class="chapter" value="Life Processes"> Life Processes</label>
 
-</div>
+<h3>Section C (Long)</h3>
+<label><input type="checkbox" class="chapter" value="Chemical Reactions"> Chemical Reactions</label>
+
+<h3>Section D (Case Study)</h3>
+<label><input type="checkbox" class="chapter" value="Control Coordination"> Control & Coordination</label>
+
+<br><br>
 
 <button id="generateBtn">🚀 Generate Paper</button>
 
