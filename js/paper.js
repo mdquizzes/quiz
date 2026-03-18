@@ -1,5 +1,10 @@
 // ===== LOAD DATA =====
-const ALL_QUESTIONS = window.QUIZ_DATA || [];
+const ALL_QUESTIONS = [
+...window.SECTION_A,
+...window.SECTION_B,
+...window.SECTION_C,
+...window.SECTION_D
+];
 
 // ===== EVENTS =====
 document.getElementById("generateBtn").addEventListener("click", generatePaper);
