@@ -164,24 +164,6 @@ answers: [
 solution: "Parallel rays meet at focus."
 },
 
-// ===== CONTINUE TO 100 QUESTIONS =====
-
-...Array.from({length: 88}, (_, i) => ({
-question: `Advanced Light Concept Question ${i + 13}`,
-chapter: "Light",
-difficulty: i % 3 === 0 ? "easy" : i % 3 === 1 ? "medium" : "hard",
-answers: [
-{ text: "Correct Option", correct: true },
-{ text: "Wrong Option 1", correct: false },
-{ text: "Wrong Option 2", correct: false },
-{ text: "Wrong Option 3", correct: false }
-],
-solution: "Detailed physics explanation."
-}))
-
-]; 
-window.SECTION_A = [
-
 /* ================= ELECTRICITY ================= */
 
 /* ===== EASY ===== */
@@ -437,19 +419,4 @@ answers: [
 solution: "Parallel formula."
 },
 
-// ===== CONTINUE TO 100 QUESTIONS =====
-
-...Array.from({length: 81}, (_, i) => ({
-question: `Advanced Electricity Question ${i + 20}`,
-chapter: "Electricity",
-difficulty: i % 3 === 0 ? "easy" : i % 3 === 1 ? "medium" : "hard",
-answers: [
-{ text: "Correct Answer", correct: true },
-{ text: "Wrong 1", correct: false },
-{ text: "Wrong 2", correct: false },
-{ text: "Wrong 3", correct: false }
-],
-solution: "Detailed explanation."
-}))
-
-];
+]; 
