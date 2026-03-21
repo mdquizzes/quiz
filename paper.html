@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -40,32 +39,33 @@ color:black;
 padding:20px;
 border-radius:10px;
 }
-  .optionsRow {
+
+.optionsRow {
 display: flex;
 flex-wrap: wrap;
-gap: 15px;
+gap: 10px;
 margin-top: 5px;
 font-size: 14px;
 }
 
 .optionItem {
-width: 48%; /* 2 per line */
+width: 48%;
 }
 
-/* PRINT OPTIMIZATION */
-.paper p {
-margin: 5px 0;
+/* Compact print */
+@media print {
+body { font-size: 12px; }
+.optionItem { width: 24%; }
+button { display: none; }
 }
 
-.optionsRow {
-margin-left: 15px;
-}
+.paper p { margin: 5px 0; }
+.optionsRow { margin-left: 15px; }
 
 .section{margin-top:15px;}
 .section h3{border-bottom:1px solid black;}
 
 .actions{text-align:center;margin-top:10px;}
-
 </style>
 
 </head>
@@ -108,11 +108,8 @@ margin-left: 15px;
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/gh/mdquizzes/mdquizzes@main/quiz-data/paper/sectionA.js"></script>
-
 <script src="https://cdn.jsdelivr.net/gh/mdquizzes/mdquizzes@main/quiz-data/paper/sectionB.js"></script>
-
 <script src="https://cdn.jsdelivr.net/gh/mdquizzes/mdquizzes@main/quiz-data/paper/sectionC.js"></script>
-
 <script src="https://cdn.jsdelivr.net/gh/mdquizzes/mdquizzes@main/quiz-data/paper/sectionD.js"></script>
 
 <script>
@@ -128,7 +125,7 @@ let currentSection = "";
 let selectedMap = new Map();
 let showAnswer = false;
 
-// SECTION
+/* SECTION */
 function openSection(sec){
 
 currentSection = sec;
@@ -150,7 +147,7 @@ document.getElementById("chapterArea").innerHTML = html;
 document.getElementById("questionArea").innerHTML = "";
 }
 
-// LOAD QUESTIONS
+/* LOAD QUESTIONS (FIXED) */
 function loadQuestions(ch, cb){
 
 if(!cb.checked){
@@ -168,6 +165,7 @@ data.slice(0,10).forEach((q,i)=>{
 
 let key=currentSection+"_"+ch+"_"+i;
 
+// OPTIONS
 let optionsHTML = "";
 
 if(q.answers){
@@ -185,12 +183,28 @@ optionsHTML += `
 
 optionsHTML += `</div>`;
 }
+
+html+=`
+<div class="questionBox">
+<label>
+<input type="checkbox"
+${selectedMap.has(key)?"checked":""}
+onchange="toggleQ('${key}',${i})">
+
+<b>${q.question}</b>
+</label>
+
+${optionsHTML}
+
+</div>
+`;
+
 });
 
 document.getElementById("questionArea").innerHTML=html;
 }
 
-// TOGGLE
+/* TOGGLE */
 function toggleQ(key,i){
 
 let q=window.currentList[i];
@@ -204,7 +218,7 @@ selectedMap.set(key,q);
 renderPaper();
 }
 
-// RENDER
+/* RENDER PAPER */
 function renderPaper(){
 
 let sections={A:[],B:[],C:[],D:[]};
@@ -274,11 +288,10 @@ html+=`</div>`;
 document.getElementById("paperOutput").innerHTML=html;
 }
 
-// REMOVE
+/* REMOVE */
 function removeQ(sec,index){
 
 let arr=[...selectedMap.values()].filter(q=>q.section===sec);
-
 let q=arr[index];
 
 selectedMap.forEach((val,key)=>{
@@ -288,23 +301,23 @@ if(val===q) selectedMap.delete(key);
 renderPaper();
 }
 
-// PRINT
+/* PRINT */
 function printPaper(){
 window.print();
 }
 
-// PDF
+/* PDF */
 function downloadPDF(){
 html2pdf().from(document.getElementById("paperOutput")).save("paper.pdf");
 }
 
-// ANSWER TOGGLE
+/* ANSWER */
 function toggleAnswer(){
 showAnswer=!showAnswer;
 renderPaper();
 }
 
-// ANSWER PDF
+/* ANSWER PDF */
 function downloadAnswerPDF(){
 showAnswer=true;
 renderPaper();
