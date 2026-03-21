@@ -40,6 +40,26 @@ color:black;
 padding:20px;
 border-radius:10px;
 }
+  .optionsRow {
+display: flex;
+flex-wrap: wrap;
+gap: 15px;
+margin-top: 5px;
+font-size: 14px;
+}
+
+.optionItem {
+width: 48%; /* 2 per line */
+}
+
+/* PRINT OPTIMIZATION */
+.paper p {
+margin: 5px 0;
+}
+
+.optionsRow {
+margin-left: 15px;
+}
 
 .section{margin-top:15px;}
 .section h3{border-bottom:1px solid black;}
@@ -151,23 +171,20 @@ let key=currentSection+"_"+ch+"_"+i;
 let optionsHTML = "";
 
 if(q.answers){
-q.answers.forEach(opt=>{
-optionsHTML += `<div style="margin-left:15px;">• ${opt.text}</div>`;
+const labels = ["(a)", "(b)", "(c)", "(d)"];
+
+optionsHTML += `<div class="optionsRow">`;
+
+q.answers.forEach((opt, idx)=>{
+optionsHTML += `
+<span class="optionItem">
+<b>${labels[idx]}</b> ${opt.text}
+</span>
+`;
 });
+
+optionsHTML += `</div>`;
 }
-
-html+=`
-<div class="questionBox">
-<label>
-<input type="checkbox"
-${selectedMap.has(key)?"checked":""}
-onchange="toggleQ('${key}',${i})">
-<b>${q.question}</b>
-</label>
-
-${optionsHTML}
-
-</div>`;
 });
 
 document.getElementById("questionArea").innerHTML=html;
