@@ -233,9 +233,23 @@ html+=`<div class="section"><h3>Section ${sec}</h3>`;
 sections[sec].forEach((q,i)=>{
 marks+=m;
 
-html+=`<p>${i+1}. ${q.question}
-${!showAnswer?`<button onclick="removeQ('${sec}',${i})">❌</button>`:""}
-</p>`;
+html+=`<p><b>${i+1}. ${q.question}</b></p>`;
+
+if(q.answers){
+const labels = ["(a)", "(b)", "(c)", "(d)"];
+
+html+=`<div class="optionsRow">`;
+
+q.answers.forEach((opt, idx)=>{
+html+=`
+<span class="optionItem">
+${labels[idx]} ${opt.text}
+</span>
+`;
+});
+
+html+=`</div>`;
+}
 
 if(showAnswer && q.answers){
 let ans=q.answers.find(a=>a.correct)?.text;
