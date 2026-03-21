@@ -148,14 +148,25 @@ data.slice(0,10).forEach((q,i)=>{
 
 let key=currentSection+"_"+ch+"_"+i;
 
+let optionsHTML = "";
+
+if(q.answers){
+q.answers.forEach(opt=>{
+optionsHTML += `<div style="margin-left:15px;">• ${opt.text}</div>`;
+});
+}
+
 html+=`
 <div class="questionBox">
 <label>
 <input type="checkbox"
 ${selectedMap.has(key)?"checked":""}
 onchange="toggleQ('${key}',${i})">
-${q.question}
+<b>${q.question}</b>
 </label>
+
+${optionsHTML}
+
 </div>`;
 });
 
