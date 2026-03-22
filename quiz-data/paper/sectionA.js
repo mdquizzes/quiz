@@ -150,6 +150,135 @@ answers: [
 ],
 solution: "P = 1/f (in meter)."
 },
+{
+question: "An object is placed at 30 cm from a concave mirror of focal length 15 cm. Image distance is:",
+chapter: "Light",
+difficulty: "hard",
+answers: [
+{ text: "30 cm", correct: true },
+{ text: "15 cm", correct: false },
+{ text: "10 cm", correct: false },
+{ text: "20 cm", correct: false }
+],
+solution: "Using mirror formula, v = -30 cm."
+},
+
+{
+question: "A convex lens of focal length 25 cm forms image at infinity. Object is placed at:",
+chapter: "Light",
+difficulty: "hard",
+answers: [
+{ text: "25 cm", correct: true },
+{ text: "50 cm", correct: false },
+{ text: "10 cm", correct: false },
+{ text: "Infinity", correct: false }
+],
+solution: "Object at focus gives image at infinity."
+},
+
+{
+question: "Magnification produced by plane mirror is:",
+chapter: "Light",
+difficulty: "hard",
+answers: [
+{ text: "+1", correct: true },
+{ text: "-1", correct: false },
+{ text: "0", correct: false },
+{ text: "∞", correct: false }
+],
+solution: "Plane mirror forms virtual upright image."
+},
+
+{
+question: "If refractive index increases, speed of light:",
+chapter: "Light",
+difficulty: "hard",
+answers: [
+{ text: "Decreases", correct: true },
+{ text: "Increases", correct: false },
+{ text: "Remains same", correct: false },
+{ text: "Becomes zero", correct: false }
+],
+solution: "n = c/v → v decreases."
+},
+
+{
+question: "For convex mirror, focal length is:",
+chapter: "Light",
+difficulty: "hard",
+answers: [
+{ text: "Positive", correct: true },
+{ text: "Negative", correct: false },
+{ text: "Zero", correct: false },
+{ text: "Infinite", correct: false }
+],
+solution: "Convex mirror has positive focal length."
+},
+
+{
+question: "Power of lens with focal length -50 cm is:",
+chapter: "Light",
+difficulty: "hard",
+answers: [
+{ text: "-2 D", correct: true },
+{ text: "2 D", correct: false },
+{ text: "-0.5 D", correct: false },
+{ text: "0.5 D", correct: false }
+],
+solution: "P = 1/f = 1/(-0.5) = -2 D."
+},
+
+{
+question: "A ray parallel to principal axis passes through:",
+chapter: "Light",
+difficulty: "hard",
+answers: [
+{ text: "Focus", correct: true },
+{ text: "Pole", correct: false },
+{ text: "Center", correct: false },
+{ text: "None", correct: false }
+],
+solution: "Standard ray rule."
+},
+
+{
+question: "Image formed by concave lens is always:",
+chapter: "Light",
+difficulty: "hard",
+answers: [
+{ text: "Virtual", correct: true },
+{ text: "Real", correct: false },
+{ text: "Inverted", correct: false },
+{ text: "None", correct: false }
+],
+solution: "Concave lens always virtual."
+},
+
+{
+question: "Critical angle depends on:",
+chapter: "Light",
+difficulty: "hard",
+answers: [
+{ text: "Refractive index", correct: true },
+{ text: "Speed only", correct: false },
+{ text: "Distance", correct: false },
+{ text: "Mass", correct: false }
+],
+solution: "Depends on medium."
+},
+
+{
+question: "Total internal reflection occurs when:",
+chapter: "Light",
+difficulty: "hard",
+answers: [
+{ text: "Angle > critical angle", correct: true },
+{ text: "Angle < critical angle", correct: false },
+{ text: "Angle = 0", correct: false },
+{ text: "None", correct: false }
+],
+solution: "Condition of TIR."
+},
 
 {
 question: "Object at infinity forms image at:",
@@ -162,6 +291,70 @@ answers: [
 { text: "None", correct: false }
 ],
 solution: "Parallel rays meet at focus."
+},
+  {
+question: "If u = -20 cm, f = -10 cm, v is:",
+chapter: "Light",
+difficulty: "hard",
+answers: [
+{ text: "-20 cm", correct: true },
+{ text: "-10 cm", correct: false },
+{ text: "-5 cm", correct: false },
+{ text: "10 cm", correct: false }
+],
+solution: "Mirror formula."
+},
+
+{
+question: "Lens formula sign convention follows:",
+chapter: "Light",
+difficulty: "hard",
+answers: [
+{ text: "Cartesian sign convention", correct: true },
+{ text: "Newton law", correct: false },
+{ text: "Hooke law", correct: false },
+{ text: "None", correct: false }
+],
+solution: "Standard sign rule."
+},
+
+{
+question: "If refractive index = 2, speed becomes:",
+chapter: "Light",
+difficulty: "hard",
+answers: [
+{ text: "c/2", correct: true },
+{ text: "2c", correct: false },
+{ text: "c", correct: false },
+{ text: "0", correct: false }
+],
+solution: "v = c/n."
+},
+
+{
+question: "Image distance is negative means:",
+chapter: "Light",
+difficulty: "hard",
+answers: [
+{ text: "Real image", correct: true },
+{ text: "Virtual image", correct: false },
+{ text: "No image", correct: false },
+{ text: "None", correct: false }
+],
+solution: "Sign convention."
+},
+
+{
+question: "Convex lens produces virtual image when:",
+chapter: "Light",
+difficulty: "hard",
+answers: [
+{ text: "Object inside focus", correct: true },
+{ text: "Beyond focus", correct: false },
+{ text: "At infinity", correct: false },
+{ text: "None", correct: false }
+],
+solution: "Standard rule."
 },
 
 /* ================= ELECTRICITY ================= */
