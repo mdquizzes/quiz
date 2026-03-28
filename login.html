@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MD QUIZZES Login</title>
+
+<style>
+
+*{
+box-sizing:border-box;
+}
+
+body{
+font-family:Segoe UI, Arial, sans-serif;
+margin:0;
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+background:linear-gradient(135deg,#001d3d,#003566,#001233);
+color:white;
+padding:16px;
+}
+
+/* MAIN WRAPPER */
+.login-wrap{
+width:100%;
+max-width:430px;
+}
+
+/* CARD */
+.card{
+background:rgba(255,255,255,0.07);
+backdrop-filter:blur(10px);
+padding:28px 24px;
+border-radius:18px;
+width:100%;
+text-align:center;
+box-shadow:0 10px 30px rgba(0,0,0,0.35);
+border:1px solid rgba(255,255,255,0.08);
+}
+
+/* TITLE */
+h2{
+color:#ffd60a;
+margin:0 0 6px;
+font-size:28px;
+font-weight:800;
+}
+
+.slogan{
+font-size:13px;
+opacity:.85;
+margin-bottom:18px;
+}
+
+/* TABS */
+.tabs{
+display:flex;
+margin-bottom:16px;
+border-radius:12px;
+overflow:hidden;
+background:#0f172a;
+}
+
+.tabs button{
+flex:1;
+border:none;
+padding:11px;
+background:transparent;
+color:white;
+cursor:pointer;
+font-size:14px;
+font-weight:600;
+transition:0.2s ease;
+margin:0;
+width:auto;
+}
+
+.tabs button.active{
+background:#ffd60a;
+color:black;
+font-weight:800;
+}
+
+/* INPUTS */
+input{
+width:100%;
+padding:11px 12px;
+margin:7px 0;
+border-radius:10px;
+border:none;
+outline:none;
+font-size:14px;
+}
+
+/* PASSWORD BOX */
+.passbox{
+position:relative;
+}
+
+.eye{
+position:absolute;
+right:14px;
+top:16px;
+cursor:pointer;
+color:#222;
+font-size:16px;
+}
+
+/* PASSWORD STRENGTH */
+.strength{
+font-size:12px;
+margin-top:4px;
+text-align:left;
+padding-left:2px;
+color:#ffd60a;
+}
+
+/* BUTTONS */
+button{
+width:100%;
+padding:12px;
+margin-top:10px;
+background:#ffd60a;
+border:none;
+font-weight:800;
+cursor:pointer;
+border-radius:10px;
+font-size:14px;
+transition:0.2s ease;
+}
+
+button:hover{
+transform:translateY(-1px);
+}
+
+.google{
+background:#4285F4;
+color:white;
+}
+
+/* LINKS + MSG */
+.link{
+font-size:13px;
+cursor:pointer;
+margin-top:8px;
+color:#ffd60a;
+}
+
+.msg{
+margin-top:12px;
+color:#ffd60a;
+font-size:13px;
+min-height:20px;
+line-height:1.5;
+}
+
+/* VERIFY BOX */
+.verifyBox{
+margin-top:14px;
+font-size:13px;
+background:rgba(255,255,255,0.06);
+padding:14px;
+border-radius:12px;
+line-height:1.6;
+}
+
+/* PRO NOTE */
+.pro-login-note{
+margin-top:14px;
+background:rgba(255,255,255,0.05);
+padding:14px 16px;
+border-radius:14px;
+font-size:12.5px;
+line-height:1.7;
+color:#e6edf7;
+text-align:left;
+border:1px solid rgba(255,255,255,0.06);
+}
+
+/* MOBILE */
+@media(max-width:480px){
+.card{
+padding:24px 18px;
+border-radius:16px;
+}
+
+h2{
+font-size:24px;
+}
+
+.slogan{
+font-size:12px;
+}
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="login-wrap">
+
+<div class="card">
+
+<h2>📐 MD QUIZZES</h2>
+<div class="slogan">Smart Practice for Smart Students</div>
+
+<div class="tabs">
+<button id="loginTab" class="active">Login</button>
+<button id="signupTab">Signup</button>
+</div>
+
+<!-- LOGIN -->
+<div id="loginBox">
+
+<input id="email" type="email" placeholder="Email">
+
+<div class="passbox">
+<input id="password" type="password" placeholder="Password">
+<span class="eye" onclick="togglePass()">👁</span>
+</div>
+
+<button id="loginBtn">Login</button>
+
+<div class="link" id="forgotBtn">
+Forgot Password?
+</div>
+
+<button class="google" id="googleLogin">
+Login with Google
+</button>
+
+</div>
+
+<!-- SIGNUP -->
+<div id="signupBox" style="display:none">
+
+<input id="firstName" placeholder="First Name">
+<input id="lastName" placeholder="Last Name">
+<input id="emailSignup" type="email" placeholder="Email">
+
+<div class="passbox">
+<input id="passwordSignup" type="password" placeholder="Password">
+<span class="eye" onclick="togglePassSignup()">👁</span>
+</div>
+
+<div class="strength" id="strength"></div>
+
+<button id="signupBtn">Create Account</button>
+
+</div>
+
+<div class="msg" id="msg"></div>
+
+<!-- EMAIL VERIFICATION BOX -->
+<div class="verifyBox" id="verifyBox" style="display:none">
+
+<p style="margin:0 0 10px 0;">
+Verification email sent.<br>
+Please check your email and click the verification link.<br>
+This page will automatically continue after verification.
+</p>
+
+<button id="resendVerify">
+Resend Verification Email
+</button>
+
+</div>
+
+</div>
+
+<!-- PRO LOGIN NOTE -->
+<div class="pro-login-note">
+<b>Pro Access:</b> Verified students can securely access dashboard stats, leaderboard ranking, quiz performance, and future premium learning tools.
+</div>
+
+</div>
+
+<script>
+
+const loginTab=document.getElementById("loginTab")
+const signupTab=document.getElementById("signupTab")
+
+const loginBox=document.getElementById("loginBox")
+const signupBox=document.getElementById("signupBox")
+
+loginTab.onclick=()=>{
+loginTab.classList.add("active")
+signupTab.classList.remove("active")
+loginBox.style.display="block"
+signupBox.style.display="none"
+}
+
+signupTab.onclick=()=>{
+signupTab.classList.add("active")
+loginTab.classList.remove("active")
+signupBox.style.display="block"
+loginBox.style.display="none"
+}
+
+function togglePass(){
+const p=document.getElementById("password")
+p.type=p.type==="password"?"text":"password"
+}
+
+function togglePassSignup(){
+const p=document.getElementById("passwordSignup")
+p.type=p.type==="password"?"text":"password"
+}
+
+/* PASSWORD STRENGTH */
+
+document.getElementById("passwordSignup").addEventListener("input",function(){
+
+const val=this.value
+const strength=document.getElementById("strength")
+
+if(val.length<6){
+strength.innerText="Weak password"
+strength.style.color="salmon"
+}else if(val.match(/[A-Z]/) && val.match(/[0-9]/)){
+strength.innerText="Strong password"
+strength.style.color="lightgreen"
+}else{
+strength.innerText="Medium password"
+strength.style.color="#ffd60a"
+}
+
+})
+
+</script>
+
+<script type="module" src="js/auth.js"></script>
+
+</body>
+</html>
