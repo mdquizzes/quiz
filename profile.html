@@ -2,64 +2,550 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Profile - MD QUIZZES</title>
+
 <style>
+
+*{
+box-sizing:border-box;
+}
+
 body{
-  font-family:Segoe UI;
-  background:#000814;
-  color:white;
-  text-align:center;
-  padding-top:80px;
+margin:0;
+font-family:Segoe UI, Arial, sans-serif;
+background:linear-gradient(135deg,#000814,#001d3d,#003566);
+color:white;
+padding:20px;
 }
-.box{
-  background:#111;
-  padding:30px;
-  border-radius:12px;
-  display:inline-block;
+
+/* MAIN WRAPPER */
+.profile-wrap{
+max-width:1100px;
+margin:auto;
 }
-button{
-  padding:10px;
-  margin:10px;
-  border:none;
-  border-radius:6px;
-  background:gold;
-  cursor:pointer;
+
+/* HERO HEADER */
+.profile-hero{
+background:linear-gradient(135deg,#0b1f5f,#003f88,#00509d);
+padding:24px 22px;
+border-radius:22px;
+box-shadow:0 12px 35px rgba(0,0,0,0.25);
+margin-bottom:20px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+flex-wrap:wrap;
+gap:15px;
 }
+
+.profile-hero h1{
+margin:0;
+font-size:34px;
+color:#ffd60a;
+font-weight:800;
+}
+
+.profile-hero p{
+margin:8px 0 0;
+font-size:15px;
+opacity:0.95;
+}
+
+.hero-actions{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.hero-actions button{
+padding:11px 18px;
+border:none;
+border-radius:10px;
+font-weight:800;
+cursor:pointer;
+font-size:14px;
+transition:0.2s ease;
+}
+
+.hero-actions button:hover{
+transform:translateY(-2px);
+}
+
+.quiz-btn{background:#ffd60a;color:#000;}
+.dashboard-btn{background:#00c896;color:white;}
+.logout-btn{background:#ff3b3b;color:white;}
+
+/* MAIN GRID */
+.profile-grid{
+display:grid;
+grid-template-columns:1.1fr 1fr;
+gap:20px;
+}
+
+/* CARD */
+.card{
+background:rgba(17,17,17,0.92);
+padding:24px;
+border-radius:20px;
+box-shadow:0 10px 28px rgba(0,0,0,0.25);
+}
+
+/* LEFT PROFILE CARD */
+.profile-main{
+text-align:center;
+}
+
+.avatar{
+width:120px;
+height:120px;
+border-radius:50%;
+background:linear-gradient(135deg,#ffd60a,#ffb703);
+color:#111;
+font-size:42px;
+font-weight:900;
+display:flex;
+align-items:center;
+justify-content:center;
+margin:0 auto 16px;
+box-shadow:0 8px 20px rgba(255,214,10,0.25);
+border:4px solid rgba(255,255,255,0.12);
+}
+
+.user-name{
+font-size:28px;
+font-weight:800;
+margin-bottom:8px;
+color:#ffffff;
+}
+
+.user-email{
+font-size:15px;
+opacity:0.88;
+margin-bottom:16px;
+word-break:break-word;
+}
+
+.badge{
+display:inline-block;
+padding:8px 14px;
+border-radius:999px;
+background:rgba(255,214,10,0.12);
+color:#ffd60a;
+font-weight:700;
+font-size:13px;
+border:1px solid rgba(255,214,10,0.18);
+margin-bottom:18px;
+}
+
+/* QUICK ACTIONS */
+.quick-actions{
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+justify-content:center;
+margin-top:14px;
+}
+
+.quick-actions button{
+padding:12px 16px;
+border:none;
+border-radius:10px;
+font-weight:800;
+cursor:pointer;
+font-size:14px;
+transition:0.2s ease;
+}
+
+.quick-actions button:hover{
+transform:translateY(-2px);
+}
+
+.pass-btn{background:#7c3aed;color:white;}
+.verify-btn{background:#2563eb;color:white;}
+.home-btn{background:#ffd60a;color:black;}
+
+/* RIGHT STATS */
+.stats-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:14px;
+}
+
+.stat-card{
+background:#0f172a;
+padding:18px;
+border-radius:16px;
+text-align:center;
+border:1px solid rgba(255,255,255,0.05);
+}
+
+.stat-card h3{
+margin:0 0 10px;
+font-size:16px;
+color:#ffd60a;
+}
+
+.stat-value{
+font-size:28px;
+font-weight:900;
+}
+
+.stat-sub{
+margin-top:6px;
+font-size:13px;
+opacity:0.8;
+}
+
+/* ACCOUNT DETAILS */
+.details-card{
+margin-top:20px;
+}
+
+.details-card h2{
+margin-top:0;
+margin-bottom:18px;
+color:#ffd60a;
+}
+
+.detail-row{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px 0;
+border-bottom:1px solid rgba(255,255,255,0.08);
+gap:10px;
+flex-wrap:wrap;
+}
+
+.detail-label{
+font-weight:700;
+opacity:0.9;
+}
+
+.detail-value{
+opacity:0.95;
+text-align:right;
+word-break:break-word;
+}
+
+/* MESSAGE */
+.msg{
+margin-top:16px;
+font-size:14px;
+color:#ffd60a;
+text-align:center;
+min-height:20px;
+}
+
+/* MOBILE */
+@media(max-width:900px){
+.profile-grid{
+grid-template-columns:1fr;
+}
+}
+
+@media(max-width:600px){
+
+body{
+padding:12px;
+}
+
+.profile-hero{
+text-align:center;
+justify-content:center;
+}
+
+.profile-hero h1{
+font-size:28px;
+}
+
+.hero-actions{
+justify-content:center;
+}
+
+.stats-grid{
+grid-template-columns:1fr;
+}
+
+.user-name{
+font-size:24px;
+}
+
+.avatar{
+width:100px;
+height:100px;
+font-size:36px;
+}
+}
+
 </style>
 </head>
+
 <body>
 
-<h2>My Profile</h2>
+<div class="profile-wrap">
 
-<div class="box">
-<p id="profileInfo"></p>
+<!-- HERO -->
+<div class="profile-hero">
+  <div>
+    <h1>👤 My Profile</h1>
+    <p>Manage your learning identity, track progress, and control your account securely.</p>
+  </div>
 
-<button onclick="changePassword()">Change Password</button>
-<button onclick="logoutUser()">Logout</button>
+  <div class="hero-actions">
+    <button class="quiz-btn" onclick="location.href='quiz1.html'">🎯 Start Quiz</button>
+    <button class="dashboard-btn" onclick="location.href='dashboard.html'">📊 Dashboard</button>
+    <button class="logout-btn" onclick="logoutUser()">🚪 Logout</button>
+  </div>
 </div>
 
-<script type="module" src="js/firebase-config.js"></script>
-<script type="module" src="js/auth.js"></script>
+<!-- MAIN GRID -->
+<div class="profile-grid">
+
+  <!-- LEFT -->
+  <div class="card profile-main">
+
+    <div class="avatar" id="avatarLetter">U</div>
+
+    <div class="user-name" id="profileName">Loading...</div>
+    <div class="user-email" id="profileEmail">Loading...</div>
+
+    <div class="badge" id="userBadge">Verified Student</div>
+
+    <div class="quick-actions">
+      <button class="pass-btn" onclick="changePassword()">🔐 Change Password</button>
+      <button class="verify-btn" onclick="sendVerifyAgain()">📩 Resend Verify</button>
+      <button class="home-btn" onclick="location.href='quiz1.html'">🏠 Home</button>
+    </div>
+
+    <div class="msg" id="msg"></div>
+
+  </div>
+
+  <!-- RIGHT -->
+  <div>
+
+    <div class="stats-grid">
+
+      <div class="stat-card">
+        <h3>⭐ Total Points</h3>
+        <div class="stat-value" id="points">0</div>
+        <div class="stat-sub">Your accumulated quiz score</div>
+      </div>
+
+      <div class="stat-card">
+        <h3>🏆 Rank</h3>
+        <div class="stat-value" id="rank">#...</div>
+        <div class="stat-sub">Your current leaderboard position</div>
+      </div>
+
+      <div class="stat-card">
+        <h3>📝 Attempts</h3>
+        <div class="stat-value" id="attempts">0</div>
+        <div class="stat-sub">Total quizzes attempted</div>
+      </div>
+
+      <div class="stat-card">
+        <h3>📈 Accuracy</h3>
+        <div class="stat-value" id="accuracy">0%</div>
+        <div class="stat-sub">Correctness ratio</div>
+      </div>
+
+    </div>
+
+    <div class="card details-card">
+      <h2>🔎 Account Details</h2>
+
+      <div class="detail-row">
+        <div class="detail-label">First Name</div>
+        <div class="detail-value" id="firstNameVal">-</div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-label">Last Name</div>
+        <div class="detail-value" id="lastNameVal">-</div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-label">Email</div>
+        <div class="detail-value" id="emailVal">-</div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-label">Verification</div>
+        <div class="detail-value" id="verifyStatus">Checking...</div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-label">User Role</div>
+        <div class="detail-value" id="roleVal">Student</div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+</div>
 
 <script type="module">
-import { auth } from "./js/firebase-config.js";
-import { sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { auth, db } from "./js/firebase-config.js";
 
-auth.onAuthStateChanged(user=>{
-  if(!user){
-    window.location.href="login.html";
-  }else{
-    document.getElementById("profileInfo").innerText =
-      "Email: " + user.email;
+import {
+  onAuthStateChanged,
+  signOut,
+  sendPasswordResetEmail,
+  sendEmailVerification
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+import {
+  doc,
+  getDoc,
+  collection,
+  getDocs,
+  query,
+  orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* =========================
+   HELPERS
+========================= */
+
+function setMsg(text, color = "#ffd60a"){
+  const msg = document.getElementById("msg");
+  if(msg){
+    msg.innerText = text;
+    msg.style.color = color;
   }
-});
-
-window.changePassword = function(){
-  const email = auth.currentUser.email;
-  sendPasswordResetEmail(auth,email)
-  .then(()=> alert("Password reset email sent"))
-  .catch(()=> alert("Error sending email"));
 }
+
+window.logoutUser = async function(){
+  try{
+    await signOut(auth);
+    location.href = "login.html";
+  }catch(err){
+    console.error(err);
+    setMsg("Logout failed", "tomato");
+  }
+};
+
+window.changePassword = async function(){
+  const user = auth.currentUser;
+  if(!user) return;
+
+  try{
+    await sendPasswordResetEmail(auth, user.email);
+    setMsg("Password reset email sent to your inbox.", "lightgreen");
+  }catch(err){
+    console.error(err);
+    setMsg("Error sending password reset email.", "tomato");
+  }
+};
+
+window.sendVerifyAgain = async function(){
+  const user = auth.currentUser;
+  if(!user) return;
+
+  try{
+    await sendEmailVerification(user);
+    setMsg("Verification email sent again.", "lightgreen");
+  }catch(err){
+    console.error(err);
+    setMsg("Could not send verification email.", "tomato");
+  }
+};
+
+/* =========================
+   AUTH + LOAD PROFILE
+========================= */
+
+onAuthStateChanged(auth, async(user)=>{
+
+  if(!user){
+    location.href = "login.html";
+    return;
+  }
+
+  try{
+
+    await user.reload();
+
+    const userRef = doc(db, "users", user.uid);
+    const snap = await getDoc(userRef);
+
+    let data = {};
+
+    if(snap.exists()){
+      data = snap.data();
+    }
+
+    const firstName = data.firstName || "User";
+    const lastName = data.lastName || "";
+    const fullName = (firstName + " " + lastName).trim();
+    const email = user.email || data.email || "No Email";
+    const totalScore = data.totalScore || 0;
+    const attempts = data.quizzesAttempted || 0;
+    const correct = data.correctAnswers || 0;
+    const wrong = data.wrongAnswers || 0;
+    const role = data.role || "Student";
+
+    const accuracy = (correct + wrong) > 0
+      ? Math.round((correct / (correct + wrong)) * 100)
+      : 0;
+
+    // UI Fill
+    document.getElementById("profileName").innerText = fullName;
+    document.getElementById("profileEmail").innerText = email;
+    document.getElementById("points").innerText = totalScore;
+    document.getElementById("attempts").innerText = attempts;
+    document.getElementById("accuracy").innerText = accuracy + "%";
+
+    document.getElementById("firstNameVal").innerText = firstName;
+    document.getElementById("lastNameVal").innerText = lastName || "-";
+    document.getElementById("emailVal").innerText = email;
+    document.getElementById("roleVal").innerText = role;
+
+    document.getElementById("verifyStatus").innerText =
+      user.emailVerified ? "Verified ✅" : "Not Verified ❌";
+
+    document.getElementById("userBadge").innerText =
+      user.emailVerified ? "Verified Student" : "Unverified Student";
+
+    // Avatar letter
+    document.getElementById("avatarLetter").innerText =
+      firstName.charAt(0).toUpperCase();
+
+    // Rank calculation
+    const q = query(
+      collection(db, "users"),
+      orderBy("totalScore", "desc")
+    );
+
+    const snapshot = await getDocs(q);
+
+    let rank = 1;
+    let foundRank = false;
+
+    snapshot.forEach(docSnap => {
+      if(!foundRank && docSnap.id === user.uid){
+        document.getElementById("rank").innerText = "#" + rank;
+        foundRank = true;
+      }
+      rank++;
+    });
+
+    if(!foundRank){
+      document.getElementById("rank").innerText = "Unranked";
+    }
+
+  }catch(err){
+    console.error("Profile load error:", err);
+    setMsg("Failed to load profile data.", "tomato");
+  }
+
+});
 </script>
 
 </body>
