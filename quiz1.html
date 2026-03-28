@@ -381,42 +381,6 @@ document.getElementById("questionAnalysis").innerHTML=analysisHTML;
 }
 
 </script>
-<script>
-function sendQuizHeight() {
-  const pageHeight = Math.max(
-    document.body.scrollHeight,
-    document.documentElement.scrollHeight,
-    document.body.offsetHeight,
-    document.documentElement.offsetHeight
-  );
 
-  if (window.parent) {
-    window.parent.postMessage({
-      type: "mdQuizResize",
-      height: pageHeight
-    }, "*");
-  }
-}
-
-// Initial load
-window.addEventListener("load", sendQuizHeight);
-
-// Resize on window change
-window.addEventListener("resize", sendQuizHeight);
-
-// Observe DOM changes (quiz start, question load, result show)
-const observer = new MutationObserver(() => {
-  setTimeout(sendQuizHeight, 150);
-});
-
-observer.observe(document.body, {
-  childList: true,
-  subtree: true,
-  attributes: true
-});
-
-// Extra calls after quiz actions
-setInterval(sendQuizHeight, 1500);
-</script>
 </body>
 </html>
