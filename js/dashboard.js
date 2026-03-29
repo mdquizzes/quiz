@@ -1,117 +1,172 @@
 import { auth, db } from "./firebase-config.js";
 
 import {
-doc,
-getDoc,
-collection,
-query,
-orderBy,
-getDocs,
-limit
-}
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  doc,
+  getDoc,
+  collection,
+  query,
+  orderBy,
+  getDocs,
+  limit
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 import {
-onAuthStateChanged
-}
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+/* =========================
+   DOM ELEMENTS
+========================= */
 
-onAuthStateChanged(auth, async user=>{
+const loginStatus = document.getElementById("loginStatus");
+const logoutBtn = document.getElementById("logoutBtn");
 
-if(!user){
+/* =========================
+   DASHBOARD LOGOUT
+========================= */
 
-location.href="login.html";
-return;
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", async () => {
+    try {
+      logoutBtn.disabled = true;
+      logoutBtn.innerText = "Logging out...";
 
-}
+      await signOut(auth);
 
-/* LOAD USER DATA */
+      if (loginStatus) {
+        loginStatus.innerText = "Logged out successfully";
+      }
 
-const snap=await getDoc(doc(db,"users",user.uid));
-const data=snap.data();
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 500);
 
-document.getElementById("userName").innerText=
-data.firstName+" "+data.lastName;
-
-document.getElementById("points").innerText=
-data.totalScore || 0;
-
-document.getElementById("attempts").innerText=
-data.quizzesAttempted || 0;
-
-document.getElementById("correct").innerText=
-data.correctAnswers || 0;
-
-document.getElementById("wrong").innerText=
-data.wrongAnswers || 0;
-
-
-/* CALCULATE ACCURACY */
-
-const total = (data.correctAnswers||0)+(data.wrongAnswers||0);
-
-let acc = total ? ((data.correctAnswers/total)*100).toFixed(1) : 0;
-
-document.getElementById("accuracy").innerText=
-acc+"%";
-
-
-/* RANK CALCULATION */
-
-const q=query(
-collection(db,"users"),
-orderBy("totalScore","desc")
-);
-
-const snapshot=await getDocs(q);
-
-let rank=1;
-
-snapshot.forEach(docSnap=>{
-
-if(docSnap.id===user.uid){
-
-document.getElementById("rank").innerText=
-"#"+rank;
-
+    } catch (error) {
+      console.error("Logout Error:", error);
+      alert("Logout failed. Please try again.");
+      logoutBtn.disabled = false;
+      logoutBtn.innerText = "🚪 Logout";
+    }
+  });
 }
 
-rank++;
+/* =========================
+   AUTH CHECK + LOAD DATA
+========================= */
 
-});
+onAuthStateChanged(auth, async (user) => {
 
+  if (!user) {
+    if (loginStatus) loginStatus.innerText = "Not logged in";
+    window.location.href = "login.html";
+    return;
+  }
 
-/* LEADERBOARD PREVIEW */
+  if (loginStatus) loginStatus.innerText = "Logged in securely";
 
-const q2=query(
-collection(db,"users"),
-orderBy("totalScore","desc"),
-limit(5)
-);
+  try {
+    await user.reload();
 
-const snap2=await getDocs(q2);
+    if (!user.emailVerified) {
+      if (loginStatus) loginStatus.innerText = "Email not verified";
+      window.location.href = "login.html";
+      return;
+    }
 
-let html="";
+    /* LOAD USER DATA */
+    const snap = await getDoc(doc(db, "users", user.uid));
 
-let r=1;
+    let data = {};
 
-snap2.forEach(docSnap=>{
+    if (snap.exists()) {
+      data = snap.data();
+    }
 
-const d=docSnap.data();
+    const firstName = data.firstName || "User";
+    const lastName = data.lastName || "";
 
-let medal="";
+    document.getElementById("userName").innerText =
+      (firstName + " " + lastName).trim();
 
-if(r===1) medal="🥇 ";
-else if(r===2) medal="🥈 ";
-else if(r===3) medal="🥉 ";
+    document.getElementById("points").innerText =
+      data.totalScore || 0;
 
-html+=`<p>${medal}${r}. ${d.firstName} — ${d.totalScore}</p>`;
+    document.getElementById("attempts").innerText =
+      data.quizzesAttempted || 0;
 
-r++;
+    document.getElementById("correct").innerText =
+      data.correctAnswers || 0;
 
-});
+    document.getElementById("wrong").innerText =
+      data.wrongAnswers || 0;
 
-document.getElementById("leaderboardPreview").innerHTML=html;
+    /* CALCULATE ACCURACY */
+    const total = (data.correctAnswers || 0) + (data.wrongAnswers || 0);
+
+    let acc = total
+      ? ((data.correctAnswers / total) * 100).toFixed(1)
+      : 0;
+
+    document.getElementById("accuracy").innerText = acc + "%";
+
+    /* RANK CALCULATION */
+    const q = query(
+      collection(db, "users"),
+      orderBy("totalScore", "desc")
+    );
+
+    const snapshot = await getDocs(q);
+
+    let rank = 1;
+    let foundRank = false;
+
+    snapshot.forEach(docSnap => {
+      if (!foundRank && docSnap.id === user.uid) {
+        document.getElementById("rank").innerText = "#" + rank;
+        foundRank = true;
+      }
+      rank++;
+    });
+
+    if (!foundRank) {
+      document.getElementById("rank").innerText = "Unranked";
+    }
+
+    /* LEADERBOARD PREVIEW */
+    const q2 = query(
+      collection(db, "users"),
+      orderBy("totalScore", "desc"),
+      limit(5)
+    );
+
+    const snap2 = await getDocs(q2);
+
+    let html = "";
+    let r = 1;
+
+    snap2.forEach(docSnap => {
+      const d = docSnap.data();
+
+      let medal = "";
+
+      if (r === 1) medal = "🥇 ";
+      else if (r === 2) medal = "🥈 ";
+      else if (r === 3) medal = "🥉 ";
+
+      const displayName =
+        ((d.firstName || "User") + " " + (d.lastName || "")).trim();
+
+      html += `<p>${medal}${r}. ${displayName} — ${d.totalScore || 0}</p>`;
+
+      r++;
+    });
+
+    document.getElementById("leaderboardPreview").innerHTML =
+      html || "<p>No leaderboard data yet.</p>";
+
+  } catch (error) {
+    console.error("Dashboard Load Error:", error);
+  }
 
 });
