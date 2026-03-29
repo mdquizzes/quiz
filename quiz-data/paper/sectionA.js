@@ -1,8 +1,538 @@
 window.SECTION_A = [
 
-/* ================= LIGHT ================= */
+/* =========================================================
+   CLASS 10 SCIENCE MCQ BANK
+   FORMAT:
+   {
+     question: "...",
+     chapter: "...",
+     difficulty: "easy/medium/hard",
+     answers: [
+       { text: "...", correct: true/false },
+       { text: "...", correct: true/false },
+       { text: "...", correct: true/false },
+       { text: "...", correct: true/false }
+     ],
+     solution: "..."
+   }
+========================================================= */
 
-/* ===== EASY ===== */
+/* =========================
+   CHAPTER 1: CHEMICAL REACTIONS AND EQUATIONS
+========================= */
+
+{
+question: "A reaction in which heat is released is called:",
+chapter: "Chemical Reactions and Equations",
+difficulty: "easy",
+answers: [
+{ text: "Exothermic reaction", correct: true },
+{ text: "Endothermic reaction", correct: false },
+{ text: "Displacement reaction", correct: false },
+{ text: "Double displacement reaction", correct: false }
+],
+solution: "Exothermic reactions release heat."
+},
+
+{
+question: "Rusting of iron is an example of:",
+chapter: "Chemical Reactions and Equations",
+difficulty: "easy",
+answers: [
+{ text: "Oxidation", correct: true },
+{ text: "Reduction", correct: false },
+{ text: "Neutralization", correct: false },
+{ text: "Precipitation", correct: false }
+],
+solution: "Rusting involves oxidation of iron."
+},
+
+{
+question: "The reaction 2Mg + O₂ → 2MgO is:",
+chapter: "Chemical Reactions and Equations",
+difficulty: "medium",
+answers: [
+{ text: "Combination reaction", correct: true },
+{ text: "Decomposition reaction", correct: false },
+{ text: "Displacement reaction", correct: false },
+{ text: "Redox reaction only", correct: false }
+],
+solution: "Two substances combine to form one product."
+},
+
+{
+question: "The balanced form of H₂ + O₂ → H₂O is:",
+chapter: "Chemical Reactions and Equations",
+difficulty: "medium",
+answers: [
+{ text: "2H₂ + O₂ → 2H₂O", correct: true },
+{ text: "H₂ + O₂ → H₂O", correct: false },
+{ text: "H₂ + 2O₂ → H₂O", correct: false },
+{ text: "2H₂ + 2O₂ → 2H₂O", correct: false }
+],
+solution: "Balanced equation is 2H₂ + O₂ → 2H₂O."
+},
+
+{
+question: "A substance that gets reduced causes another substance to get:",
+chapter: "Chemical Reactions and Equations",
+difficulty: "hard",
+answers: [
+{ text: "Oxidized", correct: true },
+{ text: "Neutralized", correct: false },
+{ text: "Dissolved", correct: false },
+{ text: "Decomposed", correct: false }
+],
+solution: "Reduction and oxidation occur together in redox reactions."
+},
+
+/* =========================
+   CHAPTER 2: ACIDS, BASES AND SALTS
+========================= */
+
+{
+question: "Acids turn blue litmus paper:",
+chapter: "Acids, Bases and Salts",
+difficulty: "easy",
+answers: [
+{ text: "Red", correct: true },
+{ text: "Green", correct: false },
+{ text: "Yellow", correct: false },
+{ text: "Black", correct: false }
+],
+solution: "Acids turn blue litmus red."
+},
+
+{
+question: "pH value of a neutral solution is:",
+chapter: "Acids, Bases and Salts",
+difficulty: "easy",
+answers: [
+{ text: "7", correct: true },
+{ text: "0", correct: false },
+{ text: "14", correct: false },
+{ text: "1", correct: false }
+],
+solution: "Neutral solutions have pH 7."
+},
+
+{
+question: "Which of the following is a base?",
+chapter: "Acids, Bases and Salts",
+difficulty: "easy",
+answers: [
+{ text: "NaOH", correct: true },
+{ text: "HCl", correct: false },
+{ text: "H₂SO₄", correct: false },
+{ text: "CH₃COOH", correct: false }
+],
+solution: "NaOH is sodium hydroxide, a strong base."
+},
+
+{
+question: "Common salt is chemically known as:",
+chapter: "Acids, Bases and Salts",
+difficulty: "medium",
+answers: [
+{ text: "Sodium chloride", correct: true },
+{ text: "Sodium carbonate", correct: false },
+{ text: "Calcium chloride", correct: false },
+{ text: "Potassium nitrate", correct: false }
+],
+solution: "Common salt is NaCl."
+},
+
+{
+question: "Tooth decay starts when mouth pH falls below:",
+chapter: "Acids, Bases and Salts",
+difficulty: "hard",
+answers: [
+{ text: "5.5", correct: true },
+{ text: "7.0", correct: false },
+{ text: "6.5", correct: false },
+{ text: "4.0", correct: false }
+],
+solution: "Enamel begins to corrode below pH 5.5."
+},
+
+/* =========================
+   CHAPTER 3: METALS AND NON-METALS
+========================= */
+
+{
+question: "Which metal is liquid at room temperature?",
+chapter: "Metals and Non-Metals",
+difficulty: "easy",
+answers: [
+{ text: "Mercury", correct: true },
+{ text: "Iron", correct: false },
+{ text: "Copper", correct: false },
+{ text: "Aluminium", correct: false }
+],
+solution: "Mercury is liquid at room temperature."
+},
+
+{
+question: "Metals are generally:",
+chapter: "Metals and Non-Metals",
+difficulty: "easy",
+answers: [
+{ text: "Good conductors of electricity", correct: true },
+{ text: "Poor conductors of heat", correct: false },
+{ text: "Brittle", correct: false },
+{ text: "Non-lustrous", correct: false }
+],
+solution: "Most metals conduct heat and electricity well."
+},
+
+{
+question: "The property by which metals can be beaten into sheets is called:",
+chapter: "Metals and Non-Metals",
+difficulty: "medium",
+answers: [
+{ text: "Malleability", correct: true },
+{ text: "Ductility", correct: false },
+{ text: "Sonority", correct: false },
+{ text: "Conductivity", correct: false }
+],
+solution: "Malleability means forming thin sheets."
+},
+
+{
+question: "Which gas is generally evolved when metals react with acids?",
+chapter: "Metals and Non-Metals",
+difficulty: "medium",
+answers: [
+{ text: "Hydrogen", correct: true },
+{ text: "Oxygen", correct: false },
+{ text: "Nitrogen", correct: false },
+{ text: "Carbon dioxide", correct: false }
+],
+solution: "Metal + Acid → Salt + Hydrogen gas."
+},
+
+{
+question: "Aluminium is protected from corrosion due to:",
+chapter: "Metals and Non-Metals",
+difficulty: "hard",
+answers: [
+{ text: "Formation of oxide layer", correct: true },
+{ text: "Low density", correct: false },
+{ text: "High conductivity", correct: false },
+{ text: "Being soft", correct: false }
+],
+solution: "Aluminium forms a protective oxide layer."
+},
+
+/* =========================
+   CHAPTER 4: CARBON AND ITS COMPOUNDS
+========================= */
+
+{
+question: "Carbon has valency:",
+chapter: "Carbon and Its Compounds",
+difficulty: "easy",
+answers: [
+{ text: "4", correct: true },
+{ text: "2", correct: false },
+{ text: "1", correct: false },
+{ text: "3", correct: false }
+],
+solution: "Carbon is tetravalent."
+},
+
+{
+question: "Compounds with same molecular formula but different structures are called:",
+chapter: "Carbon and Its Compounds",
+difficulty: "medium",
+answers: [
+{ text: "Isomers", correct: true },
+{ text: "Homologues", correct: false },
+{ text: "Polymers", correct: false },
+{ text: "Allotropes", correct: false }
+],
+solution: "Such compounds are called isomers."
+},
+
+{
+question: "Functional group of alcohol is:",
+chapter: "Carbon and Its Compounds",
+difficulty: "easy",
+answers: [
+{ text: "-OH", correct: true },
+{ text: "-CHO", correct: false },
+{ text: "-COOH", correct: false },
+{ text: "-NH₂", correct: false }
+],
+solution: "Alcohol contains hydroxyl group."
+},
+
+{
+question: "Soap molecules have:",
+chapter: "Carbon and Its Compounds",
+difficulty: "medium",
+answers: [
+{ text: "Hydrophilic head and hydrophobic tail", correct: true },
+{ text: "Only hydrophilic part", correct: false },
+{ text: "Only hydrophobic part", correct: false },
+{ text: "No ionic nature", correct: false }
+],
+solution: "Soap has dual nature for cleaning."
+},
+
+{
+question: "Ethanoic acid is commonly called:",
+chapter: "Carbon and Its Compounds",
+difficulty: "hard",
+answers: [
+{ text: "Acetic acid", correct: true },
+{ text: "Formic acid", correct: false },
+{ text: "Citric acid", correct: false },
+{ text: "Lactic acid", correct: false }
+],
+solution: "Ethanoic acid is acetic acid."
+},
+
+/* =========================
+   CHAPTER 5: LIFE PROCESSES
+========================= */
+
+{
+question: "The process by which green plants prepare food is:",
+chapter: "Life Processes",
+difficulty: "easy",
+answers: [
+{ text: "Photosynthesis", correct: true },
+{ text: "Respiration", correct: false },
+{ text: "Digestion", correct: false },
+{ text: "Transpiration", correct: false }
+],
+solution: "Plants prepare food by photosynthesis."
+},
+
+{
+question: "The functional unit of kidney is:",
+chapter: "Life Processes",
+difficulty: "easy",
+answers: [
+{ text: "Nephron", correct: true },
+{ text: "Neuron", correct: false },
+{ text: "Alveolus", correct: false },
+{ text: "Villus", correct: false }
+],
+solution: "Nephron is the structural and functional unit of kidney."
+},
+
+{
+question: "Transport of water in plants takes place through:",
+chapter: "Life Processes",
+difficulty: "medium",
+answers: [
+{ text: "Xylem", correct: true },
+{ text: "Phloem", correct: false },
+{ text: "Stomata", correct: false },
+{ text: "Chloroplast", correct: false }
+],
+solution: "Xylem carries water and minerals."
+},
+
+{
+question: "The breakdown of glucose to release energy is called:",
+chapter: "Life Processes",
+difficulty: "medium",
+answers: [
+{ text: "Respiration", correct: true },
+{ text: "Photosynthesis", correct: false },
+{ text: "Excretion", correct: false },
+{ text: "Nutrition", correct: false }
+],
+solution: "Respiration releases energy from food."
+},
+
+{
+question: "Bile is produced by:",
+chapter: "Life Processes",
+difficulty: "hard",
+answers: [
+{ text: "Liver", correct: true },
+{ text: "Pancreas", correct: false },
+{ text: "Stomach", correct: false },
+{ text: "Kidney", correct: false }
+],
+solution: "Liver produces bile."
+},
+
+/* =========================
+   CHAPTER 6: CONTROL AND COORDINATION
+========================= */
+
+{
+question: "The basic unit of nervous system is:",
+chapter: "Control and Coordination",
+difficulty: "easy",
+answers: [
+{ text: "Neuron", correct: true },
+{ text: "Nephron", correct: false },
+{ text: "Hormone", correct: false },
+{ text: "Cell wall", correct: false }
+],
+solution: "Neuron is the functional unit of the nervous system."
+},
+
+{
+question: "Plant movement in response to touch is called:",
+chapter: "Control and Coordination",
+difficulty: "medium",
+answers: [
+{ text: "Thigmotropism", correct: true },
+{ text: "Phototropism", correct: false },
+{ text: "Geotropism", correct: false },
+{ text: "Hydrotropism", correct: false }
+],
+solution: "Thigmotropism is movement due to touch."
+},
+
+{
+question: "Insulin is secreted by:",
+chapter: "Control and Coordination",
+difficulty: "medium",
+answers: [
+{ text: "Pancreas", correct: true },
+{ text: "Liver", correct: false },
+{ text: "Kidney", correct: false },
+{ text: "Thyroid", correct: false }
+],
+solution: "Insulin is secreted by pancreas."
+},
+
+{
+question: "Reflex action is controlled by:",
+chapter: "Control and Coordination",
+difficulty: "hard",
+answers: [
+{ text: "Spinal cord", correct: true },
+{ text: "Cerebrum", correct: false },
+{ text: "Cerebellum", correct: false },
+{ text: "Pituitary gland", correct: false }
+],
+solution: "Reflex actions are mainly controlled by spinal cord."
+},
+
+/* =========================
+   CHAPTER 7: HOW DO ORGANISMS REPRODUCE?
+========================= */
+
+{
+question: "Binary fission occurs in:",
+chapter: "How Do Organisms Reproduce?",
+difficulty: "easy",
+answers: [
+{ text: "Amoeba", correct: true },
+{ text: "Hydra", correct: false },
+{ text: "Yeast", correct: false },
+{ text: "Spirogyra", correct: false }
+],
+solution: "Amoeba reproduces by binary fission."
+},
+
+{
+question: "The reproductive part of a flower is:",
+chapter: "How Do Organisms Reproduce?",
+difficulty: "easy",
+answers: [
+{ text: "Flower", correct: true },
+{ text: "Root", correct: false },
+{ text: "Leaf", correct: false },
+{ text: "Stem", correct: false }
+],
+solution: "Flower is the reproductive organ in flowering plants."
+},
+
+{
+question: "Fusion of male and female gametes is called:",
+chapter: "How Do Organisms Reproduce?",
+difficulty: "medium",
+answers: [
+{ text: "Fertilization", correct: true },
+{ text: "Budding", correct: false },
+{ text: "Fragmentation", correct: false },
+{ text: "Pollination", correct: false }
+],
+solution: "Fertilization is fusion of gametes."
+},
+
+{
+question: "Condom is a method of:",
+chapter: "How Do Organisms Reproduce?",
+difficulty: "hard",
+answers: [
+{ text: "Contraception", correct: true },
+{ text: "Fertilization", correct: false },
+{ text: "Pollination", correct: false },
+{ text: "Implantation", correct: false }
+],
+solution: "Condom is a contraceptive method."
+},
+
+/* =========================
+   CHAPTER 8: HEREDITY AND EVOLUTION
+========================= */
+
+{
+question: "The science of heredity is called:",
+chapter: "Heredity and Evolution",
+difficulty: "easy",
+answers: [
+{ text: "Genetics", correct: true },
+{ text: "Ecology", correct: false },
+{ text: "Evolution", correct: false },
+{ text: "Embryology", correct: false }
+],
+solution: "Genetics is the study of heredity."
+},
+
+{
+question: "The trait that expresses itself in F1 generation is:",
+chapter: "Heredity and Evolution",
+difficulty: "medium",
+answers: [
+{ text: "Dominant trait", correct: true },
+{ text: "Recessive trait", correct: false },
+{ text: "Hybrid trait", correct: false },
+{ text: "Mutant trait", correct: false }
+],
+solution: "Dominant traits express in F1 generation."
+},
+
+{
+question: "Mendel worked on:",
+chapter: "Heredity and Evolution",
+difficulty: "easy",
+answers: [
+{ text: "Pea plants", correct: true },
+{ text: "Mango plants", correct: false },
+{ text: "Rats", correct: false },
+{ text: "Bacteria", correct: false }
+],
+solution: "Mendel used pea plants in his experiments."
+},
+
+{
+question: "Sex of a child in humans is determined by:",
+chapter: "Heredity and Evolution",
+difficulty: "hard",
+answers: [
+{ text: "Father", correct: true },
+{ text: "Mother", correct: false },
+{ text: "Both equally by XX only", correct: false },
+{ text: "Environment", correct: false }
+],
+solution: "Father contributes either X or Y chromosome."
+},
+
+/* =========================
+   CHAPTER 9: LIGHT – REFLECTION AND REFRACTION
+========================= */
 
 {
 question: "The angle of incidence is equal to angle of reflection.",
@@ -44,34 +574,6 @@ solution: "Plane mirror forms virtual, erect image."
 },
 
 {
-question: "Refractive index formula is:",
-chapter: "Light",
-difficulty: "easy",
-answers: [
-{ text: "n = c/v", correct: true },
-{ text: "n = v/c", correct: false },
-{ text: "n = uv", correct: false },
-{ text: "None", correct: false }
-],
-solution: "Definition of refractive index."
-},
-
-{
-question: "Convex lens is also called:",
-chapter: "Light",
-difficulty: "easy",
-answers: [
-{ text: "Converging lens", correct: true },
-{ text: "Diverging lens", correct: false },
-{ text: "Plane lens", correct: false },
-{ text: "None", correct: false }
-],
-solution: "Convex lens converges light."
-},
-
-/* ===== MEDIUM ===== */
-
-{
 question: "Mirror formula is:",
 chapter: "Light",
 difficulty: "medium",
@@ -82,45 +584,6 @@ answers: [
 { text: "None", correct: false }
 ],
 solution: "Standard mirror formula."
-},
-
-{
-question: "Magnification of mirror is:",
-chapter: "Light",
-difficulty: "medium",
-answers: [
-{ text: "m = -v/u", correct: true },
-{ text: "m = v/u", correct: false },
-{ text: "m = uv", correct: false },
-{ text: "None", correct: false }
-],
-solution: "Mirror magnification formula."
-},
-
-{
-question: "Refraction occurs due to:",
-chapter: "Light",
-difficulty: "medium",
-answers: [
-{ text: "Change in speed", correct: true },
-{ text: "Change in mass", correct: false },
-{ text: "No change", correct: false },
-{ text: "None", correct: false }
-],
-solution: "Speed change causes bending."
-},
-
-{
-question: "Critical angle is defined when:",
-chapter: "Light",
-difficulty: "medium",
-answers: [
-{ text: "Angle of refraction = 90°", correct: true },
-{ text: "Angle of incidence = 0°", correct: false },
-{ text: "Reflection = 0", correct: false },
-{ text: "None", correct: false }
-],
-solution: "Definition of critical angle."
 },
 
 {
@@ -136,46 +599,6 @@ answers: [
 solution: "Power is inverse of focal length."
 },
 
-/* ===== HARD ===== */
-
-{
-question: "If focal length = 20 cm, power is:",
-chapter: "Light",
-difficulty: "hard",
-answers: [
-{ text: "5 D", correct: true },
-{ text: "0.5 D", correct: false },
-{ text: "2 D", correct: false },
-{ text: "None", correct: false }
-],
-solution: "P = 1/f (in meter)."
-},
-{
-question: "An object is placed at 30 cm from a concave mirror of focal length 15 cm. Image distance is:",
-chapter: "Light",
-difficulty: "hard",
-answers: [
-{ text: "30 cm", correct: true },
-{ text: "15 cm", correct: false },
-{ text: "10 cm", correct: false },
-{ text: "20 cm", correct: false }
-],
-solution: "Using mirror formula, v = -30 cm."
-},
-
-{
-question: "A convex lens of focal length 25 cm forms image at infinity. Object is placed at:",
-chapter: "Light",
-difficulty: "hard",
-answers: [
-{ text: "25 cm", correct: true },
-{ text: "50 cm", correct: false },
-{ text: "10 cm", correct: false },
-{ text: "Infinity", correct: false }
-],
-solution: "Object at focus gives image at infinity."
-},
-
 {
 question: "Magnification produced by plane mirror is:",
 chapter: "Light",
@@ -189,177 +612,78 @@ answers: [
 solution: "Plane mirror forms virtual upright image."
 },
 
-{
-question: "If refractive index increases, speed of light:",
-chapter: "Light",
-difficulty: "hard",
-answers: [
-{ text: "Decreases", correct: true },
-{ text: "Increases", correct: false },
-{ text: "Remains same", correct: false },
-{ text: "Becomes zero", correct: false }
-],
-solution: "n = c/v → v decreases."
-},
+/* =========================
+   CHAPTER 10: HUMAN EYE AND COLOURFUL WORLD
+========================= */
 
 {
-question: "For convex mirror, focal length is:",
-chapter: "Light",
-difficulty: "hard",
+question: "The least distance of distinct vision for a normal human eye is:",
+chapter: "Human Eye and Colourful World",
+difficulty: "easy",
 answers: [
-{ text: "Positive", correct: true },
-{ text: "Negative", correct: false },
-{ text: "Zero", correct: false },
-{ text: "Infinite", correct: false }
+{ text: "25 cm", correct: true },
+{ text: "2.5 cm", correct: false },
+{ text: "50 cm", correct: false },
+{ text: "100 cm", correct: false }
 ],
-solution: "Convex mirror has positive focal length."
+solution: "Normal least distance of distinct vision is 25 cm."
 },
 
 {
-question: "Power of lens with focal length -50 cm is:",
-chapter: "Light",
-difficulty: "hard",
+question: "The splitting of white light into seven colours is called:",
+chapter: "Human Eye and Colourful World",
+difficulty: "easy",
 answers: [
-{ text: "-2 D", correct: true },
-{ text: "2 D", correct: false },
-{ text: "-0.5 D", correct: false },
-{ text: "0.5 D", correct: false }
+{ text: "Dispersion", correct: true },
+{ text: "Reflection", correct: false },
+{ text: "Refraction", correct: false },
+{ text: "Scattering", correct: false }
 ],
-solution: "P = 1/f = 1/(-0.5) = -2 D."
+solution: "Dispersion is splitting of white light."
 },
 
 {
-question: "A ray parallel to principal axis passes through:",
-chapter: "Light",
-difficulty: "hard",
+question: "Myopia can be corrected using:",
+chapter: "Human Eye and Colourful World",
+difficulty: "medium",
 answers: [
-{ text: "Focus", correct: true },
-{ text: "Pole", correct: false },
-{ text: "Center", correct: false },
-{ text: "None", correct: false }
+{ text: "Concave lens", correct: true },
+{ text: "Convex lens", correct: false },
+{ text: "Bifocal lens", correct: false },
+{ text: "Plane glass", correct: false }
 ],
-solution: "Standard ray rule."
+solution: "Myopia is corrected by concave lens."
 },
 
 {
-question: "Image formed by concave lens is always:",
-chapter: "Light",
-difficulty: "hard",
+question: "Hypermetropia is corrected by:",
+chapter: "Human Eye and Colourful World",
+difficulty: "medium",
 answers: [
-{ text: "Virtual", correct: true },
-{ text: "Real", correct: false },
-{ text: "Inverted", correct: false },
-{ text: "None", correct: false }
+{ text: "Convex lens", correct: true },
+{ text: "Concave lens", correct: false },
+{ text: "Cylindrical lens", correct: false },
+{ text: "No lens", correct: false }
 ],
-solution: "Concave lens always virtual."
+solution: "Hypermetropia is corrected using convex lens."
 },
 
 {
-question: "Critical angle depends on:",
-chapter: "Light",
+question: "The colour of sky appears blue due to:",
+chapter: "Human Eye and Colourful World",
 difficulty: "hard",
 answers: [
-{ text: "Refractive index", correct: true },
-{ text: "Speed only", correct: false },
-{ text: "Distance", correct: false },
-{ text: "Mass", correct: false }
+{ text: "Scattering of light", correct: true },
+{ text: "Reflection of light", correct: false },
+{ text: "Refraction of light", correct: false },
+{ text: "Dispersion of light", correct: false }
 ],
-solution: "Depends on medium."
+solution: "Blue light scatters more, so sky appears blue."
 },
 
-{
-question: "Total internal reflection occurs when:",
-chapter: "Light",
-difficulty: "hard",
-answers: [
-{ text: "Angle > critical angle", correct: true },
-{ text: "Angle < critical angle", correct: false },
-{ text: "Angle = 0", correct: false },
-{ text: "None", correct: false }
-],
-solution: "Condition of TIR."
-},
-
-{
-question: "Object at infinity forms image at:",
-chapter: "Light",
-difficulty: "hard",
-answers: [
-{ text: "Focus", correct: true },
-{ text: "Pole", correct: false },
-{ text: "Center", correct: false },
-{ text: "None", correct: false }
-],
-solution: "Parallel rays meet at focus."
-},
-  {
-question: "If u = -20 cm, f = -10 cm, v is:",
-chapter: "Light",
-difficulty: "hard",
-answers: [
-{ text: "-20 cm", correct: true },
-{ text: "-10 cm", correct: false },
-{ text: "-5 cm", correct: false },
-{ text: "10 cm", correct: false }
-],
-solution: "Mirror formula."
-},
-
-{
-question: "Lens formula sign convention follows:",
-chapter: "Light",
-difficulty: "hard",
-answers: [
-{ text: "Cartesian sign convention", correct: true },
-{ text: "Newton law", correct: false },
-{ text: "Hooke law", correct: false },
-{ text: "None", correct: false }
-],
-solution: "Standard sign rule."
-},
-
-{
-question: "If refractive index = 2, speed becomes:",
-chapter: "Light",
-difficulty: "hard",
-answers: [
-{ text: "c/2", correct: true },
-{ text: "2c", correct: false },
-{ text: "c", correct: false },
-{ text: "0", correct: false }
-],
-solution: "v = c/n."
-},
-
-{
-question: "Image distance is negative means:",
-chapter: "Light",
-difficulty: "hard",
-answers: [
-{ text: "Real image", correct: true },
-{ text: "Virtual image", correct: false },
-{ text: "No image", correct: false },
-{ text: "None", correct: false }
-],
-solution: "Sign convention."
-},
-
-{
-question: "Convex lens produces virtual image when:",
-chapter: "Light",
-difficulty: "hard",
-answers: [
-{ text: "Object inside focus", correct: true },
-{ text: "Beyond focus", correct: false },
-{ text: "At infinity", correct: false },
-{ text: "None", correct: false }
-],
-solution: "Standard rule."
-},
-
-/* ================= ELECTRICITY ================= */
-
-/* ===== EASY ===== */
+/* =========================
+   CHAPTER 11: ELECTRICITY
+========================= */
 
 {
 question: "SI unit of electric current is:",
@@ -372,19 +696,6 @@ answers: [
 { text: "Watt", correct: false }
 ],
 solution: "SI unit of current is Ampere."
-},
-
-{
-question: "Instrument used to measure current is:",
-chapter: "Electricity",
-difficulty: "easy",
-answers: [
-{ text: "Ammeter", correct: true },
-{ text: "Voltmeter", correct: false },
-{ text: "Galvanometer", correct: false },
-{ text: "Thermometer", correct: false }
-],
-solution: "Ammeter measures current."
 },
 
 {
@@ -414,86 +725,6 @@ solution: "Ohm's law relation."
 },
 
 {
-question: "Resistance unit is:",
-chapter: "Electricity",
-difficulty: "easy",
-answers: [
-{ text: "Ohm", correct: true },
-{ text: "Volt", correct: false },
-{ text: "Ampere", correct: false },
-{ text: "Watt", correct: false }
-],
-solution: "Resistance unit is ohm."
-},
-
-{
-question: "Electric charge unit is:",
-chapter: "Electricity",
-difficulty: "easy",
-answers: [
-{ text: "Coulomb", correct: true },
-{ text: "Ampere", correct: false },
-{ text: "Volt", correct: false },
-{ text: "Watt", correct: false }
-],
-solution: "Charge unit is Coulomb."
-},
-
-{
-question: "1 Ampere =",
-chapter: "Electricity",
-difficulty: "easy",
-answers: [
-{ text: "1 C/s", correct: true },
-{ text: "1 V/s", correct: false },
-{ text: "1 J/s", correct: false },
-{ text: "None", correct: false }
-],
-solution: "Definition of current."
-},
-
-{
-question: "Resistance depends on:",
-chapter: "Electricity",
-difficulty: "easy",
-answers: [
-{ text: "Length of conductor", correct: true },
-{ text: "Color", correct: false },
-{ text: "Weight", correct: false },
-{ text: "None", correct: false }
-],
-solution: "R ∝ L"
-},
-
-{
-question: "Good conductor example:",
-chapter: "Electricity",
-difficulty: "easy",
-answers: [
-{ text: "Copper", correct: true },
-{ text: "Rubber", correct: false },
-{ text: "Wood", correct: false },
-{ text: "Plastic", correct: false }
-],
-solution: "Copper is good conductor."
-},
-
-{
-question: "Insulator example:",
-chapter: "Electricity",
-difficulty: "easy",
-answers: [
-{ text: "Rubber", correct: true },
-{ text: "Copper", correct: false },
-{ text: "Iron", correct: false },
-{ text: "Silver", correct: false }
-],
-solution: "Rubber is insulator."
-},
-
-/* ===== MEDIUM ===== */
-
-{
 question: "Power formula is:",
 chapter: "Electricity",
 difficulty: "medium",
@@ -504,45 +735,6 @@ answers: [
 { text: "None", correct: false }
 ],
 solution: "Power relation."
-},
-
-{
-question: "Energy formula is:",
-chapter: "Electricity",
-difficulty: "medium",
-answers: [
-{ text: "E = VIt", correct: true },
-{ text: "E = VI", correct: false },
-{ text: "E = IR", correct: false },
-{ text: "None", correct: false }
-],
-solution: "Electrical energy formula."
-},
-
-{
-question: "Series resistance formula:",
-chapter: "Electricity",
-difficulty: "medium",
-answers: [
-{ text: "R = R1 + R2", correct: true },
-{ text: "1/R = 1/R1 + 1/R2", correct: false },
-{ text: "R = R1R2", correct: false },
-{ text: "None", correct: false }
-],
-solution: "Series combination."
-},
-
-{
-question: "Parallel resistance formula:",
-chapter: "Electricity",
-difficulty: "medium",
-answers: [
-{ text: "1/R = 1/R1 + 1/R2", correct: true },
-{ text: "R = R1 + R2", correct: false },
-{ text: "R = R1R2", correct: false },
-{ text: "None", correct: false }
-],
-solution: "Parallel combination."
 },
 
 {
@@ -558,8 +750,6 @@ answers: [
 solution: "Joule’s law."
 },
 
-/* ===== HARD ===== */
-
 {
 question: "If V = 10V, I = 2A, power is:",
 chapter: "Electricity",
@@ -573,43 +763,211 @@ answers: [
 solution: "P = VI"
 },
 
+/* =========================
+   CHAPTER 12: MAGNETIC EFFECTS OF ELECTRIC CURRENT
+========================= */
+
 {
-question: "If R = 5Ω, I = 2A, voltage is:",
-chapter: "Electricity",
-difficulty: "hard",
+question: "Magnetic field lines around a straight conductor are:",
+chapter: "Magnetic Effects of Electric Current",
+difficulty: "easy",
 answers: [
-{ text: "10V", correct: true },
-{ text: "5V", correct: false },
-{ text: "2V", correct: false },
-{ text: "None", correct: false }
+{ text: "Circular", correct: true },
+{ text: "Straight", correct: false },
+{ text: "Elliptical", correct: false },
+{ text: "Random", correct: false }
 ],
-solution: "V = IR"
+solution: "Magnetic field lines around a straight conductor are circular."
 },
 
 {
-question: "If 2 resistors 2Ω and 3Ω in series, total:",
-chapter: "Electricity",
-difficulty: "hard",
+question: "The device used to detect current is:",
+chapter: "Magnetic Effects of Electric Current",
+difficulty: "easy",
 answers: [
-{ text: "5Ω", correct: true },
-{ text: "1Ω", correct: false },
-{ text: "6Ω", correct: false },
-{ text: "None", correct: false }
+{ text: "Galvanometer", correct: true },
+{ text: "Voltmeter", correct: false },
+{ text: "Ammeter", correct: false },
+{ text: "Motor", correct: false }
 ],
-solution: "Series sum."
+solution: "Galvanometer detects electric current."
 },
 
 {
-question: "If 2 resistors 2Ω and 2Ω in parallel:",
-chapter: "Electricity",
-difficulty: "hard",
+question: "Fleming’s left-hand rule is used for:",
+chapter: "Magnetic Effects of Electric Current",
+difficulty: "medium",
 answers: [
-{ text: "1Ω", correct: true },
-{ text: "4Ω", correct: false },
-{ text: "2Ω", correct: false },
-{ text: "None", correct: false }
+{ text: "Direction of force on conductor", correct: true },
+{ text: "Direction of induced current", correct: false },
+{ text: "Resistance measurement", correct: false },
+{ text: "Voltage calculation", correct: false }
 ],
-solution: "Parallel formula."
+solution: "Left-hand rule gives direction of force."
 },
 
-]; 
+{
+question: "An electric motor converts:",
+chapter: "Magnetic Effects of Electric Current",
+difficulty: "medium",
+answers: [
+{ text: "Electrical energy into mechanical energy", correct: true },
+{ text: "Mechanical energy into electrical energy", correct: false },
+{ text: "Heat energy into electrical energy", correct: false },
+{ text: "Chemical energy into sound energy", correct: false }
+],
+solution: "Motor converts electrical energy to mechanical energy."
+},
+
+{
+question: "Domestic electric fuse works on:",
+chapter: "Magnetic Effects of Electric Current",
+difficulty: "hard",
+answers: [
+{ text: "Heating effect of current", correct: true },
+{ text: "Chemical effect of current", correct: false },
+{ text: "Magnetic effect of current", correct: false },
+{ text: "Cooling effect of current", correct: false }
+],
+solution: "Fuse wire melts due to heating effect."
+},
+
+/* =========================
+   CHAPTER 13: OUR ENVIRONMENT
+========================= */
+
+{
+question: "The organisms which break down dead matter are called:",
+chapter: "Our Environment",
+difficulty: "easy",
+answers: [
+{ text: "Decomposers", correct: true },
+{ text: "Producers", correct: false },
+{ text: "Consumers", correct: false },
+{ text: "Herbivores", correct: false }
+],
+solution: "Decomposers break down dead organic matter."
+},
+
+{
+question: "Green plants are:",
+chapter: "Our Environment",
+difficulty: "easy",
+answers: [
+{ text: "Producers", correct: true },
+{ text: "Consumers", correct: false },
+{ text: "Decomposers", correct: false },
+{ text: "Parasites", correct: false }
+],
+solution: "Plants produce their own food."
+},
+
+{
+question: "Ozone layer protects us from:",
+chapter: "Our Environment",
+difficulty: "medium",
+answers: [
+{ text: "Ultraviolet rays", correct: true },
+{ text: "Infrared rays", correct: false },
+{ text: "X-rays", correct: false },
+{ text: "Gamma rays", correct: false }
+],
+solution: "Ozone absorbs harmful UV rays."
+},
+
+{
+question: "A food chain begins with:",
+chapter: "Our Environment",
+difficulty: "medium",
+answers: [
+{ text: "Producer", correct: true },
+{ text: "Herbivore", correct: false },
+{ text: "Carnivore", correct: false },
+{ text: "Decomposer", correct: false }
+],
+solution: "Every food chain begins with a producer."
+},
+
+{
+question: "Biodegradable waste can be broken down by:",
+chapter: "Our Environment",
+difficulty: "hard",
+answers: [
+{ text: "Microorganisms", correct: true },
+{ text: "Only sunlight", correct: false },
+{ text: "Only machines", correct: false },
+{ text: "Only water", correct: false }
+],
+solution: "Microorganisms decompose biodegradable waste."
+},
+
+/* =========================
+   CHAPTER 14: SUSTAINABLE MANAGEMENT OF NATURAL RESOURCES
+========================= */
+
+{
+question: "The use of resources in a way that meets present needs without harming future generations is called:",
+chapter: "Sustainable Management of Natural Resources",
+difficulty: "easy",
+answers: [
+{ text: "Sustainable development", correct: true },
+{ text: "Industrialization", correct: false },
+{ text: "Deforestation", correct: false },
+{ text: "Urbanization", correct: false }
+],
+solution: "This is the definition of sustainable development."
+},
+
+{
+question: "Chipko movement was related to:",
+chapter: "Sustainable Management of Natural Resources",
+difficulty: "easy",
+answers: [
+{ text: "Conservation of forests", correct: true },
+{ text: "Saving rivers", correct: false },
+{ text: "Saving animals", correct: false },
+{ text: "Controlling pollution", correct: false }
+],
+solution: "Chipko movement aimed to protect forests."
+},
+
+{
+question: "Rainwater harvesting helps in:",
+chapter: "Sustainable Management of Natural Resources",
+difficulty: "medium",
+answers: [
+{ text: "Groundwater recharge", correct: true },
+{ text: "Deforestation", correct: false },
+{ text: "Acid rain", correct: false },
+{ text: "Ozone depletion", correct: false }
+],
+solution: "Rainwater harvesting increases groundwater level."
+},
+
+{
+question: "Three R’s stand for:",
+chapter: "Sustainable Management of Natural Resources",
+difficulty: "medium",
+answers: [
+{ text: "Reduce, Reuse, Recycle", correct: true },
+{ text: "Read, Revise, Repeat", correct: false },
+{ text: "Run, Rest, Recover", correct: false },
+{ text: "Repair, Return, Remove", correct: false }
+],
+solution: "The 3 R's help conserve resources."
+},
+
+{
+question: "Coal and petroleum are:",
+chapter: "Sustainable Management of Natural Resources",
+difficulty: "hard",
+answers: [
+{ text: "Non-renewable resources", correct: true },
+{ text: "Renewable resources", correct: false },
+{ text: "Biodegradable resources", correct: false },
+{ text: "Unlimited resources", correct: false }
+],
+solution: "Coal and petroleum take millions of years to form."
+}
+
+];
