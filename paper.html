@@ -308,7 +308,6 @@ let currentSection = "";
 let selectedMap = new Map();
 let showAnswer = false;
 let currentChapterSelections = new Set();
-let loadedScripts = [];
 let instituteLogo = "";
 
 /* =========================
@@ -320,12 +319,16 @@ function getFolderName() {
   const classPrefix = cls === "10" ? "x" : cls;
   return `${classPrefix}${subject}`;
 }
+
 function getSectionPath(section) {
   const folder = getFolderName();
   return `quiz-data/paper/${folder}/section${section}.js`;
 }
+
 function capitalize(str){ return str.charAt(0).toUpperCase() + str.slice(1); }
+
 function escapeQuotes(str){ return String(str).replace(/'/g, "\\'"); }
+
 function hashString(str){
   let hash = 0;
   for(let i=0; i<str.length; i++){
@@ -334,6 +337,7 @@ function hashString(str){
   }
   return Math.abs(hash);
 }
+
 function makeKey(q, i) {
   return `${q.section}_${q.chapter}_${i}_${hashString(q.question)}`;
 }
@@ -367,39 +371,49 @@ function clearError(){
 }
 
 /* =========================
-   SCRIPT LOADER
+   SAFE SCRIPT LOADER
 ========================= */
-function loadScript(src) {
-  return new Promise((resolve, reject) => {
+function loadScriptSafe(src) {
+  return new Promise((resolve) => {
     const s = document.createElement("script");
     s.src = src + "?v=" + Date.now();
-    s.onload = () => resolve(src);
-    s.onerror = () => reject(src);
+
+    s.onload = () => {
+      console.log("Loaded:", src);
+      resolve({ success: true, src });
+    };
+
+    s.onerror = () => {
+      console.warn("Failed to load:", src);
+      resolve({ success: false, src, reason: "404 / file missing" });
+    };
+
     document.body.appendChild(s);
-    loadedScripts.push(s);
   });
-}
-function clearOldScripts() {
-  loadedScripts.forEach(s => s.remove());
-  loadedScripts = [];
 }
 
 /* =========================
-   DATA LOADING
+   DATA LOADING (SAFE)
 ========================= */
 async function reloadAllData() {
   document.getElementById("loader").style.display = "block";
+  clearError();
 
-  // reset global windows
+  // reset globals
   window.SECTION_A = [];
   window.SECTION_B = [];
   window.SECTION_C = [];
   window.SECTION_D = [];
+  window.SECTION_E = [];
 
-  clearOldScripts();
+  window.sectionA = [];
+  window.sectionB = [];
+  window.sectionC = [];
+  window.sectionD = [];
+  window.sectionE = [];
+
   ALL_RAW = [];
   ALL = [];
-  
   currentSection = "";
   currentChapterSelections.clear();
   document.getElementById("chapterArea").innerHTML = "";
@@ -408,59 +422,74 @@ async function reloadAllData() {
   selectedMap.clear();
   renderPaper();
 
-  const paths = ["A","B","C","D","E"].map(sec => getSectionPath(sec));
+  const sectionNames = ["A","B","C","D","E"];
+  const paths = sectionNames.map(sec => ({
+    sec,
+    path: getSectionPath(sec)
+  }));
 
-  try {
-    await Promise.all(paths.map(p => loadScript(p)));
-
-    const sectionAData = window.SECTION_A?.length ? window.SECTION_A : (window.sectionA || []);
-    const sectionBData = window.SECTION_B?.length ? window.SECTION_B : (window.sectionB || []);
-    const sectionCData = window.SECTION_C?.length ? window.SECTION_C : (window.sectionC || []);
-    const sectionDData = window.SECTION_D?.length ? window.SECTION_D : (window.sectionD || []);
-    const sectionEData = window.SECTION_E?.length ? window.SECTION_E : (window.sectionE || []);
-
-    ALL_RAW = [
-      ...sectionAData.map(q => ({...q, section: "A"})),
-      ...sectionBData.map(q => ({...q, section: "B"})),
-      ...sectionCData.map(q => ({...q, section: "C"})),
-      ...sectionDData.map(q => ({...q, section: "D"})),
-      ...sectionEData.map(q => ({...q, section: "E"}))
-    ];
-
-    const cls = document.getElementById("classSelect").value;
-    const subject = document.getElementById("subjectSelect").value;
-
-    ALL_RAW = ALL_RAW.map(q => ({
-      class: q.class ?? cls,
-      subject: q.subject ?? capitalize(subject),
-      difficulty: q.difficulty ?? "medium",
-      answers: Array.isArray(q.answers) ? q.answers : [],
-      subType: q.subType ?? "normal",
-      source: q.source ?? "OTHERS",
-      ...q
-    }));
-
-    filterData();
-
-    if(!ALL_RAW.length){
-      showError("No questions loaded. Check file path and file syntax.<br>Example path: <b>quiz-data/paper/xscience/sectionA.js</b><br>Inside file use: <b>window.SECTION_A = [ ... ]</b>");
-    }
-
-  } catch (err) {
-    console.error("Load error:", err);
-    showError(`
-      Some section JS files could not be loaded.<br><br>
-      <b>Check these:</b><br>
-      1. File path correct hai?<br>
-      2. File uploaded hai?<br>
-      3. File name exact same hai? (sectionA.js, not SectionA.js)<br>
-      4. JS syntax correct hai?<br><br>
-      Example correct path:<br>
-      <b>quiz-data/paper/xscience/sectionA.js</b>
-    `);
-  } finally {
-    document.getElementById("loader").style.display = "none";
+  const results = [];
+  for (const item of paths) {
+    const res = await loadScriptSafe(item.path);
+    results.push({ ...res, sec: item.sec });
   }
+
+  // collect loaded data safely
+  const sectionAData = window.SECTION_A?.length ? window.SECTION_A : (window.sectionA || []);
+  const sectionBData = window.SECTION_B?.length ? window.SECTION_B : (window.sectionB || []);
+  const sectionCData = window.SECTION_C?.length ? window.SECTION_C : (window.sectionC || []);
+  const sectionDData = window.SECTION_D?.length ? window.SECTION_D : (window.sectionD || []);
+  const sectionEData = window.SECTION_E?.length ? window.SECTION_E : (window.sectionE || []);
+
+  ALL_RAW = [
+    ...sectionAData.map(q => ({...q, section: "A"})),
+    ...sectionBData.map(q => ({...q, section: "B"})),
+    ...sectionCData.map(q => ({...q, section: "C"})),
+    ...sectionDData.map(q => ({...q, section: "D"})),
+    ...sectionEData.map(q => ({...q, section: "E"}))
+  ];
+
+  const cls = document.getElementById("classSelect").value;
+  const subject = document.getElementById("subjectSelect").value;
+
+  ALL_RAW = ALL_RAW.map(q => ({
+    class: q.class ?? cls,
+    subject: q.subject ?? capitalize(subject),
+    difficulty: q.difficulty ?? "medium",
+    answers: Array.isArray(q.answers) ? q.answers : [],
+    subType: q.subType ?? "normal",
+    source: q.source ?? "OTHERS",
+    ...q
+  }));
+
+  filterData();
+
+  // Build load status
+  let failed = results.filter(r => !r.success);
+  let loaded = results.filter(r => r.success);
+
+  if (!ALL_RAW.length) {
+    showError(`
+      ❌ No question bank loaded.<br><br>
+      <b>Likely reasons:</b><br>
+      1. JS file path wrong hai<br>
+      2. JS file upload nahi hui<br>
+      3. File me syntax error hai<br><br>
+      <b>Expected example:</b><br>
+      quiz-data/paper/xscience/sectionA.js<br>
+      and inside:<br>
+      <b>window.SECTION_A = [ ... ]</b>
+    `);
+  } else if (failed.length) {
+    showError(`
+      ⚠ Some section files failed, but other sections loaded successfully.<br><br>
+      <b>Loaded:</b> ${loaded.map(x => x.sec).join(", ") || "None"}<br>
+      <b>Failed:</b> ${failed.map(x => x.sec + " (" + x.path + ")").join("<br>")}<br><br>
+      Missing file hone par baaki question bank ab bhi kaam karega.
+    `);
+  }
+
+  document.getElementById("loader").style.display = "none";
 }
 
 /* =========================
@@ -555,7 +584,6 @@ function buildChapterChoices(sec){
 function toggleChapter(ch, cb) {
   if (cb.checked) currentChapterSelections.add(ch);
   else currentChapterSelections.delete(ch);
-
   refreshQuestionArea();
 }
 
@@ -816,6 +844,5 @@ function downloadAnswerPDF(){
 ========================= */
 reloadAllData();
 </script>
-
 </body>
 </html>
