@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>MD QUIZZES - Smart Paper Builder</title>
+<title>Smart Paper Builder</title>
 
 <style>
 body{
@@ -13,8 +13,7 @@ body{
   padding:20px;
   margin:0;
 }
-
-h2{ margin-top:0; }
+h2{margin-top:0;}
 
 .panel{
   background:#003566;
@@ -88,34 +87,13 @@ button:hover{
   gap:10px;
 }
 
-.paperTopLeft, .paperTopCenter, .paperTopRight{
-  flex:1;
-}
+.paperTopLeft, .paperTopCenter, .paperTopRight{ flex:1; }
+.paperTopLeft{ text-align:left; font-size:14px; }
+.paperTopCenter{ text-align:center; }
+.paperTopCenter h2{ margin:0; font-size:24px; }
+.paperTopRight{ text-align:right; font-size:14px; }
 
-.paperTopLeft{
-  text-align:left;
-  font-size:14px;
-}
-
-.paperTopCenter{
-  text-align:center;
-}
-
-.paperTopCenter h2{
-  margin:0;
-  font-size:24px;
-}
-
-.paperTopRight{
-  text-align:right;
-  font-size:14px;
-}
-
-.logoWrap{
-  text-align:center;
-  margin-bottom:8px;
-}
-
+.logoWrap{ text-align:center; margin-bottom:8px; }
 .logoWrap img{
   max-height:70px;
   max-width:120px;
@@ -129,19 +107,11 @@ button:hover{
   margin-top:6px;
   font-size:14px;
 }
+.optionItem{ width:48%; }
 
-.optionItem{
-  width:48%;
-}
+.paper p{ margin:6px 0; }
 
-.paper p{
-  margin:6px 0;
-}
-
-.section{
-  margin-top:18px;
-}
-
+.section{ margin-top:18px; }
 .section h3{
   border-bottom:1px solid #444;
   padding-bottom:5px;
@@ -210,6 +180,20 @@ button:hover{
   border-radius:6px;
 }
 
+#dynamicFilters{
+  margin-top:12px;
+}
+
+.errorBox{
+  background:#7f1d1d;
+  color:#fff;
+  padding:10px;
+  border-radius:8px;
+  margin-top:10px;
+  font-size:13px;
+  display:none;
+}
+
 hr{
   border:none;
   border-top:1px solid rgba(255,255,255,0.1);
@@ -218,7 +202,7 @@ hr{
 
 @media print {
   body { font-size: 12px; background:white; color:black; padding:0; }
-  .panel, .actions, button, #questionArea, #chapterArea, #loader { display: none !important; }
+  .panel, .actions, button, #questionArea, #chapterArea, #loader, #dynamicFilters { display: none !important; }
   .paper { box-shadow:none; border-radius:0; }
   .optionItem { width: 24%; }
 }
@@ -248,13 +232,6 @@ hr{
       <option value="hard">Hard</option>
     </select>
 
-    <!-- Section A sub category -->
-    <select id="sectionASubType" onchange="refreshQuestionArea()">
-      <option value="">Section A Type: All</option>
-      <option value="mcq">MCQ</option>
-      <option value="assertion-reason">Assertion & Reasoning</option>
-    </select>
-
     <input type="text" id="searchInput" placeholder="Search question..." oninput="refreshQuestionArea()" />
   </div>
 
@@ -267,11 +244,13 @@ hr{
   </div>
 
   <div id="loader">Loading question bank...</div>
+  <div id="errorBox" class="errorBox"></div>
+
   <div class="note">
-    Folder format used:
-    <span class="badge">quiz-data/paper/{class}{subject}/sectionA.js</span>
-    Example:
-    <span class="badge">quiz-data/paper/xscience/sectionE.js</span>
+    Expected path:
+    <span class="badge">quiz-data/paper/xscience/sectionA.js</span>
+    and inside file:
+    <span class="badge">window.SECTION_A = [ ... ]</span>
   </div>
 </div>
 
@@ -283,6 +262,9 @@ hr{
   <button onclick="openSection('C')">Section C</button>
   <button onclick="openSection('D')">Section D</button>
   <button onclick="openSection('E')">Section E</button>
+
+  <!-- DYNAMIC FILTERS -->
+  <div id="dynamicFilters"></div>
 
   <div class="counterBox">
     <div class="inlineGroup">
@@ -319,9 +301,6 @@ hr{
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script>
-/* =========================
-   GLOBAL STATE
-========================= */
 let ALL_RAW = [];
 let ALL = [];
 let currentSection = "";
@@ -332,7 +311,7 @@ let loadedScripts = [];
 let instituteLogo = "";
 
 /* =========================
-   PATH HELPERS
+   HELPERS
 ========================= */
 function getFolderName() {
   const cls = document.getElementById("classSelect").value;
@@ -340,10 +319,50 @@ function getFolderName() {
   const classPrefix = cls === "10" ? "x" : cls;
   return `${classPrefix}${subject}`;
 }
-
 function getSectionPath(section) {
   const folder = getFolderName();
   return `quiz-data/paper/${folder}/section${section}.js`;
+}
+function capitalize(str){ return str.charAt(0).toUpperCase() + str.slice(1); }
+function escapeQuotes(str){ return String(str).replace(/'/g, "\\'"); }
+function hashString(str){
+  let hash = 0;
+  for(let i=0; i<str.length; i++){
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+function makeKey(q, i) {
+  return `${q.section}_${q.chapter}_${i}_${hashString(q.question)}`;
+}
+
+/* =========================
+   LOGO
+========================= */
+function handleLogoUpload(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    instituteLogo = e.target.result;
+    renderPaper();
+  };
+  reader.readAsDataURL(file);
+}
+
+/* =========================
+   ERROR DISPLAY
+========================= */
+function showError(msg){
+  const box = document.getElementById("errorBox");
+  box.style.display = "block";
+  box.innerHTML = msg;
+}
+function clearError(){
+  const box = document.getElementById("errorBox");
+  box.style.display = "none";
+  box.innerHTML = "";
 }
 
 /* =========================
@@ -359,34 +378,18 @@ function loadScript(src) {
     loadedScripts.push(s);
   });
 }
-
 function clearOldScripts() {
   loadedScripts.forEach(s => s.remove());
   loadedScripts = [];
 }
 
 /* =========================
-   LOGO UPLOAD
-========================= */
-function handleLogoUpload(event){
-  const file = event.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e){
-    instituteLogo = e.target.result;
-    renderPaper();
-  };
-  reader.readAsDataURL(file);
-}
-
-/* =========================
    DATA LOADING
-   FIXED FOR SECTION C / sectionC
 ========================= */
 async function reloadAllData() {
   document.getElementById("loader").style.display = "block";
+  clearError();
 
-  // reset all globals
   window.SECTION_A = [];
   window.SECTION_B = [];
   window.SECTION_C = [];
@@ -406,6 +409,7 @@ async function reloadAllData() {
   currentChapterSelections.clear();
   document.getElementById("chapterArea").innerHTML = "";
   document.getElementById("questionArea").innerHTML = "";
+  document.getElementById("dynamicFilters").innerHTML = "";
   selectedMap.clear();
   renderPaper();
 
@@ -437,20 +441,31 @@ async function reloadAllData() {
       difficulty: q.difficulty ?? "medium",
       answers: Array.isArray(q.answers) ? q.answers : [],
       subType: q.subType ?? "normal",
+      source: q.source ?? "OTHERS",
       ...q
     }));
 
     filterData();
+
+    if(!ALL_RAW.length){
+      showError("No questions loaded. Check file path and file syntax.<br>Example path: <b>quiz-data/paper/xscience/sectionA.js</b><br>Inside file use: <b>window.SECTION_A = [ ... ]</b>");
+    }
+
   } catch (err) {
     console.error("Load error:", err);
-    alert("Some section JS files could not be loaded. Check folder/file paths.");
+    showError(`
+      Some section JS files could not be loaded.<br><br>
+      <b>Check these:</b><br>
+      1. File path correct hai?<br>
+      2. File uploaded hai?<br>
+      3. File name exact same hai? (sectionA.js, not SectionA.js)<br>
+      4. JS syntax correct hai?<br><br>
+      Example correct path:<br>
+      <b>quiz-data/paper/xscience/sectionA.js</b>
+    `);
   } finally {
     document.getElementById("loader").style.display = "none";
   }
-}
-
-function capitalize(str){
-  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 /* =========================
@@ -469,16 +484,49 @@ function filterData() {
   currentChapterSelections.clear();
   document.getElementById("chapterArea").innerHTML = "";
   document.getElementById("questionArea").innerHTML = "";
+  document.getElementById("dynamicFilters").innerHTML = "";
   renderPaper();
 }
 
 /* =========================
-   OPEN SECTION
+   SECTION UI
 ========================= */
 function openSection(sec) {
   currentSection = sec;
   currentChapterSelections.clear();
+  buildDynamicFilters(sec);
+  buildChapterChoices(sec);
+}
 
+function buildDynamicFilters(sec){
+  let html = `<div class="row" style="margin-top:12px;">`;
+
+  if(sec === "A"){
+    html += `
+      <select id="sectionASubType" onchange="refreshQuestionArea()">
+        <option value="">Section A Type: All</option>
+        <option value="mcq">MCQ</option>
+        <option value="assertion-reason">Assertion & Reasoning</option>
+      </select>
+    `;
+  }
+
+  html += `
+    <select id="sourceSelect" onchange="refreshQuestionArea()">
+      <option value="">All Sources</option>
+      <option value="NCERT">NCERT</option>
+      <option value="NCERT EXEMPLAR">NCERT EXEMPLAR</option>
+      <option value="RS AGARWAL">RS AGARWAL</option>
+      <option value="RD SHARMA">RD SHARMA</option>
+      <option value="OTHERS">OTHERS</option>
+    </select>
+  `;
+
+  html += `</div>`;
+  document.getElementById("dynamicFilters").innerHTML = html;
+}
+
+function buildChapterChoices(sec){
   let chapters = [...new Set(
     ALL.filter(q => q.section === sec).map(q => q.chapter)
   )].sort();
@@ -509,10 +557,6 @@ function openSection(sec) {
   document.getElementById("questionArea").innerHTML = "";
 }
 
-function escapeQuotes(str){
-  return String(str).replace(/'/g, "\\'");
-}
-
 function toggleChapter(ch, cb) {
   if (cb.checked) currentChapterSelections.add(ch);
   else currentChapterSelections.delete(ch);
@@ -531,12 +575,14 @@ function refreshQuestionArea() {
 
   const diff = document.getElementById("difficultySelect").value.trim().toLowerCase();
   const search = document.getElementById("searchInput").value.trim().toLowerCase();
-  const secAType = document.getElementById("sectionASubType").value.trim().toLowerCase();
+  const source = document.getElementById("sourceSelect") ? document.getElementById("sourceSelect").value.trim().toUpperCase() : "";
+  const secAType = document.getElementById("sectionASubType") ? document.getElementById("sectionASubType").value.trim().toLowerCase() : "";
 
   let data = ALL.filter(q =>
     q.section === currentSection &&
     currentChapterSelections.has(q.chapter) &&
     (!diff || q.difficulty.toLowerCase() === diff) &&
+    (!source || String(q.source).toUpperCase() === source) &&
     (!search ||
       q.question.toLowerCase().includes(search) ||
       q.chapter.toLowerCase().includes(search) ||
@@ -576,46 +622,25 @@ function refreshQuestionArea() {
         ${optionsHTML}
 
         <div class="questionMeta">
-          Chapter: ${q.chapter} | Difficulty: ${q.difficulty} | Marks: ${q.marks || getSectionMarks(q.section)} | Type: ${q.subType || "normal"}
+          Chapter: ${q.chapter} | Difficulty: ${q.difficulty} | Marks: ${q.marks || getSectionMarks(q.section)} | Source: ${q.source || "OTHERS"}
         </div>
       </div>
     `;
   });
 
   html += `</div>`;
-
   window.currentList = data;
   document.getElementById("questionArea").innerHTML = html;
 }
 
-function makeKey(q, i) {
-  return `${q.section}_${q.chapter}_${i}_${hashString(q.question)}`;
-}
-
-function hashString(str){
-  let hash = 0;
-  for(let i=0; i<str.length; i++){
-    hash = ((hash << 5) - hash) + str.charCodeAt(i);
-    hash |= 0;
-  }
-  return Math.abs(hash);
-}
-
 function buildOptionsHTML(answers = []) {
   if (!answers || !answers.length) return "";
-
   const labels = ["(a)", "(b)", "(c)", "(d)"];
   let html = `<div class="optionsRow">`;
-
   answers.forEach((opt, idx) => {
     const text = typeof opt === "string" ? opt : opt.text;
-    html += `
-      <span class="optionItem">
-        <b>${labels[idx] || ""}</b> ${text || ""}
-      </span>
-    `;
+    html += `<span class="optionItem"><b>${labels[idx] || ""}</b> ${text || ""}</span>`;
   });
-
   html += `</div>`;
   return html;
 }
@@ -626,15 +651,13 @@ function buildOptionsHTML(answers = []) {
 function toggleQ(key, i) {
   const q = window.currentList[i];
   if (!q) return;
-
   if (selectedMap.has(key)) selectedMap.delete(key);
   else selectedMap.set(key, q);
-
   renderPaper();
 }
 
 /* =========================
-   RANDOM PAPER GENERATOR
+   AUTO PAPER
 ========================= */
 function generateRandomPaper() {
   if (!ALL.length) {
@@ -656,16 +679,15 @@ function generateRandomPaper() {
     let pool = ALL.filter(q => q.section === sec);
 
     const diff = document.getElementById("difficultySelect").value.trim().toLowerCase();
-    if (diff) {
-      pool = pool.filter(q => q.difficulty.toLowerCase() === diff);
+    if (diff) pool = pool.filter(q => q.difficulty.toLowerCase() === diff);
+
+    if(sec === "A"){
+      const secAType = document.getElementById("sectionASubType") ? document.getElementById("sectionASubType").value.trim().toLowerCase() : "";
+      if(secAType) pool = pool.filter(q => q.subType.toLowerCase() === secAType);
     }
 
-    if (sec === "A") {
-      const secAType = document.getElementById("sectionASubType").value.trim().toLowerCase();
-      if (secAType) {
-        pool = pool.filter(q => q.subType.toLowerCase() === secAType);
-      }
-    }
+    const source = document.getElementById("sourceSelect") ? document.getElementById("sourceSelect").value.trim().toUpperCase() : "";
+    if(source) pool = pool.filter(q => String(q.source).toUpperCase() === source);
 
     shuffle(pool);
     pool.slice(0, counts[sec]).forEach((q, idx) => {
@@ -693,13 +715,12 @@ function clearPaper() {
 }
 
 /* =========================
-   RENDER PAPER
+   PAPER RENDER
 ========================= */
 function renderPaper() {
   let sections = {A:[], B:[], C:[], D:[], E:[]};
   selectedMap.forEach(q => sections[q.section].push(q));
 
-  let marks = 0;
   let html = `<div class="paper">`;
 
   const date = new Date().toLocaleDateString();
@@ -716,11 +737,9 @@ function renderPaper() {
         <div><b>Std:</b> ${cls}</div>
         <div><b>Date:</b> ${date}</div>
       </div>
-
       <div class="paperTopCenter">
         <h2>${subject}</h2>
       </div>
-
       <div class="paperTopRight">
         <div><b>Time:</b> ${Math.ceil(getTotalMarks(sections)*1.5)} min</div>
         <div><b>Max Marks:</b> ${getTotalMarks(sections)}</div>
@@ -733,20 +752,12 @@ function renderPaper() {
       html += `<div class="section"><h3>Section ${sec}</h3>`;
 
       sections[sec].forEach((q, i) => {
-        marks += (q.marks || getSectionMarks(sec));
-
         html += `<p><b>${i+1}. ${q.question}</b></p>`;
 
         if(q.assertion) html += `<p><b>Assertion:</b> ${q.assertion}</p>`;
         if(q.reason) html += `<p><b>Reason:</b> ${q.reason}</p>`;
-
-        if(q.caseText){
-          html += `<div class="caseBox"><b>Case Study:</b><br>${q.caseText}</div>`;
-        }
-
-        if (q.answers && q.answers.length) {
-          html += buildOptionsHTML(q.answers);
-        }
+        if(q.caseText) html += `<div class="caseBox"><b>Case Study:</b><br>${q.caseText}</div>`;
+        if (q.answers && q.answers.length) html += buildOptionsHTML(q.answers);
 
         if (showAnswer && q.answers && q.answers.length) {
           let ans = q.answers.find(a => typeof a === "object" && a.correct)?.text || "";
@@ -781,27 +792,22 @@ function getSectionMarks(sec){
   if(sec === "B") return 2;
   if(sec === "C") return 3;
   if(sec === "D") return 5;
-  if(sec === "E") return 4; // case study usually 4 marks
+  if(sec === "E") return 4;
   return 1;
 }
 
 /* =========================
-   PRINT / PDF / ANSWERS
+   PRINT / PDF
 ========================= */
-function printPaper() {
-  window.print();
-}
-
-function downloadPDF() {
+function printPaper(){ window.print(); }
+function downloadPDF(){
   html2pdf().from(document.getElementById("paperOutput")).save("paper.pdf");
 }
-
-function toggleAnswer() {
+function toggleAnswer(){
   showAnswer = !showAnswer;
   renderPaper();
 }
-
-function downloadAnswerPDF() {
+function downloadAnswerPDF(){
   const prev = showAnswer;
   showAnswer = true;
   renderPaper();
