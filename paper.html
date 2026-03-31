@@ -72,9 +72,14 @@ button:hover{
 .paper{
   background:white;
   color:black;
-  padding:24px;
+  padding:20mm 15mm;
   border-radius:12px;
   box-shadow:0 4px 12px rgba(0,0,0,0.15);
+  width:210mm;
+  min-height:297mm;
+  margin:20px auto;
+  box-sizing:border-box;
+  overflow:hidden;
 }
 
 .paperTopBar{
@@ -823,20 +828,62 @@ function getSectionMarks(sec){
    PRINT / PDF
 ========================= */
 function printPaper(){ window.print(); }
-function downloadPDF(){
-  html2pdf().from(document.getElementById("paperOutput")).save("paper.pdf");
+function downloadPDF() {
+  const element = document.getElementById("paperOutput");
+
+  const opt = {
+    margin: [5, 5, 5, 5],
+    filename: "paper.pdf",
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      scrollX: 0,
+      scrollY: 0
+    },
+    jsPDF: {
+      unit: "mm",
+      format: "a4",
+      orientation: "portrait"
+    },
+    pagebreak: { mode: ["avoid-all", "css", "legacy"] }
+  };
+
+  html2pdf().set(opt).from(element).save();
 }
 function toggleAnswer(){
   showAnswer = !showAnswer;
   renderPaper();
 }
-function downloadAnswerPDF(){
+function downloadAnswerPDF() {
   const prev = showAnswer;
   showAnswer = true;
   renderPaper();
-  html2pdf().from(document.getElementById("paperOutput")).save("answer-key.pdf");
-  showAnswer = prev;
-  renderPaper();
+
+  const element = document.getElementById("paperOutput");
+
+  const opt = {
+    margin: [5, 5, 5, 5],
+    filename: "answer-key.pdf",
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      scrollX: 0,
+      scrollY: 0
+    },
+    jsPDF: {
+      unit: "mm",
+      format: "a4",
+      orientation: "portrait"
+    },
+    pagebreak: { mode: ["avoid-all", "css", "legacy"] }
+  };
+
+  html2pdf().set(opt).from(element).save().then(() => {
+    showAnswer = prev;
+    renderPaper();
+  });
 }
 
 /* =========================
