@@ -389,23 +389,17 @@ function clearOldScripts() {
 ========================= */
 async function reloadAllData() {
   document.getElementById("loader").style.display = "block";
-  clearError();
 
+  // reset global windows
   window.SECTION_A = [];
   window.SECTION_B = [];
   window.SECTION_C = [];
   window.SECTION_D = [];
-  window.SECTION_E = [];
-
-  window.sectionA = [];
-  window.sectionB = [];
-  window.sectionC = [];
-  window.sectionD = [];
-  window.sectionE = [];
 
   clearOldScripts();
   ALL_RAW = [];
   ALL = [];
+  
   currentSection = "";
   currentChapterSelections.clear();
   document.getElementById("chapterArea").innerHTML = "";
