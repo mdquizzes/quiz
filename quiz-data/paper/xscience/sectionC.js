@@ -1,16 +1,5 @@
 window.SECTION_C = [
 
-/* =========================================================
-   CLASS 10 SCIENCE – SECTION C (3 MARKS / DESCRIPTIVE)
-   PART 1
-   Chapters Covered:
-   1. Chemical Reactions and Equations
-   2. Acids, Bases and Salts
-   3. Metals and Non-metals
-   4. Carbon and Its Compounds
-   5. Periodic Classification of Elements
-========================================================= */
-
 /* ================= CHEMICAL REACTIONS AND EQUATIONS ================= */
 
 {
