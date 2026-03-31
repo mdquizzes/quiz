@@ -1599,5 +1599,3 @@ solution: "Biomass is organic matter like wood, crop residue and animal waste us
 },
 
 ];
-
-];
