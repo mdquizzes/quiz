@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ultimate Question Extractor</title>
+  <title>Smart Question Extractor Pro</title>
 
   <!-- OCR -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
-  <!-- PDF.js -->
+  <!-- PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
   <style>
@@ -20,52 +20,54 @@
       font-family: Arial, sans-serif;
       background: #f4f7fb;
       margin: 0;
-      padding: 20px;
+      padding: 14px;
       color: #222;
     }
 
     .container {
-      max-width: 1300px;
+      max-width: 1400px;
       margin: auto;
     }
 
-    h1, h2 {
-      margin-bottom: 12px;
+    h1, h2, h3 {
+      margin: 0 0 12px;
     }
 
     .card {
       background: #fff;
-      padding: 18px;
-      border-radius: 14px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-      margin-bottom: 20px;
+      padding: 16px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      margin-bottom: 18px;
     }
 
     .form-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 12px;
     }
 
     input, select, textarea, button {
       width: 100%;
-      padding: 10px 12px;
-      border-radius: 8px;
+      padding: 12px;
+      border-radius: 10px;
       border: 1px solid #ccc;
-      font-size: 14px;
+      font-size: 15px;
+      font-family: inherit;
     }
 
     textarea {
-      min-height: 160px;
+      min-height: 130px;
       resize: vertical;
     }
 
     button {
       border: none;
       background: #007bff;
-      color: #fff;
+      color: white;
       cursor: pointer;
       font-weight: bold;
+      transition: 0.2s;
     }
 
     button:hover {
@@ -85,7 +87,7 @@
     }
 
     .btn-warning:hover {
-      background: #db8200;
+      background: #d67d00;
     }
 
     .btn-danger {
@@ -97,84 +99,22 @@
     }
 
     .toolbar {
-      display: flex;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 12px;
-      flex-wrap: wrap;
       margin-top: 15px;
     }
 
-    .toolbar button {
-      flex: 1;
-      min-width: 220px;
-    }
-
     .status {
-      margin-top: 12px;
+      margin-top: 14px;
       font-weight: bold;
       color: #444;
+      font-size: 15px;
     }
 
     .muted {
       color: #666;
       font-size: 14px;
-    }
-
-    .images-preview {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 12px;
-    }
-
-    .images-preview img {
-      width: 140px;
-      height: 180px;
-      object-fit: cover;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      background: #fff;
-    }
-
-    .question-card {
-      background: #fafafa;
-      border: 1px solid #ddd;
-      padding: 16px;
-      border-radius: 10px;
-      margin-bottom: 16px;
-    }
-
-    .question-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .question-header h3 {
-      margin: 0;
-    }
-
-    .small-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    pre {
-      background: #f1f3f5;
-      padding: 12px;
-      border-radius: 8px;
-      overflow-x: auto;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-    }
-
-    .json-preview {
-      max-height: 500px;
-      overflow: auto;
     }
 
     .tabs {
@@ -208,40 +148,175 @@
       display: block;
     }
 
-    .raw-preview {
-      max-height: 280px;
+    .images-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .images-preview img {
+      width: 110px;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      background: #fff;
+    }
+
+    .raw-preview, .json-preview {
+      max-height: 360px;
       overflow: auto;
+    }
+
+    pre {
+      background: #f1f3f5;
+      padding: 12px;
+      border-radius: 10px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-size: 13px;
+    }
+
+    .section-block {
+      margin-bottom: 24px;
+      border: 2px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 14px;
+      background: #fafcff;
+    }
+
+    .section-title {
+      font-size: 22px;
+      color: #0056b3;
+      margin-bottom: 14px;
+      border-bottom: 2px solid #d8e6ff;
+      padding-bottom: 8px;
+    }
+
+    .question-card {
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 14px;
+      border-radius: 12px;
+      margin-bottom: 14px;
+    }
+
+    .question-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .small-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .option-box {
+      background: #f8fbff;
+      border: 1px dashed #b9d7ff;
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+
+    .pill {
+      display: inline-block;
+      background: #e8f0ff;
+      color: #0056b3;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      .card {
+        padding: 14px;
+      }
+
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+
+      .question-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .section-title {
+        font-size: 20px;
+      }
+
+      textarea {
+        min-height: 110px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>📚 Ultimate Question Extractor</h1>
+    <h1>📚 Smart Question Extractor Pro</h1>
 
     <div class="card">
       <h2>1) Input Mode</h2>
-
       <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('imageTab', this)">🖼️ Images</button>
+        <button class="tab-btn active" onclick="switchTab('textTab', this)">✍️ Text</button>
         <button class="tab-btn" onclick="switchTab('pdfTab', this)">📄 PDF</button>
-        <button class="tab-btn" onclick="switchTab('textTab', this)">✍️ Paste Text</button>
+        <button class="tab-btn" onclick="switchTab('imageTab', this)">🖼️ Image</button>
       </div>
 
-      <div id="imageTab" class="tab-panel active">
-        <label><strong>Upload Images</strong></label>
-        <input type="file" id="imageInput" accept="image/*" multiple />
-        <div class="images-preview" id="imagesPreview"></div>
+      <div id="textTab" class="tab-panel active">
+        <label><strong>Paste Section-wise / Mixed Question Text</strong></label>
+        <textarea id="textInput" placeholder="Paste your chapter questions here...
+
+Example:
+SECTION A
+1. What is photosynthesis?
+2. Define chlorophyll.
+
+SECTION B
+3. Explain the process of photosynthesis.
+4. Why is sunlight important for plants?
+
+5. Which of the following is correct?
+(a) Root makes food
+(b) Leaf makes food
+(c) Stem makes food
+(d) Flower makes food
+
+Answer: (b)
+"></textarea>
       </div>
 
       <div id="pdfTab" class="tab-panel">
         <label><strong>Upload PDF</strong></label>
         <input type="file" id="pdfInput" accept="application/pdf" />
-        <p class="muted">Best for digital PDFs. Scanned PDFs may need OCR page rendering later.</p>
+        <p class="muted">Best for text-based PDFs. Scanned PDFs may still need OCR-style cleanup.</p>
       </div>
 
-      <div id="textTab" class="tab-panel">
-        <label><strong>Paste Question Text</strong></label>
-        <textarea id="textInput" placeholder="Paste your question text here..."></textarea>
+      <div id="imageTab" class="tab-panel">
+        <label><strong>Upload Images</strong></label>
+        <input type="file" id="imageInput" accept="image/*" multiple />
+        <div class="images-preview" id="imagesPreview"></div>
       </div>
     </div>
 
@@ -250,26 +325,26 @@
       <div class="form-grid">
         <div>
           <label><strong>Source</strong></label>
-          <input type="text" id="sourceInput" placeholder="e.g. RD SHARMA" value="RD SHARMA" />
+          <input type="text" id="sourceInput" value="NCERT" />
         </div>
 
         <div>
           <label><strong>Chapter</strong></label>
-          <input type="text" id="chapterInput" placeholder="e.g. Real Numbers" value="Real Numbers" />
+          <input type="text" id="chapterInput" value="Chapter Name" />
         </div>
 
         <div>
           <label><strong>Subject</strong></label>
-          <input type="text" id="subjectInput" placeholder="e.g. Maths" value="Maths" />
+          <input type="text" id="subjectInput" value="Science" />
         </div>
 
         <div>
           <label><strong>Class</strong></label>
-          <input type="number" id="classInput" placeholder="e.g. 10" value="10" />
+          <input type="number" id="classInput" value="10" />
         </div>
 
         <div>
-          <label><strong>Difficulty</strong></label>
+          <label><strong>Default Difficulty</strong></label>
           <select id="difficultyInput">
             <option value="easy">easy</option>
             <option value="medium" selected>medium</option>
@@ -278,59 +353,63 @@
         </div>
 
         <div>
-          <label><strong>Marks</strong></label>
-          <input type="number" id="marksInput" placeholder="e.g. 2" value="2" />
+          <label><strong>Default Marks</strong></label>
+          <input type="number" id="marksInput" value="2" />
         </div>
       </div>
 
       <div class="toolbar">
-        <button onclick="extractFromCurrentMode()">Extract Questions</button>
-        <button class="btn-warning" onclick="clearAllData()">Clear All</button>
-        <button class="btn-secondary" onclick="downloadJS()">Download JS File</button>
+        <button onclick="extractFromCurrentMode()">🚀 Extract Questions</button>
+        <button class="btn-warning" onclick="clearAllData()">🧹 Clear All</button>
+        <button class="btn-secondary" onclick="downloadJS()">⬇️ Download JS</button>
       </div>
 
       <div class="status" id="statusText">Ready.</div>
     </div>
 
-    <div class="card">
-      <h2>3) Raw Extracted Text</h2>
-      <p class="muted">This helps you debug OCR/PDF extraction quality.</p>
-      <div class="raw-preview">
-        <pre id="rawTextPreview"></pre>
+    <div class="two-col">
+      <div class="card">
+        <h2>3) Raw Extracted Text</h2>
+        <p class="muted">Useful for debugging OCR / PDF extraction issues.</p>
+        <div class="raw-preview">
+          <pre id="rawTextPreview"></pre>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>4) Final JS Preview</h2>
+        <div class="json-preview">
+          <pre id="jsonPreview">const questionBank = {};</pre>
+        </div>
       </div>
     </div>
 
     <div class="card">
-      <h2>4) Extracted Questions (Editable)</h2>
-      <p class="muted">Fix OCR or formatting mistakes before downloading.</p>
+      <h2>5) Section-wise Editable Questions</h2>
+      <p class="muted">Auto detect works first, but you can still manually correct everything.</p>
       <div id="questionsEditor"></div>
-    </div>
-
-    <div class="card">
-      <h2>5) Final JSON Preview</h2>
-      <div class="json-preview">
-        <pre id="jsonPreview">[]</pre>
-      </div>
     </div>
   </div>
 
   <script>
-    let extractedQuestions = [];
     let rawExtractedText = "";
-    let currentTab = "imageTab";
+    let currentTab = "textTab";
+
+    let questionBank = {
+      sectionA: [],
+      sectionB: [],
+      sectionC: [],
+      sectionD: [],
+      sectionE: []
+    };
 
     document.getElementById("imageInput").addEventListener("change", previewSelectedImages);
 
     function switchTab(tabId, btn) {
       currentTab = tabId;
 
-      document.querySelectorAll(".tab-panel").forEach(panel => {
-        panel.classList.remove("active");
-      });
-
-      document.querySelectorAll(".tab-btn").forEach(button => {
-        button.classList.remove("active");
-      });
+      document.querySelectorAll(".tab-panel").forEach(panel => panel.classList.remove("active"));
+      document.querySelectorAll(".tab-btn").forEach(button => button.classList.remove("active"));
 
       document.getElementById(tabId).classList.add("active");
       btn.classList.add("active");
@@ -353,41 +432,92 @@
       return {
         source: document.getElementById("sourceInput").value.trim() || "Uploaded Source",
         chapter: document.getElementById("chapterInput").value.trim() || "Unknown Chapter",
-        subject: document.getElementById("subjectInput").value.trim() || "Maths",
+        subject: document.getElementById("subjectInput").value.trim() || "Science",
         classValue: Number(document.getElementById("classInput").value) || 10,
         difficulty: document.getElementById("difficultyInput").value || "medium",
         marks: Number(document.getElementById("marksInput").value) || 2
       };
     }
 
+    function resetQuestionBank() {
+      questionBank = {
+        sectionA: [],
+        sectionB: [],
+        sectionC: [],
+        sectionD: [],
+        sectionE: []
+      };
+    }
+
     async function extractFromCurrentMode() {
-      extractedQuestions = [];
       rawExtractedText = "";
+      resetQuestionBank();
       renderEditor();
       renderJSONPreview();
       document.getElementById("rawTextPreview").textContent = "";
 
       const meta = getMeta();
 
-      if (currentTab === "imageTab") {
-        await processImages(meta);
+      if (currentTab === "textTab") {
+        processText(meta);
       } else if (currentTab === "pdfTab") {
         await processPDF(meta);
-      } else if (currentTab === "textTab") {
-        processText(meta);
+      } else if (currentTab === "imageTab") {
+        await processImages(meta);
+      }
+    }
+
+    function processText(meta) {
+      const text = document.getElementById("textInput").value.trim();
+      if (!text) {
+        alert("Please paste question text.");
+        return;
+      }
+
+      rawExtractedText = text;
+      finalizeExtraction(meta);
+    }
+
+    async function processPDF(meta) {
+      const file = document.getElementById("pdfInput").files[0];
+      if (!file) {
+        alert("Please upload a PDF file.");
+        return;
+      }
+
+      updateStatus("Reading PDF...");
+
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        let pdfText = "";
+
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+          updateStatus(`Reading PDF page ${pageNum} of ${pdf.numPages}...`);
+          const page = await pdf.getPage(pageNum);
+          const content = await page.getTextContent();
+          const pageText = content.items.map(item => item.str).join(" ");
+          pdfText += `\n\n===== PDF PAGE ${pageNum} =====\n\n${pageText}`;
+        }
+
+        rawExtractedText = pdfText;
+        finalizeExtraction(meta);
+
+      } catch (error) {
+        console.error(error);
+        updateStatus("❌ Failed to read PDF.");
       }
     }
 
     async function processImages(meta) {
-      const input = document.getElementById("imageInput");
-      const files = Array.from(input.files);
+      const files = Array.from(document.getElementById("imageInput").files);
 
       if (!files.length) {
         alert("Please upload one or more images.");
         return;
       }
 
-      updateStatus("Starting OCR on image(s)...");
+      updateStatus("Starting OCR on images...");
 
       for (let i = 0; i < files.length; i++) {
         updateStatus(`Processing image ${i + 1} of ${files.length}...`);
@@ -411,68 +541,21 @@
       finalizeExtraction(meta);
     }
 
-    async function processPDF(meta) {
-      const file = document.getElementById("pdfInput").files[0];
-
-      if (!file) {
-        alert("Please upload a PDF file.");
-        return;
-      }
-
-      updateStatus("Reading PDF...");
-
-      try {
-        const arrayBuffer = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-
-        let pdfText = "";
-
-        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-          updateStatus(`Reading PDF page ${pageNum} of ${pdf.numPages}...`);
-          const page = await pdf.getPage(pageNum);
-          const content = await page.getTextContent();
-
-          const pageText = content.items.map(item => item.str).join(" ");
-          pdfText += `\n\n===== PDF PAGE ${pageNum} =====\n\n${pageText}`;
-        }
-
-        rawExtractedText = pdfText;
-        finalizeExtraction(meta);
-
-      } catch (error) {
-        console.error("PDF parse error:", error);
-        updateStatus("❌ Failed to read PDF.");
-      }
-    }
-
-    function processText(meta) {
-      const text = document.getElementById("textInput").value.trim();
-
-      if (!text) {
-        alert("Please paste question text.");
-        return;
-      }
-
-      rawExtractedText = text;
-      finalizeExtraction(meta);
-    }
-
     function finalizeExtraction(meta) {
       const cleanedText = cleanOCRText(rawExtractedText);
       document.getElementById("rawTextPreview").textContent = cleanedText;
 
-      extractedQuestions = parseQuestions(cleanedText, meta).map((q, i) => ({
-        ...q,
-        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + i)
-      }));
+      questionBank = parseSectionWiseQuestions(cleanedText, meta);
 
       renderEditor();
       renderJSONPreview();
 
-      if (extractedQuestions.length) {
-        updateStatus(`Done! Extracted ${extractedQuestions.length} question(s).`);
+      const total = Object.values(questionBank).reduce((sum, arr) => sum + arr.length, 0);
+
+      if (total > 0) {
+        updateStatus(`Done! Extracted ${total} question(s).`);
       } else {
-        updateStatus("No questions found. Try cleaner input or manually paste better text.");
+        updateStatus("No questions found. Try cleaner input or edit manually.");
       }
     }
 
@@ -497,45 +580,66 @@
         .trim();
     }
 
-    function parseQuestions(text, meta) {
-      const normalized = text
-        .replace(/\n+/g, "\n")
-        .replace(/[ \t]+/g, " ")
-        .trim();
+    function parseSectionWiseQuestions(text, meta) {
+      const lines = text.split("\n").map(line => line.trim()).filter(Boolean);
 
-      const lines = normalized.split("\n").map(line => line.trim()).filter(Boolean);
+      let currentSection = "sectionA";
+      const sections = {
+        sectionA: [],
+        sectionB: [],
+        sectionC: [],
+        sectionD: [],
+        sectionE: []
+      };
 
-      const blocks = [];
-      let current = "";
+      let currentBlock = "";
 
       const questionStartRegex = /^(Q\s*)?\d+[\.\)]\s+|^Question\s+\d+[:\.\)]?\s+/i;
       const solutionRegex = /^(solution|soln|answer|ans)[:\-\s]*/i;
 
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
+      function detectSection(line) {
+        const normalized = line.toLowerCase().replace(/\s+/g, " ").trim();
 
-        if (questionStartRegex.test(line)) {
-          if (current.trim()) {
-            blocks.push(current.trim());
+        if (/^section\s*a\b|^sec\s*a\b|^part\s*a\b|^a[\.\):]?$/.test(normalized)) return "sectionA";
+        if (/^section\s*b\b|^sec\s*b\b|^part\s*b\b|^b[\.\):]?$/.test(normalized)) return "sectionB";
+        if (/^section\s*c\b|^sec\s*c\b|^part\s*c\b|^c[\.\):]?$/.test(normalized)) return "sectionC";
+        if (/^section\s*d\b|^sec\s*d\b|^part\s*d\b|^d[\.\):]?$/.test(normalized)) return "sectionD";
+        if (/^section\s*e\b|^sec\s*e\b|^part\s*e\b|^e[\.\):]?$/.test(normalized)) return "sectionE";
+
+        return null;
+      }
+
+      function isOptionLine(line) {
+        return /^(\(?[a-dA-D]\)|[a-dA-D][\.\)])\s+/.test(line);
+      }
+
+      function parseOptions(linesArr) {
+        const options = [];
+        const nonOptionLines = [];
+        let collectingOptions = false;
+
+        for (const line of linesArr) {
+          if (isOptionLine(line)) {
+            collectingOptions = true;
+            options.push(line.replace(/^(\(?[a-dA-D]\)|[a-dA-D][\.\)])\s*/, "").trim());
+          } else {
+            if (collectingOptions && options.length && !solutionRegex.test(line)) {
+              const lastIndex = options.length - 1;
+              options[lastIndex] += " " + line;
+            } else {
+              nonOptionLines.push(line);
+            }
           }
-          current = line;
-        } else {
-          current += "\n" + line;
         }
+
+        return { options, nonOptionLines };
       }
 
-      if (current.trim()) {
-        blocks.push(current.trim());
-      }
+      function pushQuestion(block, sectionKey) {
+        if (!block.trim()) return;
 
-      if (!blocks.length && normalized.length > 20) {
-        blocks.push(normalized);
-      }
+        const splitLines = block.split("\n").map(x => x.trim()).filter(Boolean);
 
-      const parsed = [];
-
-      for (const block of blocks) {
-        const splitLines = block.split("\n");
         let questionPart = [];
         let solutionPart = [];
         let inSolution = false;
@@ -553,7 +657,9 @@
           }
         }
 
-        let questionText = questionPart.join(" ").trim();
+        const { options, nonOptionLines } = parseOptions(questionPart);
+
+        let questionText = nonOptionLines.join(" ").trim();
         let solution = solutionPart.join(" ").trim();
 
         questionText = questionText
@@ -564,22 +670,66 @@
         questionText = smartCleanupQuestion(questionText);
         solution = smartCleanupSolution(solution);
 
-        if (!questionText || questionText.length < 8) continue;
+        if (!questionText || questionText.length < 6) return;
 
-        parsed.push({
+        sections[sectionKey].push({
+          id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()),
           question: questionText,
           chapter: meta.chapter,
-          difficulty: meta.difficulty,
-          marks: meta.marks,
+          difficulty: getDifficultyBySection(sectionKey, meta.difficulty),
+          marks: getMarksBySection(sectionKey, meta.marks),
           class: meta.classValue,
           subject: meta.subject,
           source: meta.source,
-          answers: [],
+          answers: options,
           solution: solution
         });
       }
 
-      return parsed;
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const detectedSection = detectSection(line);
+
+        if (detectedSection) {
+          pushQuestion(currentBlock, currentSection);
+          currentBlock = "";
+          currentSection = detectedSection;
+          continue;
+        }
+
+        if (questionStartRegex.test(line)) {
+          pushQuestion(currentBlock, currentSection);
+          currentBlock = line;
+        } else {
+          currentBlock += "\n" + line;
+        }
+      }
+
+      pushQuestion(currentBlock, currentSection);
+
+      return sections;
+    }
+
+    function getDifficultyBySection(section, fallback) {
+      const map = {
+        sectionA: "easy",
+        sectionB: "medium",
+        sectionC: "medium",
+        sectionD: "hard",
+        sectionE: "hard"
+      };
+      return map[section] || fallback;
+    }
+
+    function getMarksBySection(section, fallback) {
+      const map = {
+        sectionA: 1,
+        sectionB: 2,
+        sectionC: 3,
+        sectionD: 4,
+        sectionE: 5
+      };
+      return map[section] || fallback;
     }
 
     function smartCleanupQuestion(text) {
@@ -587,6 +737,7 @@
         .replace(/\s+/g, " ")
         .replace(/\s+([.,;:!?])/g, "$1")
         .replace(/([a-z])([A-Z])/g, "$1 $2")
+        .replace(/\s+\)/g, ")")
         .trim();
     }
 
@@ -599,109 +750,205 @@
 
     function renderEditor() {
       const editor = document.getElementById("questionsEditor");
+      editor.innerHTML = "";
 
-      if (!extractedQuestions.length) {
-        editor.innerHTML = "<p>No questions extracted yet.</p>";
-        return;
+      const labels = {
+        sectionA: "SECTION A",
+        sectionB: "SECTION B",
+        sectionC: "SECTION C",
+        sectionD: "SECTION D",
+        sectionE: "SECTION E"
+      };
+
+      let total = 0;
+
+      for (const [sectionKey, questions] of Object.entries(questionBank)) {
+        total += questions.length;
+
+        const sectionDiv = document.createElement("div");
+        sectionDiv.className = "section-block";
+
+        let html = `<div class="section-title">${labels[sectionKey]} (${questions.length})</div>`;
+
+        if (!questions.length) {
+          html += `<p class="muted">No questions found in this section.</p>`;
+        }
+
+        questions.forEach((q, index) => {
+          html += `
+            <div class="question-card">
+              <div class="question-header">
+                <div>
+                  <div class="pill">${labels[sectionKey]}</div>
+                  <h3>Question ${index + 1}</h3>
+                </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                  <button onclick="moveQuestion('${sectionKey}', '${q.id}', 'up')">⬆️</button>
+                  <button onclick="moveQuestion('${sectionKey}', '${q.id}', 'down')">⬇️</button>
+                  <button class="btn-danger" onclick="deleteQuestion('${sectionKey}', '${q.id}')">Delete</button>
+                </div>
+              </div>
+
+              <label><strong>Section</strong></label>
+              <select onchange="changeSection('${sectionKey}', '${q.id}', this.value)">
+                <option value="sectionA" ${sectionKey === "sectionA" ? "selected" : ""}>SECTION A</option>
+                <option value="sectionB" ${sectionKey === "sectionB" ? "selected" : ""}>SECTION B</option>
+                <option value="sectionC" ${sectionKey === "sectionC" ? "selected" : ""}>SECTION C</option>
+                <option value="sectionD" ${sectionKey === "sectionD" ? "selected" : ""}>SECTION D</option>
+                <option value="sectionE" ${sectionKey === "sectionE" ? "selected" : ""}>SECTION E</option>
+              </select>
+
+              <label style="margin-top:10px;"><strong>Question</strong></label>
+              <textarea onchange="updateQuestion('${sectionKey}', '${q.id}', 'question', this.value)">${escapeHtml(q.question)}</textarea>
+
+              <div class="option-box">
+                <label><strong>Options / Answers Array (one per line)</strong></label>
+                <textarea onchange="updateAnswers('${sectionKey}', '${q.id}', this.value)">${escapeHtml((q.answers || []).join('\n'))}</textarea>
+              </div>
+
+              <label style="margin-top:10px;"><strong>Solution</strong></label>
+              <textarea onchange="updateQuestion('${sectionKey}', '${q.id}', 'solution', this.value)">${escapeHtml(q.solution)}</textarea>
+
+              <div class="small-grid">
+                <div>
+                  <label><strong>Chapter</strong></label>
+                  <input type="text" value="${escapeHtml(q.chapter)}" onchange="updateQuestion('${sectionKey}', '${q.id}', 'chapter', this.value)" />
+                </div>
+
+                <div>
+                  <label><strong>Difficulty</strong></label>
+                  <select onchange="updateQuestion('${sectionKey}', '${q.id}', 'difficulty', this.value)">
+                    <option value="easy" ${q.difficulty === "easy" ? "selected" : ""}>easy</option>
+                    <option value="medium" ${q.difficulty === "medium" ? "selected" : ""}>medium</option>
+                    <option value="hard" ${q.difficulty === "hard" ? "selected" : ""}>hard</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label><strong>Marks</strong></label>
+                  <input type="number" value="${q.marks}" onchange="updateQuestion('${sectionKey}', '${q.id}', 'marks', Number(this.value))" />
+                </div>
+
+                <div>
+                  <label><strong>Class</strong></label>
+                  <input type="number" value="${q.class}" onchange="updateQuestion('${sectionKey}', '${q.id}', 'class', Number(this.value))" />
+                </div>
+
+                <div>
+                  <label><strong>Subject</strong></label>
+                  <input type="text" value="${escapeHtml(q.subject)}" onchange="updateQuestion('${sectionKey}', '${q.id}', 'subject', this.value)" />
+                </div>
+
+                <div>
+                  <label><strong>Source</strong></label>
+                  <input type="text" value="${escapeHtml(q.source)}" onchange="updateQuestion('${sectionKey}', '${q.id}', 'source', this.value)" />
+                </div>
+              </div>
+            </div>
+          `;
+        });
+
+        sectionDiv.innerHTML = html;
+        editor.appendChild(sectionDiv);
       }
 
-      editor.innerHTML = extractedQuestions.map((q, index) => `
-        <div class="question-card">
-          <div class="question-header">
-            <h3>Question ${index + 1}</h3>
-            <button class="btn-danger" onclick="deleteQuestion('${q.id}')">Delete</button>
-          </div>
-
-          <label><strong>Question</strong></label>
-          <textarea onchange="updateQuestion('${q.id}', 'question', this.value)">${escapeHtml(q.question)}</textarea>
-
-          <label><strong>Solution</strong></label>
-          <textarea onchange="updateQuestion('${q.id}', 'solution', this.value)">${escapeHtml(q.solution)}</textarea>
-
-          <div class="small-grid">
-            <div>
-              <label><strong>Chapter</strong></label>
-              <input type="text" value="${escapeHtml(q.chapter)}" onchange="updateQuestion('${q.id}', 'chapter', this.value)" />
-            </div>
-
-            <div>
-              <label><strong>Difficulty</strong></label>
-              <select onchange="updateQuestion('${q.id}', 'difficulty', this.value)">
-                <option value="easy" ${q.difficulty === "easy" ? "selected" : ""}>easy</option>
-                <option value="medium" ${q.difficulty === "medium" ? "selected" : ""}>medium</option>
-                <option value="hard" ${q.difficulty === "hard" ? "selected" : ""}>hard</option>
-              </select>
-            </div>
-
-            <div>
-              <label><strong>Marks</strong></label>
-              <input type="number" value="${q.marks}" onchange="updateQuestion('${q.id}', 'marks', Number(this.value))" />
-            </div>
-
-            <div>
-              <label><strong>Class</strong></label>
-              <input type="number" value="${q.class}" onchange="updateQuestion('${q.id}', 'class', Number(this.value))" />
-            </div>
-
-            <div>
-              <label><strong>Subject</strong></label>
-              <input type="text" value="${escapeHtml(q.subject)}" onchange="updateQuestion('${q.id}', 'subject', this.value)" />
-            </div>
-
-            <div>
-              <label><strong>Source</strong></label>
-              <input type="text" value="${escapeHtml(q.source)}" onchange="updateQuestion('${q.id}', 'source', this.value)" />
-            </div>
-          </div>
-        </div>
-      `).join("");
+      if (total === 0) {
+        editor.innerHTML = "<p>No questions extracted yet.</p>";
+      }
     }
 
-    function updateQuestion(id, field, value) {
-      extractedQuestions = extractedQuestions.map(q =>
+    function updateQuestion(sectionKey, id, field, value) {
+      questionBank[sectionKey] = questionBank[sectionKey].map(q =>
         q.id === id ? { ...q, [field]: value } : q
       );
       renderJSONPreview();
     }
 
-    function deleteQuestion(id) {
-      extractedQuestions = extractedQuestions.filter(q => q.id !== id);
+    function updateAnswers(sectionKey, id, value) {
+      const answers = value
+        .split("\n")
+        .map(x => x.trim())
+        .filter(Boolean);
+
+      questionBank[sectionKey] = questionBank[sectionKey].map(q =>
+        q.id === id ? { ...q, answers } : q
+      );
+
+      renderJSONPreview();
+    }
+
+    function deleteQuestion(sectionKey, id) {
+      questionBank[sectionKey] = questionBank[sectionKey].filter(q => q.id !== id);
       renderEditor();
       renderJSONPreview();
     }
 
+    function changeSection(oldSection, id, newSection) {
+      if (oldSection === newSection) return;
+
+      const index = questionBank[oldSection].findIndex(q => q.id === id);
+      if (index === -1) return;
+
+      const [question] = questionBank[oldSection].splice(index, 1);
+      questionBank[newSection].push(question);
+
+      renderEditor();
+      renderJSONPreview();
+    }
+
+    function moveQuestion(sectionKey, id, direction) {
+      const arr = questionBank[sectionKey];
+      const index = arr.findIndex(q => q.id === id);
+      if (index === -1) return;
+
+      if (direction === "up" && index > 0) {
+        [arr[index - 1], arr[index]] = [arr[index], arr[index - 1]];
+      }
+
+      if (direction === "down" && index < arr.length - 1) {
+        [arr[index + 1], arr[index]] = [arr[index], arr[index + 1]];
+      }
+
+      renderEditor();
+      renderJSONPreview();
+    }
+
+    function getCleanedQuestionBank() {
+      const cleaned = {};
+      for (const [sectionKey, questions] of Object.entries(questionBank)) {
+        cleaned[sectionKey] = questions.map(({ id, ...rest }) => rest);
+      }
+      return cleaned;
+    }
+
     function renderJSONPreview() {
-      const cleaned = extractedQuestions.map(({ id, ...rest }) => rest);
-      document.getElementById("jsonPreview").textContent = JSON.stringify(cleaned, null, 2);
+      const cleaned = getCleanedQuestionBank();
+      document.getElementById("jsonPreview").textContent =
+        `const questionBank = ${JSON.stringify(cleaned, null, 2)};`;
     }
 
     function downloadJS() {
-      if (!extractedQuestions.length) {
-        alert("No data to download.");
-        return;
-      }
-
-      const cleaned = extractedQuestions.map(({ id, ...rest }) => rest);
-      const content = `const questions = ${JSON.stringify(cleaned, null, 2)};`;
+      const cleaned = getCleanedQuestionBank();
+      const content = `const questionBank = ${JSON.stringify(cleaned, null, 2)};`;
 
       const blob = new Blob([content], { type: "application/javascript" });
       const url = URL.createObjectURL(blob);
 
       const a = document.createElement("a");
       a.href = url;
-      a.download = "questions.js";
+      a.download = "questionBank.js";
       a.click();
 
       URL.revokeObjectURL(url);
     }
 
     function clearAllData() {
-      extractedQuestions = [];
       rawExtractedText = "";
+      resetQuestionBank();
 
-      document.getElementById("imageInput").value = "";
-      document.getElementById("pdfInput").value = "";
       document.getElementById("textInput").value = "";
+      document.getElementById("pdfInput").value = "";
+      document.getElementById("imageInput").value = "";
       document.getElementById("imagesPreview").innerHTML = "";
       document.getElementById("rawTextPreview").textContent = "";
       updateStatus("Cleared.");
@@ -717,6 +964,8 @@
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
     }
+
+    renderJSONPreview();
   </script>
 </body>
 </html>
