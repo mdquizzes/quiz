@@ -3,164 +3,499 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Question Extractor Tool</title>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
-
+  <title>Advanced Question Extractor</title>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: Arial, sans-serif;
-      background: #f5f7fa;
+      background: #f4f7fb;
       margin: 0;
       padding: 20px;
+      color: #222;
     }
 
     .container {
-      max-width: 800px;
+      max-width: 1200px;
       margin: auto;
-      text-align: center;
     }
 
     h1 {
-      color: #333;
+      text-align: center;
+      margin-bottom: 20px;
     }
 
-    input, button {
-      margin: 10px;
-      padding: 10px;
+    .card {
+      background: #fff;
+      padding: 18px;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    input, select, textarea, button {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
     }
 
     button {
-      background: #007bff;
-      color: white;
       border: none;
+      background: #007bff;
+      color: #fff;
       cursor: pointer;
-      border-radius: 6px;
+      font-weight: bold;
     }
 
     button:hover {
-      background: #0056b3;
+      background: #005ec7;
     }
 
-    #preview {
-      margin-top: 20px;
-      text-align: left;
-      background: white;
-      padding: 15px;
-      border-radius: 8px;
-      max-height: 400px;
-      overflow: auto;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    .btn-secondary {
+      background: #28a745;
+    }
+
+    .btn-secondary:hover {
+      background: #1f7f35;
+    }
+
+    .btn-danger {
+      background: #dc3545;
+    }
+
+    .btn-danger:hover {
+      background: #b02534;
+    }
+
+    .status {
+      margin-top: 12px;
+      font-weight: bold;
+      color: #444;
+    }
+
+    .question-card {
+      background: #fafafa;
+      border: 1px solid #ddd;
+      padding: 16px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+
+    .question-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .question-header h3 {
+      margin: 0;
+      color: #333;
+    }
+
+    .small-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
     }
 
     pre {
-      background: #f0f2f5;
+      background: #f1f3f5;
       padding: 12px;
-      border-radius: 6px;
+      border-radius: 8px;
       overflow-x: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 15px;
+    }
+
+    .toolbar button {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .muted {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .images-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .images-preview img {
+      width: 140px;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .json-preview {
+      max-height: 450px;
+      overflow: auto;
     }
   </style>
 </head>
 <body>
-
   <div class="container">
-    <h1>📚 Question Extractor</h1>
+    <h1>📚 Advanced Question Extractor</h1>
 
-    <input type="file" id="imageInput" accept="image/*" />
-    <button onclick="processImage()">Extract Questions</button>
+    <div class="card">
+      <h2>1) Upload & Metadata</h2>
+      <div class="form-grid">
+        <div>
+          <label><strong>Upload Images</strong></label>
+          <input type="file" id="imageInput" accept="image/*" multiple />
+        </div>
 
-    <div id="preview"></div>
+        <div>
+          <label><strong>Source</strong></label>
+          <input type="text" id="sourceInput" placeholder="e.g. RD SHARMA" value="RD SHARMA" />
+        </div>
 
-    <button onclick="downloadJS()">Download JS File</button>
+        <div>
+          <label><strong>Chapter</strong></label>
+          <input type="text" id="chapterInput" placeholder="e.g. Real Numbers" value="Real Numbers" />
+        </div>
+
+        <div>
+          <label><strong>Subject</strong></label>
+          <input type="text" id="subjectInput" placeholder="e.g. Maths" value="Maths" />
+        </div>
+
+        <div>
+          <label><strong>Class</strong></label>
+          <input type="number" id="classInput" placeholder="e.g. 10" value="10" />
+        </div>
+
+        <div>
+          <label><strong>Difficulty</strong></label>
+          <select id="difficultyInput">
+            <option value="easy">easy</option>
+            <option value="medium" selected>medium</option>
+            <option value="hard">hard</option>
+          </select>
+        </div>
+
+        <div>
+          <label><strong>Marks</strong></label>
+          <input type="number" id="marksInput" placeholder="e.g. 2" value="2" />
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <button onclick="processImages()">Extract Questions</button>
+        <button class="btn-secondary" onclick="downloadJS()">Download JS File</button>
+      </div>
+
+      <div class="status" id="statusText">Ready.</div>
+      <div class="images-preview" id="imagesPreview"></div>
+    </div>
+
+    <div class="card">
+      <h2>2) Extracted Questions (Editable)</h2>
+      <p class="muted">You can manually fix OCR mistakes before downloading.</p>
+      <div id="questionsEditor"></div>
+    </div>
+
+    <div class="card">
+      <h2>3) Final JSON Preview</h2>
+      <div class="json-preview">
+        <pre id="jsonPreview">[]</pre>
+      </div>
+    </div>
   </div>
 
   <script>
     let extractedQuestions = [];
 
-    async function processImage() {
+    document.getElementById("imageInput").addEventListener("change", previewSelectedImages);
+
+    function previewSelectedImages() {
       const input = document.getElementById("imageInput");
+      const preview = document.getElementById("imagesPreview");
+      preview.innerHTML = "";
 
-      if (!input.files[0]) {
-        alert("Please upload an image");
-        return;
-      }
-
-      const file = input.files[0];
-      document.getElementById("preview").innerHTML = "⏳ Processing image, please wait...";
-
-      try {
-        const { data: { text } } = await Tesseract.recognize(
-          file,
-          "eng",
-          { logger: m => console.log(m) }
-        );
-
-        console.log("OCR TEXT:", text);
-
-        extractedQuestions = parseQuestions(text);
-        displayPreview();
-
-      } catch (error) {
-        console.error(error);
-        document.getElementById("preview").innerHTML = "❌ Failed to extract text from image.";
-      }
-    }
-
-    function parseQuestions(text) {
-      text = text.replace(/\r/g, "").trim();
-
-      const rawQuestions = text
-        .split(/\n(?=(?:Q?\d+[\.\)]\s))/i)
-        .filter(q => q.trim() !== "");
-
-      return rawQuestions.map(q => {
-        const cleaned = q.trim();
-
-        let solution = "";
-        let questionText = cleaned;
-
-        if (/solution[:\-]/i.test(cleaned)) {
-          const parts = cleaned.split(/solution[:\-]/i);
-          questionText = parts[0].trim();
-          solution = parts[1]?.trim() || "";
-        }
-
-        return {
-          question: questionText,
-          chapter: "Real Numbers",
-          difficulty: "medium",
-          marks: 2,
-          class: 10,
-          subject: "Maths",
-          source: "Uploaded Image",
-          answers: [],
-          solution: solution
-        };
+      Array.from(input.files).forEach(file => {
+        const img = document.createElement("img");
+        img.src = URL.createObjectURL(file);
+        img.onload = () => URL.revokeObjectURL(img.src);
+        preview.appendChild(img);
       });
     }
 
-    function displayPreview() {
-      const preview = document.getElementById("preview");
+    async function processImages() {
+      const input = document.getElementById("imageInput");
+      const files = Array.from(input.files);
 
-      if (extractedQuestions.length === 0) {
-        preview.innerHTML = "⚠️ No questions found.";
+      if (!files.length) {
+        alert("Please upload one or more images.");
         return;
       }
 
-      preview.innerHTML = extractedQuestions
-        .map((q, index) => `
-          <h3>Question ${index + 1}</h3>
-          <pre>${JSON.stringify(q, null, 2)}</pre>
-        `)
-        .join("");
+      const source = document.getElementById("sourceInput").value.trim() || "Uploaded Image";
+      const chapter = document.getElementById("chapterInput").value.trim() || "Unknown Chapter";
+      const subject = document.getElementById("subjectInput").value.trim() || "Maths";
+      const classValue = Number(document.getElementById("classInput").value) || 10;
+      const difficulty = document.getElementById("difficultyInput").value || "medium";
+      const marks = Number(document.getElementById("marksInput").value) || 2;
+
+      extractedQuestions = [];
+      updateStatus("Starting OCR on " + files.length + " image(s)...");
+
+      for (let i = 0; i < files.length; i++) {
+        updateStatus(`Processing image ${i + 1} of ${files.length}...`);
+
+        try {
+          const { data: { text } } = await Tesseract.recognize(files[i], "eng", {
+            logger: m => {
+              if (m.status === "recognizing text") {
+                const progress = Math.round((m.progress || 0) * 100);
+                updateStatus(`Image ${i + 1}/${files.length}: OCR ${progress}%`);
+              }
+            }
+          });
+
+          const cleanedText = cleanOCRText(text);
+          const parsed = parseQuestions(cleanedText, {
+            source,
+            chapter,
+            subject,
+            classValue,
+            difficulty,
+            marks
+          });
+
+          extractedQuestions.push(...parsed);
+
+        } catch (error) {
+          console.error("OCR error on image:", files[i].name, error);
+        }
+      }
+
+      if (!extractedQuestions.length) {
+        updateStatus("No questions found. Try clearer images or manually improve scan quality.");
+      } else {
+        extractedQuestions = extractedQuestions.map((q, i) => ({
+          ...q,
+          id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + i)
+        }));
+        updateStatus(`Done! Extracted ${extractedQuestions.length} question(s).`);
+      }
+
+      renderEditor();
+      renderJSONPreview();
+    }
+
+    function updateStatus(message) {
+      document.getElementById("statusText").textContent = message;
+    }
+
+    function cleanOCRText(text) {
+      return text
+        .replace(/\r/g, "")
+        .replace(/[“”]/g, '"')
+        .replace(/[‘’]/g, "'")
+        .replace(/—/g, "-")
+        .replace(/–/g, "-")
+        .replace(/[|]/g, "I")
+        .replace(/\s+\n/g, "\n")
+        .replace(/\n{3,}/g, "\n\n")
+        .replace(/[ ]{2,}/g, " ")
+        .trim();
+    }
+
+    function parseQuestions(text, meta) {
+      const lines = text.split("\n").map(line => line.trim()).filter(Boolean);
+
+      const blocks = [];
+      let current = "";
+
+      const questionStartRegex = /^(Q\s*)?\d+[\.\)]\s+|^Question\s+\d+[:\.\)]?\s+/i;
+      const solutionRegex = /^(solution|soln|answer)[:\-\s]*/i;
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+
+        if (questionStartRegex.test(line)) {
+          if (current.trim()) {
+            blocks.push(current.trim());
+          }
+          current = line;
+        } else {
+          current += "\n" + line;
+        }
+      }
+
+      if (current.trim()) {
+        blocks.push(current.trim());
+      }
+
+      const parsed = [];
+
+      for (const block of blocks) {
+        let questionText = block;
+        let solution = "";
+
+        const splitLines = block.split("\n");
+        let questionPart = [];
+        let solutionPart = [];
+        let inSolution = false;
+
+        for (const line of splitLines) {
+          if (solutionRegex.test(line)) {
+            inSolution = true;
+            solutionPart.push(line.replace(solutionRegex, "").trim());
+          } else {
+            if (inSolution) {
+              solutionPart.push(line);
+            } else {
+              questionPart.push(line);
+            }
+          }
+        }
+
+        questionText = questionPart.join(" ").trim();
+        solution = solutionPart.join(" ").trim();
+
+        questionText = questionText
+          .replace(/^(Q\s*)?\d+[\.\)]\s*/i, "")
+          .replace(/^Question\s+\d+[:\.\)]?\s*/i, "")
+          .trim();
+
+        if (!questionText || questionText.length < 8) continue;
+
+        parsed.push({
+          question: questionText,
+          chapter: meta.chapter,
+          difficulty: meta.difficulty,
+          marks: meta.marks,
+          class: meta.classValue,
+          subject: meta.subject,
+          source: meta.source,
+          answers: [],
+          solution: solution
+        });
+      }
+
+      return parsed;
+    }
+
+    function renderEditor() {
+      const editor = document.getElementById("questionsEditor");
+
+      if (!extractedQuestions.length) {
+        editor.innerHTML = "<p>No questions extracted yet.</p>";
+        return;
+      }
+
+      editor.innerHTML = extractedQuestions.map((q, index) => `
+        <div class="question-card">
+          <div class="question-header">
+            <h3>Question ${index + 1}</h3>
+            <button class="btn-danger" onclick="deleteQuestion('${q.id}')">Delete</button>
+          </div>
+
+          <label><strong>Question</strong></label>
+          <textarea onchange="updateQuestion('${q.id}', 'question', this.value)">${escapeHtml(q.question)}</textarea>
+
+          <label><strong>Solution</strong></label>
+          <textarea onchange="updateQuestion('${q.id}', 'solution', this.value)">${escapeHtml(q.solution)}</textarea>
+
+          <div class="small-grid">
+            <div>
+              <label><strong>Chapter</strong></label>
+              <input type="text" value="${escapeHtml(q.chapter)}" onchange="updateQuestion('${q.id}', 'chapter', this.value)" />
+            </div>
+
+            <div>
+              <label><strong>Difficulty</strong></label>
+              <select onchange="updateQuestion('${q.id}', 'difficulty', this.value)">
+                <option value="easy" ${q.difficulty === "easy" ? "selected" : ""}>easy</option>
+                <option value="medium" ${q.difficulty === "medium" ? "selected" : ""}>medium</option>
+                <option value="hard" ${q.difficulty === "hard" ? "selected" : ""}>hard</option>
+              </select>
+            </div>
+
+            <div>
+              <label><strong>Marks</strong></label>
+              <input type="number" value="${q.marks}" onchange="updateQuestion('${q.id}', 'marks', Number(this.value))" />
+            </div>
+
+            <div>
+              <label><strong>Class</strong></label>
+              <input type="number" value="${q.class}" onchange="updateQuestion('${q.id}', 'class', Number(this.value))" />
+            </div>
+
+            <div>
+              <label><strong>Subject</strong></label>
+              <input type="text" value="${escapeHtml(q.subject)}" onchange="updateQuestion('${q.id}', 'subject', this.value)" />
+            </div>
+
+            <div>
+              <label><strong>Source</strong></label>
+              <input type="text" value="${escapeHtml(q.source)}" onchange="updateQuestion('${q.id}', 'source', this.value)" />
+            </div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function updateQuestion(id, field, value) {
+      extractedQuestions = extractedQuestions.map(q =>
+        q.id === id ? { ...q, [field]: value } : q
+      );
+      renderJSONPreview();
+    }
+
+    function deleteQuestion(id) {
+      extractedQuestions = extractedQuestions.filter(q => q.id !== id);
+      renderEditor();
+      renderJSONPreview();
+    }
+
+    function renderJSONPreview() {
+      const cleaned = extractedQuestions.map(({ id, ...rest }) => rest);
+      document.getElementById("jsonPreview").textContent = JSON.stringify(cleaned, null, 2);
     }
 
     function downloadJS() {
-      if (extractedQuestions.length === 0) {
-        alert("No data to download");
+      if (!extractedQuestions.length) {
+        alert("No data to download.");
         return;
       }
 
-      const content = `const questions = ${JSON.stringify(extractedQuestions, null, 2)};`;
+      const cleaned = extractedQuestions.map(({ id, ...rest }) => rest);
+      const content = `const questions = ${JSON.stringify(cleaned, null, 2)};`;
 
       const blob = new Blob([content], { type: "application/javascript" });
       const url = URL.createObjectURL(blob);
@@ -171,6 +506,15 @@
       a.click();
 
       URL.revokeObjectURL(url);
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
     }
   </script>
 </body>
