@@ -1,0 +1,49 @@
+window.SECTION_D = [
+
+/* ================= NUMBER PLAY ================= */
+
+{
+      "question": "For each statement below, determine whether it is Always True, Sometimes True, or Never True. Justify your answer with examples: (i) The sum of two even numbers is a multiple of 3. (ii) If a number is not divisible by 18, then it is also not divisible by 9. (iii) If two numbers are not divisible by 6, then their sum is not divisible by 6. (iv) The sum of a multiple of 6 and a multiple of 9 is a multiple of 3. (v) The sum of a multiple of 6 and a multiple of 3 is a multiple of 9.",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "hard",
+      "marks": 5,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "If 31z5 is a multiple of 9, where z is a digit, find all possible values of z. Explain why there are two possible answers.",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "hard",
+      "marks": 5,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "Find three consecutive numbers such that; first is a multiple of 2, second is a multiple of 3, third is a multiple of 4 Are there more such numbers? How often do they occur?",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "hard",
+      "marks": 5,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "Is the product of two consecutive integers always a multiple of 2? Why? Is it always a multiple of 6? Why or why not? What about four consecutive integers? five consecutive integers?",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "hard",
+      "marks": 5,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+  ]
