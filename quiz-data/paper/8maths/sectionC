@@ -1,4 +1,8 @@
-   {
+   window.SECTION_D = [
+
+/* ================= NUMBER PLAY ================= */
+
+{
       "question": "Find a number that leaves: remainder 2 when divided by 3; remainder 3 when divided by 4; remainder 4 when divided by 5. What is the smallest such number? Explain why.",
       "chapter": "NUMBER PLAY",
       "difficulty": "medium",
