@@ -1,0 +1,100 @@
+   {
+      "question": "Find a number that leaves: remainder 2 when divided by 3; remainder 3 when divided by 4; remainder 4 when divided by 5. What is the smallest such number? Explain why.",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "medium",
+      "marks": 3,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "Write five multiples of 36 between 45,000 and 47,000. Explain your method.",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "medium",
+      "marks": 3,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "Snehal says: \"I take a number that leaves a remainder of 8 when divided by 12. I take another number which is 4 less than a multiple of 12. Their sum will always be a multiple of 8.\" Examine his claim and justify your conclusion.",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "medium",
+      "marks": 3,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "Determine whether the following are Always True, Sometimes True, or Never True: (i) Product of a multiple of 6 and a multiple of 3 is a multiple of 9 (ii) Sum of three consecutive even numbers is divisible by 6 (iii) If abcdef is a multiple of 6, then badcef is also a multiple of 6",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "medium",
+      "marks": 3,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "Sreelatha says: \"I have a number divisible by 9. If I reverse its digits, it will still be divisible by 9.\" (i) Is her statement always true? (ii) Are there other rearrangements of digits that preserve divisibility by 9?",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "medium",
+      "marks": 3,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "If 48a23b is a multiple of 18, find all possible values of a and b.",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "medium",
+      "marks": 3,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "If 3p7q8 is divisible by 44, list all possible pairs of values for p and q.",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "medium",
+      "marks": 3,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "Solve the cryptarithms: (i) EF × E = GGG (ii) WOW × 5 = MEOW",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "medium",
+      "marks": 3,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "\"I hold some pebbles, not too many; When paired, one remains; When grouped in 3's, one remains; When grouped in 5's, one remains; But when grouped in 7's, none remain.\" how much pebbles i have? [3] Find the number of pebbles (less than 100).",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "medium",
+      "marks": 3,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    ]
