@@ -1,3 +1,191 @@
 window.SECTION_B = [
 
 /* ================= NUMBER PLAY ================= */
+{
+      "question": "The sum of four consecutive numbers is 34. What are these numbers?",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "easy",
+      "marks": 1,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "Find, without dividing, whether the following numbers are divisible by 9: (i) 8888 (ii) 93547",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "easy",
+      "marks": 2,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "Find, without dividing, whether the following numbers are divisible by 9: (i) 358095 (ii) 8888",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "easy",
+      "marks": 2,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "Find the smallest multiple of 9 with no odd digits.",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "easy",
+      "marks": 2,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "Find the multiple of 9 that is closest to the number 6000.",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "easy",
+      "marks": 2,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "How many multiples of 9 are there between 4300 and 4400?",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "easy",
+      "marks": 2,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "When divided by 7: 661 leaves remainder 3 4779 leaves remainder 5 Without calculating directly, find the remainder when (4779 - 661) is divided by 7. [2] Q9. Find a few numbers that leave a remainder of 2 when divided by both 3 and 4. Write an algebraic expression to represent all such numbers.",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "easy",
+      "marks": 2,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "The middle number in a sequence of 5 consecutive even numbers is 5p. Express the other four numbers in terms of p.",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "easy",
+      "marks": 2,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "Write a 6-digit number that is divisible by 15 such that when its digits are reversed, it becomes divisible by 6?",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "easy",
+      "marks": 2,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "Tathagat claims: \"If you add any three numbers that leave a remainder of 2 when divided by 6, the sum will always be a multiple of 6.\" Is his claim true? Justify your answer.",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "easy",
+      "marks": 2,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "When is the sum of two multiples of 3 also a multiple of 6, and when is it not? Explain all cases and generalise the pattern.",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "easy",
+      "marks": 2,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "Deepak claims: \"There are some multiples of 11 which, when doubled, remain multiples of 11, but others do not.\" Examine this claim and explain your conclusion.",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "easy",
+      "marks": 2,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "Choose any three numbers. When is their sum divisible by 3? Explore all cases and generalise.",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "easy",
+      "marks": 2,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "Which Venn diagram correctly represents the relationship between multiples of 4, 8, and 32?",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "easy",
+      "marks": 2,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "Solve the cryptarithms: (i) UT × 3 = PUT (ii) AB × 5 = BC",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "easy",
+      "marks": 2,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "Solve the cryptarithms: (i) L2N × 2 = 2NP (ii) XY × 4 = ZX",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "easy",
+      "marks": 2,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+    {
+      "question": "Solve the cryptarithms: (i)PP × QQ = PRP (ii) JK × 6 = KKK",
+      "chapter": "NUMBER PLAY",
+      "difficulty": "easy",
+      "marks": 2,
+      "class": 8,
+      "subject": "MATHS",
+      "source": "NCERT",
+      "answers": [],
+      "solution": ""
+    },
+]
