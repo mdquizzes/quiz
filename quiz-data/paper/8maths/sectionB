@@ -5,7 +5,7 @@ window.SECTION_B = [
       "question": "The sum of four consecutive numbers is 34. What are these numbers?",
       "chapter": "NUMBER PLAY",
       "difficulty": "easy",
-      "marks": 1,
+      "marks": 2,
       "class": 8,
       "subject": "MATHS",
       "source": "NCERT",
@@ -68,7 +68,7 @@ window.SECTION_B = [
       "solution": ""
     },
     {
-      "question": "When divided by 7: 661 leaves remainder 3 4779 leaves remainder 5 Without calculating directly, find the remainder when (4779 - 661) is divided by 7. [2] Q9. Find a few numbers that leave a remainder of 2 when divided by both 3 and 4. Write an algebraic expression to represent all such numbers.",
+      "question": "When divided by 7,661 leaves remainder 3 4779 leaves remainder 5 Without calculating directly, find the remainder when (4779 - 661) is divided by 7. [2] Q9. Find a few numbers that leave a remainder of 2 when divided by both 3 and 4. Write an algebraic expression to represent all such numbers.",
       "chapter": "NUMBER PLAY",
       "difficulty": "easy",
       "marks": 2,
