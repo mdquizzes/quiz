@@ -456,6 +456,10 @@ async function reloadAllData() {
 
   const cls = document.getElementById("classSelect").value;
   const subject = document.getElementById("subjectSelect").value;
+  console.log("Class selected:", document.getElementById("classSelect").value);
+  console.log("Subject selected:", document.getElementById("subjectSelect").value);
+  console.log("Expected Section B Path:", getSectionPath("B"));
+  console.log("SECTION_B loaded data:", window.SECTION_B);
 
   ALL_RAW = ALL_RAW.map(q => ({
     class: q.class ?? cls,
