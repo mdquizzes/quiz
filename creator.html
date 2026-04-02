@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Smart Question Extractor Pro</title>
+  <title>Smart Question Extractor Pro - Auto Section Distributor</title>
 
   <!-- OCR -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -244,6 +244,29 @@
       gap: 16px;
     }
 
+    .config-box {
+      background: #f8fbff;
+      border: 1px solid #d9e8ff;
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 15px;
+    }
+
+    .legend-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .legend-item {
+      background: #fff;
+      border: 1px solid #d9e8ff;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
     @media (max-width: 768px) {
       body {
         padding: 10px;
@@ -285,32 +308,28 @@
       </div>
 
       <div id="textTab" class="tab-panel active">
-        <label><strong>Paste Section-wise / Mixed Question Text</strong></label>
-        <textarea id="textInput" placeholder="Paste your chapter questions here...
+        <label><strong>Paste Question Text</strong></label>
+        <textarea id="textInput" placeholder="Paste your question paper here...
 
-Example:
-SECTION A
-1. What is photosynthesis?
-2. Define chlorophyll.
-
-SECTION B
-3. Explain the process of photosynthesis.
-4. Why is sunlight important for plants?
-
-5. Which of the following is correct?
+Examples:
+1. What is chlorophyll? (1)
+2. Which of the following is correct? (1)
 (a) Root makes food
 (b) Leaf makes food
 (c) Stem makes food
 (d) Flower makes food
-
 Answer: (b)
+
+3. Explain photosynthesis. (2)
+4. Differentiate between x and y. (3)
+5. Long answer type question... (5)
 "></textarea>
       </div>
 
       <div id="pdfTab" class="tab-panel">
         <label><strong>Upload PDF</strong></label>
         <input type="file" id="pdfInput" accept="application/pdf" />
-        <p class="muted">Best for text-based PDFs. Scanned PDFs may still need OCR-style cleanup.</p>
+        <p class="muted">Text-based PDFs work best. Marks like (1), [2], (3 Marks), 5M, etc. will be auto detected.</p>
       </div>
 
       <div id="imageTab" class="tab-panel">
@@ -353,8 +372,19 @@ Answer: (b)
         </div>
 
         <div>
-          <label><strong>Default Marks</strong></label>
+          <label><strong>Fallback Marks</strong></label>
           <input type="number" id="marksInput" value="2" />
+        </div>
+      </div>
+
+      <div class="config-box">
+        <h3>🎯 Auto Section Distribution Rules</h3>
+        <div class="legend-grid">
+          <div class="legend-item"><strong>MCQ</strong><br>1 mark + options</div>
+          <div class="legend-item"><strong>SECTION B</strong><br>2 marks</div>
+          <div class="legend-item"><strong>SECTION C</strong><br>3 marks</div>
+          <div class="legend-item"><strong>SECTION D</strong><br>5 marks</div>
+          <div class="legend-item"><strong>SECTION E</strong><br>4 marks</div>
         </div>
       </div>
 
@@ -386,7 +416,7 @@ Answer: (b)
 
     <div class="card">
       <h2>5) Section-wise Editable Questions</h2>
-      <p class="muted">Auto detect works first, but you can still manually correct everything.</p>
+      <p class="muted">Questions are auto distributed by marks + options. You can still manually edit or move them.</p>
       <div id="questionsEditor"></div>
     </div>
   </div>
@@ -396,7 +426,7 @@ Answer: (b)
     let currentTab = "textTab";
 
     let questionBank = {
-      sectionA: [],
+      mcq: [],
       sectionB: [],
       sectionC: [],
       sectionD: [],
@@ -441,7 +471,7 @@ Answer: (b)
 
     function resetQuestionBank() {
       questionBank = {
-        sectionA: [],
+        mcq: [],
         sectionB: [],
         sectionC: [],
         sectionD: [],
@@ -545,7 +575,7 @@ Answer: (b)
       const cleanedText = cleanOCRText(rawExtractedText);
       document.getElementById("rawTextPreview").textContent = cleanedText;
 
-      questionBank = parseSectionWiseQuestions(cleanedText, meta);
+      questionBank = parseQuestionsAutoSection(cleanedText, meta);
 
       renderEditor();
       renderJSONPreview();
@@ -553,7 +583,7 @@ Answer: (b)
       const total = Object.values(questionBank).reduce((sum, arr) => sum + arr.length, 0);
 
       if (total > 0) {
-        updateStatus(`Done! Extracted ${total} question(s).`);
+        updateStatus(`Done! Extracted ${total} question(s). Auto distributed section-wise.`);
       } else {
         updateStatus("No questions found. Try cleaner input or edit manually.");
       }
@@ -570,44 +600,33 @@ Answer: (b)
         .replace(/[‘’]/g, "'")
         .replace(/—/g, "-")
         .replace(/–/g, "-")
-        .replace(/[|]/g, "I")
         .replace(/\u00A0/g, " ")
-        .replace(/\s+\n/g, "\n")
-        .replace(/\n{3,}/g, "\n\n")
-        .replace(/[ ]{2,}/g, " ")
         .replace(/ﬁ/g, "fi")
         .replace(/ﬂ/g, "fl")
+        .replace(/[ ]{2,}/g, " ")
+        .replace(/\n{3,}/g, "\n\n")
         .trim();
     }
 
-    function parseSectionWiseQuestions(text, meta) {
-      const lines = text.split("\n").map(line => line.trim()).filter(Boolean);
-
-      let currentSection = "sectionA";
+    function parseQuestionsAutoSection(text, meta) {
       const sections = {
-        sectionA: [],
+        mcq: [],
         sectionB: [],
         sectionC: [],
         sectionD: [],
         sectionE: []
       };
 
-      let currentBlock = "";
+      const lines = text
+        .split("\n")
+        .map(line => line.trim())
+        .filter(Boolean)
+        .filter(line => !/^=====/.test(line));
 
       const questionStartRegex = /^(Q\s*)?\d+[\.\)]\s+|^Question\s+\d+[:\.\)]?\s+/i;
       const solutionRegex = /^(solution|soln|answer|ans)[:\-\s]*/i;
 
-      function detectSection(line) {
-        const normalized = line.toLowerCase().replace(/\s+/g, " ").trim();
-
-        if (/^section\s*a\b|^sec\s*a\b|^part\s*a\b|^a[\.\):]?$/.test(normalized)) return "sectionA";
-        if (/^section\s*b\b|^sec\s*b\b|^part\s*b\b|^b[\.\):]?$/.test(normalized)) return "sectionB";
-        if (/^section\s*c\b|^sec\s*c\b|^part\s*c\b|^c[\.\):]?$/.test(normalized)) return "sectionC";
-        if (/^section\s*d\b|^sec\s*d\b|^part\s*d\b|^d[\.\):]?$/.test(normalized)) return "sectionD";
-        if (/^section\s*e\b|^sec\s*e\b|^part\s*e\b|^e[\.\):]?$/.test(normalized)) return "sectionE";
-
-        return null;
-      }
+      let currentBlock = "";
 
       function isOptionLine(line) {
         return /^(\(?[a-dA-D]\)|[a-dA-D][\.\)])\s+/.test(line);
@@ -635,7 +654,67 @@ Answer: (b)
         return { options, nonOptionLines };
       }
 
-      function pushQuestion(block, sectionKey) {
+      function extractMarks(text) {
+        const patterns = [
+          /\((\d{1,2})\s*(?:marks?|m)?\)\s*$/i,
+          /\[(\d{1,2})\s*(?:marks?|m)?\]\s*$/i,
+          /-(\d{1,2})\s*(?:marks?|m)\s*$/i,
+          /\b(\d{1,2})\s*(?:marks?|m)\s*$/i,
+          /\((\d{1,2})\)\s*$/i,
+          /\[(\d{1,2})\]\s*$/i
+        ];
+
+        for (const pattern of patterns) {
+          const match = text.match(pattern);
+          if (match) {
+            return Number(match[1]);
+          }
+        }
+
+        return null;
+      }
+
+      function removeMarksFromQuestion(text) {
+        return text
+          .replace(/\((\d{1,2})\s*(?:marks?|m)?\)\s*$/i, "")
+          .replace(/\[(\d{1,2})\s*(?:marks?|m)?\]\s*$/i, "")
+          .replace(/-(\d{1,2})\s*(?:marks?|m)\s*$/i, "")
+          .replace(/\b(\d{1,2})\s*(?:marks?|m)\s*$/i, "")
+          .replace(/\((\d{1,2})\)\s*$/i, "")
+          .replace(/\[(\d{1,2})\]\s*$/i, "")
+          .trim();
+      }
+
+      function detectSectionHeading(line) {
+        const normalized = line.toLowerCase().replace(/\s+/g, " ").trim();
+
+        if (/^mcq\b|^multiple choice\b/.test(normalized)) return "mcq";
+        if (/^section\s*b\b|^sec\s*b\b|^part\s*b\b/.test(normalized)) return "sectionB";
+        if (/^section\s*c\b|^sec\s*c\b|^part\s*c\b/.test(normalized)) return "sectionC";
+        if (/^section\s*d\b|^sec\s*d\b|^part\s*d\b/.test(normalized)) return "sectionD";
+        if (/^section\s*e\b|^sec\s*e\b|^part\s*e\b/.test(normalized)) return "sectionE";
+
+        return null;
+      }
+
+      let manualSectionOverride = null;
+
+      function classifySection(marks, hasOptions) {
+        if (hasOptions && marks === 1) return "mcq";
+        if (marks === 2) return "sectionB";
+        if (marks === 3) return "sectionC";
+        if (marks === 5) return "sectionD";
+        if (marks === 4) return "sectionE";
+
+        if (hasOptions) return "mcq";
+
+        if (manualSectionOverride) return manualSectionOverride;
+
+        if (marks === 1) return "mcq";
+        return "sectionB";
+      }
+
+      function pushQuestion(block) {
         if (!block.trim()) return;
 
         const splitLines = block.split("\n").map(x => x.trim()).filter(Boolean);
@@ -667,17 +746,24 @@ Answer: (b)
           .replace(/^Question\s+\d+[:\.\)]?\s*/i, "")
           .trim();
 
+        const marksDetected = extractMarks(questionText);
+        questionText = removeMarksFromQuestion(questionText);
+
         questionText = smartCleanupQuestion(questionText);
         solution = smartCleanupSolution(solution);
 
         if (!questionText || questionText.length < 6) return;
+
+        const hasOptions = options.length >= 2;
+        const finalMarks = marksDetected || (hasOptions ? 1 : meta.marks);
+        const sectionKey = classifySection(finalMarks, hasOptions);
 
         sections[sectionKey].push({
           id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()),
           question: questionText,
           chapter: meta.chapter,
           difficulty: getDifficultyBySection(sectionKey, meta.difficulty),
-          marks: getMarksBySection(sectionKey, meta.marks),
+          marks: finalMarks,
           class: meta.classValue,
           subject: meta.subject,
           source: meta.source,
@@ -688,46 +774,35 @@ Answer: (b)
 
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
-        const detectedSection = detectSection(line);
+        const heading = detectSectionHeading(line);
 
-        if (detectedSection) {
-          pushQuestion(currentBlock, currentSection);
+        if (heading) {
+          pushQuestion(currentBlock);
           currentBlock = "";
-          currentSection = detectedSection;
+          manualSectionOverride = heading;
           continue;
         }
 
         if (questionStartRegex.test(line)) {
-          pushQuestion(currentBlock, currentSection);
+          pushQuestion(currentBlock);
           currentBlock = line;
         } else {
           currentBlock += "\n" + line;
         }
       }
 
-      pushQuestion(currentBlock, currentSection);
+      pushQuestion(currentBlock);
 
       return sections;
     }
 
     function getDifficultyBySection(section, fallback) {
       const map = {
-        sectionA: "easy",
-        sectionB: "medium",
+        mcq: "easy",
+        sectionB: "easy",
         sectionC: "medium",
         sectionD: "hard",
         sectionE: "hard"
-      };
-      return map[section] || fallback;
-    }
-
-    function getMarksBySection(section, fallback) {
-      const map = {
-        sectionA: 1,
-        sectionB: 2,
-        sectionC: 3,
-        sectionD: 4,
-        sectionE: 5
       };
       return map[section] || fallback;
     }
@@ -753,7 +828,7 @@ Answer: (b)
       editor.innerHTML = "";
 
       const labels = {
-        sectionA: "SECTION A",
+        mcq: "MCQ",
         sectionB: "SECTION B",
         sectionC: "SECTION C",
         sectionD: "SECTION D",
@@ -791,7 +866,7 @@ Answer: (b)
 
               <label><strong>Section</strong></label>
               <select onchange="changeSection('${sectionKey}', '${q.id}', this.value)">
-                <option value="sectionA" ${sectionKey === "sectionA" ? "selected" : ""}>SECTION A</option>
+                <option value="mcq" ${sectionKey === "mcq" ? "selected" : ""}>MCQ</option>
                 <option value="sectionB" ${sectionKey === "sectionB" ? "selected" : ""}>SECTION B</option>
                 <option value="sectionC" ${sectionKey === "sectionC" ? "selected" : ""}>SECTION C</option>
                 <option value="sectionD" ${sectionKey === "sectionD" ? "selected" : ""}>SECTION D</option>
