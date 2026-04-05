@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AI Question Bank Builder</title>
+  <title>Question Bank Creator 2</title>
 
-  <!-- PDF / OCR / DOC / ZIP Libraries -->
+  <!-- OCR / PDF / DOC / ZIP -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc =
@@ -15,6 +15,56 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/index.umd.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  <!-- Firebase (Script Tag Version) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getFirestore,
+      doc,
+      setDoc,
+      getDoc,
+      collection,
+      addDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import {
+      getStorage,
+      ref,
+      uploadBytes,
+      getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+    // ===============================
+    // 🔥 PASTE YOUR FIREBASE CONFIG HERE
+    // ===============================
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const firebaseApp = initializeApp(firebaseConfig);
+    const db = getFirestore(firebaseApp);
+    const storage = getStorage(firebaseApp);
+
+    window.firebaseServices = {
+      db,
+      storage,
+      doc,
+      setDoc,
+      getDoc,
+      collection,
+      addDoc,
+      serverTimestamp,
+      ref,
+      uploadBytes,
+      getDownloadURL
+    };
+  </script>
 
   <style>
     :root{
@@ -301,9 +351,9 @@
       position:relative;
     }
 
-    .question-card.duplicate{
-      background:var(--dup);
-      border:2px solid var(--dupBorder);
+    .question-card.exact-duplicate{
+      background:#f1f5f9;
+      border:2px solid #94a3b8;
     }
 
     .q-top{
@@ -344,6 +394,12 @@
       background:#ecfdf5;
       color:#15803d;
       border:1px solid #86efac;
+    }
+
+    .chip.gray{
+      background:#f1f5f9;
+      color:#334155;
+      border:1px solid #cbd5e1;
     }
 
     .q-text{
@@ -444,6 +500,27 @@
       color:#475569;
     }
 
+    .firebase-status{
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:12px;
+      font-size:13px;
+      font-weight:700;
+      background:#ecfdf5;
+      color:#166534;
+      border:1px solid #86efac;
+    }
+
+    .source-list{
+      margin-top:8px;
+      padding:10px 12px;
+      background:#f8fafc;
+      border:1px solid #e2e8f0;
+      border-radius:12px;
+      font-size:13px;
+      color:#334155;
+    }
+
     @media (max-width:1100px){
       .grid{grid-template-columns:1fr}
       .sidebar{position:relative; top:0}
@@ -455,10 +532,9 @@
 <body>
   <div class="app">
     <div class="topbar">
-      <h1>📚 AI Question Bank Builder</h1>
+      <h1>📚 Question Bank Creator 2</h1>
       <p>
-        Screenshot / Image / PDF se automatic question extract karo, section-wise save karo,
-        duplicate detect karo, answer likho, aur chapter-wise PDF export karo.
+        Firebase save + No duplicate add + OCR + PDF export + answer box + section-wise management.
       </p>
 
       <div class="controls">
@@ -479,17 +555,16 @@
         </div>
 
         <div class="control-card">
-          <h3>⚙️ Global Actions</h3>
-          <button class="btn btn-success" id="backupBtn">Backup JSON</button>
-          <button class="btn btn-purple" id="restoreBtn">Restore JSON</button>
-          <button class="btn btn-danger" id="clearAllBtn">Clear All Data</button>
-          <input type="file" id="restoreInput" accept=".json" style="display:none;">
+          <h3>☁️ Firebase Save</h3>
+          <button class="btn btn-success" id="saveFirebaseBtn">Save to Firebase</button>
+          <button class="btn btn-dark" id="loadFirebaseBtn">Load from Firebase</button>
+          <div class="firebase-status" id="firebaseStatus">Firebase ready (after config paste)</div>
         </div>
 
         <div class="control-card">
           <h3>📝 Bank Title</h3>
           <input type="text" id="bankTitle" placeholder="e.g. Class 10 Science Mega Question Bank" />
-          <div class="mini-note">Ye title exported PDFs me bhi aayega.</div>
+          <div class="mini-note">Ye title Firebase aur PDF dono me use hoga.</div>
         </div>
       </div>
     </div>
@@ -505,7 +580,7 @@
           </div>
           <div class="stat">
             <div class="num" id="totalDuplicates">0</div>
-            <div class="label">Duplicates</div>
+            <div class="label">Duplicates Blocked</div>
           </div>
           <div class="stat">
             <div class="num" id="totalWithAnswers">0</div>
@@ -526,23 +601,20 @@
           <h3>📤 Export All</h3>
           <button class="btn btn-dark" id="exportAllWithoutPdfBtn">All PDF (Without Solution)</button>
           <button class="btn btn-success" id="exportAllWithPdfBtn">All PDF (With Solution)</button>
-          <button class="btn btn-teal" id="exportAllDocBtn">All DOCX</button>
+          <button class="btn btn-purple" id="exportAllDocBtn">All DOCX</button>
           <button class="btn btn-warning" id="exportAllZipBtn">ZIP (All Section PDFs)</button>
         </div>
 
         <div class="sidebar-section">
-          <h3>🧹 Duplicate Manager</h3>
-          <button class="btn btn-warning" id="markDuplicatesBtn">Re-check Duplicates</button>
-          <button class="btn btn-danger" id="deleteAllDuplicatesBtn">Delete All Duplicates</button>
-          <p class="small">Same / almost same questions ko detect karke highlight karega.</p>
+          <h3>📥 Import History</h3>
+          <div id="importHistoryBox" class="small">No imports yet.</div>
         </div>
 
         <div class="sidebar-section">
-          <h3>💾 Auto Save</h3>
-          <p class="small">
-            Sab data automatically browser me save hota rahega.  
-            Agar browser close ho jaye tab bhi data wapas milega.
-          </p>
+          <h3>💾 Local Backup</h3>
+          <button class="btn btn-teal" id="backupBtn">Backup JSON</button>
+          <button class="btn btn-light" id="restoreBtn">Restore JSON</button>
+          <input type="file" id="restoreInput" accept=".json" style="display:none;">
         </div>
       </aside>
 
@@ -550,7 +622,7 @@
     </div>
 
     <div class="footer-note">
-      Built for huge question-bank workflow • Offline local save • OCR + PDF + Export
+      Creator2 • Firebase connected • Exact duplicates are NOT added
     </div>
   </div>
 
@@ -567,7 +639,10 @@
 
     let appData = {
       title: "",
-      uploadedFilesQueue: [],
+      imports: [],
+      settings: {
+        duplicateThreshold: 0.82
+      },
       sections: SECTION_NAMES.map((name, index) => ({
         id: "section_" + (index + 1),
         name,
@@ -583,6 +658,7 @@
     const clearUploadsBtn = document.getElementById("clearUploadsBtn");
     const globalLoader = document.getElementById("globalLoader");
     const globalSearch = document.getElementById("globalSearch");
+    const firebaseStatus = document.getElementById("firebaseStatus");
 
     // ===============================
     // INIT
@@ -594,7 +670,8 @@
       renderSections();
       updateDashboard();
       bindGlobalEvents();
-      runDuplicateCheck();
+      renderImportHistory();
+      updateFirebaseStatus("Firebase ready (after config paste)", true);
     }
 
     // ===============================
@@ -605,11 +682,11 @@
     }
 
     function saveToLocalStorage() {
-      localStorage.setItem("questionBankAppData", JSON.stringify(appData));
+      localStorage.setItem("questionBankCreator2", JSON.stringify(appData));
     }
 
     function loadFromLocalStorage() {
-      const saved = localStorage.getItem("questionBankAppData");
+      const saved = localStorage.getItem("questionBankCreator2");
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
@@ -636,6 +713,30 @@
         .replace(/\s+/g, " ")
         .replace(/[^\w\s\u0900-\u097F]/g, "")
         .trim();
+    }
+
+    function normalizeForFingerprint(text = "") {
+      return text
+        .toLowerCase()
+        .replace(/\r/g, " ")
+        .replace(/\n/g, " ")
+        .replace(/[^\w\s\u0900-\u097F]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function simpleHash(str = "") {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        const chr = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + chr;
+        hash |= 0;
+      }
+      return "h_" + Math.abs(hash);
+    }
+
+    function createQuestionFingerprint(text = "") {
+      return simpleHash(normalizeForFingerprint(text));
     }
 
     function similarity(a, b) {
@@ -666,7 +767,6 @@
         .replace(/\n{3,}/g, "\n\n")
         .trim();
 
-      // Try numbered question patterns first
       const numberedRegex = /(?:^|\n)(?:Q\.?\s*\d+|Question\s*\d+|\d+[.)]|[A-D][.)])\s+/gim;
       const matches = [...cleaned.matchAll(numberedRegex)];
 
@@ -680,14 +780,12 @@
           if (part.length > 20) parts.push(part);
         }
       } else {
-        // fallback split by blank lines
         parts = cleaned
           .split(/\n\s*\n/)
           .map(p => p.trim())
           .filter(p => p.length > 20);
       }
 
-      // Cleanup tiny / invalid chunks
       parts = parts
         .map(p => p.replace(/\n+/g, "\n").trim())
         .filter(p => p.length > 15);
@@ -703,7 +801,6 @@
       if (/biology|cell|plant|animal|human|organ|blood/.test(t)) return 2;
       if (/math|algebra|equation|triangle|geometry|percentage|profit/.test(t)) return 3;
 
-      // fallback: shortest section count
       let minIndex = 0;
       let minCount = appData.sections[0].questions.length;
       for (let i = 1; i < appData.sections.length; i++) {
@@ -727,9 +824,139 @@
       return section.questions.find(q => q.id === qId);
     }
 
+    function sectionIndexFromId(sectionId) {
+      return appData.sections.findIndex(s => s.id === sectionId);
+    }
+
     function formatDate(dateString) {
+      if (!dateString) return "-";
       const d = new Date(dateString);
       return d.toLocaleString();
+    }
+
+    function findExistingQuestionByFingerprint(fingerprint) {
+      for (const section of appData.sections) {
+        for (const q of section.questions) {
+          if (q.fingerprint === fingerprint) {
+            return { section, question: q };
+          }
+        }
+      }
+      return null;
+    }
+
+    function findNearDuplicateQuestion(text) {
+      let bestMatch = null;
+      let bestScore = 0;
+
+      for (const section of appData.sections) {
+        for (const q of section.questions) {
+          const score = similarity(text, q.text);
+          if (score > bestScore) {
+            bestScore = score;
+            bestMatch = { section, question: q, score };
+          }
+        }
+      }
+
+      if (bestMatch && bestScore >= (appData.settings?.duplicateThreshold || 0.82)) {
+        return bestMatch;
+      }
+
+      return null;
+    }
+
+    function updateFirebaseStatus(message, success = true) {
+      firebaseStatus.textContent = message;
+      firebaseStatus.style.background = success ? "#ecfdf5" : "#fef2f2";
+      firebaseStatus.style.color = success ? "#166534" : "#991b1b";
+      firebaseStatus.style.border = success ? "1px solid #86efac" : "1px solid #fca5a5";
+    }
+
+    // ===============================
+    // SMART ADD (NO DUPLICATE ADD)
+    // ===============================
+    function smartAddQuestionToSection(sectionIndex, questionText, sourceFileName = "manual", answer = "") {
+      const now = new Date().toISOString();
+      const fingerprint = createQuestionFingerprint(questionText);
+
+      // 1) Exact duplicate => DO NOT ADD
+      const exactMatch = findExistingQuestionByFingerprint(fingerprint);
+
+      if (exactMatch) {
+        exactMatch.question.lastSeenDate = now;
+        exactMatch.question.updatedAt = now;
+        exactMatch.question.seenCount = (exactMatch.question.seenCount || 1) + 1;
+
+        if (!Array.isArray(exactMatch.question.sourceFiles)) {
+          exactMatch.question.sourceFiles = [];
+        }
+        if (!exactMatch.question.sourceFiles.includes(sourceFileName)) {
+          exactMatch.question.sourceFiles.push(sourceFileName);
+        }
+
+        if (!Array.isArray(exactMatch.question.importHistory)) {
+          exactMatch.question.importHistory = [];
+        }
+        exactMatch.question.importHistory.push({
+          fileName: sourceFileName,
+          importedAt: now
+        });
+
+        exactMatch.question.duplicateType = "exact_reseen";
+        exactMatch.question.blockedDuplicateCount = (exactMatch.question.blockedDuplicateCount || 0) + 1;
+
+        return { status: "blocked_exact_duplicate", question: exactMatch.question };
+      }
+
+      // 2) Near duplicate => mark but still DO NOT ADD if very close
+      const nearMatch = findNearDuplicateQuestion(questionText);
+
+      if (nearMatch && nearMatch.score >= 0.92) {
+        nearMatch.question.lastSeenDate = now;
+        nearMatch.question.updatedAt = now;
+        nearMatch.question.seenCount = (nearMatch.question.seenCount || 1) + 1;
+
+        if (!Array.isArray(nearMatch.question.sourceFiles)) {
+          nearMatch.question.sourceFiles = [];
+        }
+        if (!nearMatch.question.sourceFiles.includes(sourceFileName)) {
+          nearMatch.question.sourceFiles.push(sourceFileName);
+        }
+
+        if (!Array.isArray(nearMatch.question.importHistory)) {
+          nearMatch.question.importHistory = [];
+        }
+        nearMatch.question.importHistory.push({
+          fileName: sourceFileName,
+          importedAt: now
+        });
+
+        nearMatch.question.duplicateType = "near_reseen";
+        nearMatch.question.blockedDuplicateCount = (nearMatch.question.blockedDuplicateCount || 0) + 1;
+
+        return { status: "blocked_near_duplicate", question: nearMatch.question };
+      }
+
+      // 3) New question => ADD
+      const newQuestion = {
+        id: uid(),
+        text: questionText,
+        answer: answer,
+        fingerprint,
+        createdAt: now,
+        updatedAt: now,
+        firstSeenDate: now,
+        lastSeenDate: now,
+        seenCount: 1,
+        blockedDuplicateCount: 0,
+        sourceFiles: [sourceFileName],
+        importHistory: [{ fileName: sourceFileName, importedAt: now }],
+        duplicateType: null
+      };
+
+      appData.sections[sectionIndex].questions.unshift(newQuestion);
+      return { status: "added_new", question: newQuestion };
     }
 
     // ===============================
@@ -738,7 +965,7 @@
     function renderSections(filterText = "") {
       sectionsContainer.innerHTML = "";
 
-      appData.sections.forEach((section, sectionIndex) => {
+      appData.sections.forEach((section) => {
         const filteredQuestions = section.questions.filter(q =>
           normalizeText(q.text).includes(normalizeText(filterText)) ||
           normalizeText(q.answer || "").includes(normalizeText(filterText))
@@ -752,7 +979,7 @@
             <div class="section-title-wrap">
               <div class="section-badge">${section.icon}</div>
               <div>
-                <h2 contenteditable="false">${escapeHtml(section.name)}</h2>
+                <h2>${escapeHtml(section.name)}</h2>
                 <div class="small">${filteredQuestions.length} questions in this section</div>
               </div>
             </div>
@@ -776,7 +1003,7 @@
                 </div>
               </div>
               <div class="small">
-                Ek ya multiple questions paste kar sakte ho. Agar numbering hai to auto split ho jayega.
+                Exact duplicate question dubara add nahi hoga.
               </div>
             </div>
 
@@ -791,9 +1018,9 @@
           </div>
 
           <div class="search-row">
-            <input type="search" id="sectionSearch_${section.id}" placeholder="Search inside ${escapeHtml(section.name)}..." oninput="renderSections(globalSearch.value)" />
-            <button class="btn btn-warning" onclick="removeSectionDuplicates('${section.id}')">Delete Duplicates</button>
+            <input type="search" placeholder="Search inside ${escapeHtml(section.name)}..." oninput="globalSearch.value=this.value; renderSections(this.value)" />
             <button class="btn btn-light" onclick="sortSectionQuestions('${section.id}')">Sort A-Z</button>
+            <button class="btn btn-danger" onclick="deleteAllSectionQuestions('${section.id}')">Clear Section</button>
           </div>
 
           <div class="questions-list">
@@ -806,28 +1033,30 @@
         `;
 
         sectionsContainer.appendChild(sectionCard);
-
         setupDropZone(sectionCard.querySelector(".drop-zone"));
       });
+
+      renderImportHistory();
     }
 
     function renderQuestionCard(sectionId, q, index) {
-      const duplicateLabel = q.isDuplicate
-        ? `<span class="chip warning">⚠ Duplicate</span>`
-        : `<span class="chip success">✔ Unique</span>`;
-
       const answerStatus = q.answer && q.answer.trim()
         ? `<span class="chip success">📝 Solution Added</span>`
         : `<span class="chip">📝 No Solution</span>`;
 
+      const duplicateInfo = (q.blockedDuplicateCount || 0) > 0
+        ? `<span class="chip warning">🚫 Blocked Duplicates: ${q.blockedDuplicateCount}</span>`
+        : `<span class="chip gray">✔ Unique Stored</span>`;
+
       return `
-        <div class="question-card ${q.isDuplicate ? "duplicate" : ""}" id="${q.id}">
+        <div class="question-card ${(q.blockedDuplicateCount || 0) > 0 ? "exact-duplicate" : ""}" id="${q.id}">
           <div class="q-top">
             <div class="q-meta">
               <span class="chip">#${index + 1}</span>
-              ${duplicateLabel}
+              ${duplicateInfo}
               ${answerStatus}
-              <span class="chip">Added: ${formatDate(q.createdAt)}</span>
+              <span class="chip">🔁 Seen: ${q.seenCount || 1}</span>
+              <span class="chip">📅 First Seen: ${formatDate(q.firstSeenDate)}</span>
             </div>
           </div>
 
@@ -835,11 +1064,10 @@
             ${escapeHtml(q.text)}
           </div>
 
-          ${
-            q.duplicateOf && q.isDuplicate
-              ? `<div class="duplicate-panel">Similar to: ${escapeHtml(q.duplicateOfPreview || "Another question")}</div>`
-              : ""
-          }
+          <div class="source-list">
+            <strong>Source Files:</strong> ${(q.sourceFiles || []).join(", ") || "manual"}<br>
+            <strong>Last Seen:</strong> ${formatDate(q.lastSeenDate)}
+          </div>
 
           <div class="answer-box">
             <textarea placeholder="Write solution / answer here..." oninput="updateAnswer('${sectionId}','${q.id}', this.value)">${escapeHtml(q.answer || "")}</textarea>
@@ -856,14 +1084,34 @@
       `;
     }
 
+    function renderImportHistory() {
+      const box = document.getElementById("importHistoryBox");
+      if (!box) return;
+
+      if (!appData.imports || !appData.imports.length) {
+        box.innerHTML = "No imports yet.";
+        return;
+      }
+
+      box.innerHTML = appData.imports.slice(0, 10).map(item => `
+        <div style="padding:10px; border:1px solid #cbd5e1; border-radius:12px; margin-bottom:8px; background:#f8fafc;">
+          <strong>${item.fileName}</strong><br>
+          Total: ${item.totalExtracted}<br>
+          New: ${item.newAdded}<br>
+          Blocked: ${item.duplicatesBlocked}<br>
+          <span style="font-size:12px;color:#64748b;">${formatDate(item.importedAt)}</span>
+        </div>
+      `).join("");
+    }
+
     function updateDashboard() {
       const all = getAllQuestionsFlat();
-      const duplicates = all.filter(q => q.isDuplicate).length;
+      const blocked = all.reduce((sum, q) => sum + (q.blockedDuplicateCount || 0), 0);
       const withAnswers = all.filter(q => q.answer && q.answer.trim()).length;
       const withoutAnswers = all.length - withAnswers;
 
       document.getElementById("totalQuestions").textContent = all.length;
-      document.getElementById("totalDuplicates").textContent = duplicates;
+      document.getElementById("totalDuplicates").textContent = blocked;
       document.getElementById("totalWithAnswers").textContent = withAnswers;
       document.getElementById("totalWithoutAnswers").textContent = withoutAnswers;
     }
@@ -895,51 +1143,19 @@
         renderSections(globalSearch.value);
       });
 
-      document.getElementById("markDuplicatesBtn").addEventListener("click", () => {
-        runDuplicateCheck();
-        alert("Duplicate check completed.");
-      });
-
-      document.getElementById("deleteAllDuplicatesBtn").addEventListener("click", () => {
-        if (!confirm("Are you sure you want to delete ALL duplicate questions?")) return;
-        appData.sections.forEach(section => {
-          section.questions = section.questions.filter(q => !q.isDuplicate);
-        });
-        runDuplicateCheck();
-        saveToLocalStorage();
-        renderSections(globalSearch.value);
-        updateDashboard();
-      });
-
-      document.getElementById("clearAllBtn").addEventListener("click", () => {
-        if (!confirm("This will delete ALL data. Continue?")) return;
-        localStorage.removeItem("questionBankAppData");
-        appData = {
-          title: "",
-          uploadedFilesQueue: [],
-          sections: SECTION_NAMES.map((name, index) => ({
-            id: "section_" + (index + 1),
-            name,
-            icon: ["①","②","③","④"][index],
-            questions: []
-          }))
-        };
-        bankTitleInput.value = "";
-        renderSections();
-        updateDashboard();
-      });
-
       document.getElementById("backupBtn").addEventListener("click", backupJSON);
       document.getElementById("restoreBtn").addEventListener("click", () => {
         document.getElementById("restoreInput").click();
       });
-
       document.getElementById("restoreInput").addEventListener("change", restoreJSON);
 
       document.getElementById("exportAllWithoutPdfBtn").addEventListener("click", () => exportAllPDF(false));
       document.getElementById("exportAllWithPdfBtn").addEventListener("click", () => exportAllPDF(true));
       document.getElementById("exportAllDocBtn").addEventListener("click", exportAllDOCX);
       document.getElementById("exportAllZipBtn").addEventListener("click", exportAllSectionsZip);
+
+      document.getElementById("saveFirebaseBtn").addEventListener("click", saveToFirebase);
+      document.getElementById("loadFirebaseBtn").addEventListener("click", loadFromFirebase);
     }
 
     function setupDropZone(zone) {
@@ -961,7 +1177,7 @@
     }
 
     // ===============================
-    // QUESTION CRUD
+    // CRUD
     // ===============================
     function toggleManualAdd(sectionId) {
       const box = document.getElementById(`manualAdd_${sectionId}`);
@@ -977,47 +1193,37 @@
         return;
       }
 
-      const section = appData.sections.find(s => s.id === sectionId);
       const parts = splitQuestionsFromText(qText);
+      let added = 0;
+      let blocked = 0;
 
       if (parts.length <= 1) {
-        section.questions.unshift({
-          id: uid(),
-          text: qText,
-          answer: answer,
-          createdAt: new Date().toISOString(),
-          isDuplicate: false,
-          duplicateOf: null,
-          duplicateOfPreview: ""
-        });
+        const result = smartAddQuestionToSection(sectionIndexFromId(sectionId), qText, "manual", answer);
+        if (result.status === "added_new") added++;
+        else blocked++;
       } else {
         parts.forEach((part, idx) => {
-          section.questions.unshift({
-            id: uid(),
-            text: part,
-            answer: idx === 0 ? answer : "",
-            createdAt: new Date().toISOString(),
-            isDuplicate: false,
-            duplicateOf: null,
-            duplicateOfPreview: ""
-          });
+          const result = smartAddQuestionToSection(sectionIndexFromId(sectionId), part, "manual", idx === 0 ? answer : "");
+          if (result.status === "added_new") added++;
+          else blocked++;
         });
       }
 
       document.getElementById(`manualQuestion_${sectionId}`).value = "";
       document.getElementById(`manualAnswer_${sectionId}`).value = "";
 
-      runDuplicateCheck();
       saveToLocalStorage();
       renderSections(globalSearch.value);
       updateDashboard();
+      alert(`Added: ${added}, Blocked Duplicates: ${blocked}`);
     }
 
     function editQuestionText(sectionId, qId, newText) {
       const q = getQuestionById(sectionId, qId);
       if (!q) return;
       q.text = newText.trim();
-      runDuplicateCheck();
+      q.fingerprint = createQuestionFingerprint(q.text);
+      q.updatedAt = new Date().toISOString();
       saveToLocalStorage();
       renderSections(globalSearch.value);
       updateDashboard();
@@ -1027,6 +1233,7 @@
       const q = getQuestionById(sectionId, qId);
       if (!q) return;
       q.answer = value;
+      q.updatedAt = new Date().toISOString();
       saveToLocalStorage();
       updateDashboard();
     }
@@ -1035,7 +1242,15 @@
       if (!confirm("Delete this question?")) return;
       const section = appData.sections.find(s => s.id === sectionId);
       section.questions = section.questions.filter(q => q.id !== qId);
-      runDuplicateCheck();
+      saveToLocalStorage();
+      renderSections(globalSearch.value);
+      updateDashboard();
+    }
+
+    function deleteAllSectionQuestions(sectionId) {
+      if (!confirm("Delete all questions in this section?")) return;
+      const section = appData.sections.find(s => s.id === sectionId);
+      section.questions = [];
       saveToLocalStorage();
       renderSections(globalSearch.value);
       updateDashboard();
@@ -1060,18 +1275,22 @@
       const target = prompt("Enter target section number (1-4):", "1");
       if (!target || !["1","2","3","4"].includes(target)) return;
 
-      const targetSection = appData.sections[parseInt(target) - 1];
-      targetSection.questions.unshift({
-        ...structuredClone(q),
-        id: uid(),
-        createdAt: new Date().toISOString()
-      });
+      const result = smartAddQuestionToSection(
+        parseInt(target) - 1,
+        q.text,
+        "move-copy",
+        q.answer || ""
+      );
 
-      runDuplicateCheck();
       saveToLocalStorage();
       renderSections(globalSearch.value);
       updateDashboard();
-      alert("Question copied to " + targetSection.name);
+
+      if (result.status === "added_new") {
+        alert("Question copied.");
+      } else {
+        alert("Duplicate detected. Not added.");
+      }
     }
 
     function toggleAnswer(qId) {
@@ -1086,50 +1305,6 @@
       section.questions.sort((a, b) => a.text.localeCompare(b.text));
       saveToLocalStorage();
       renderSections(globalSearch.value);
-    }
-
-    function removeSectionDuplicates(sectionId) {
-      if (!confirm("Delete all duplicate questions in this section?")) return;
-      const section = appData.sections.find(s => s.id === sectionId);
-      section.questions = section.questions.filter(q => !q.isDuplicate);
-      runDuplicateCheck();
-      saveToLocalStorage();
-      renderSections(globalSearch.value);
-      updateDashboard();
-    }
-
-    // ===============================
-    // DUPLICATE DETECTION
-    // ===============================
-    function runDuplicateCheck() {
-      const all = [];
-
-      appData.sections.forEach(section => {
-        section.questions.forEach(q => {
-          q.isDuplicate = false;
-          q.duplicateOf = null;
-          q.duplicateOfPreview = "";
-          all.push({ section, q });
-        });
-      });
-
-      for (let i = 0; i < all.length; i++) {
-        for (let j = 0; j < i; j++) {
-          const current = all[i];
-          const previous = all[j];
-          const score = similarity(current.q.text, previous.q.text);
-
-          if (score >= 0.82) {
-            current.q.isDuplicate = true;
-            current.q.duplicateOf = previous.q.id;
-            current.q.duplicateOfPreview = previous.q.text.slice(0, 120);
-            break;
-          }
-        }
-      }
-
-      saveToLocalStorage();
-      updateDashboard();
     }
 
     // ===============================
@@ -1156,26 +1331,43 @@
           return;
         }
 
-        const section = appData.sections.find(s => s.id === sectionId);
+        let added = 0;
+        let blocked = 0;
+
+        const importStats = {
+          fileName: files.map(f => f.name).join(", "),
+          importedAt: new Date().toISOString(),
+          totalExtracted: questions.length,
+          newAdded: 0,
+          duplicatesBlocked: 0
+        };
+
+        for (const file of files) {
+          await uploadSourceFileToFirebase(file);
+        }
 
         questions.forEach(questionText => {
-          section.questions.unshift({
-            id: uid(),
-            text: questionText,
-            answer: "",
-            createdAt: new Date().toISOString(),
-            isDuplicate: false,
-            duplicateOf: null,
-            duplicateOfPreview: ""
-          });
+          const result = smartAddQuestionToSection(
+            sectionIndexFromId(sectionId),
+            questionText,
+            files[0]?.name || "upload"
+          );
+
+          if (result.status === "added_new") {
+            added++;
+            importStats.newAdded++;
+          } else {
+            blocked++;
+            importStats.duplicatesBlocked++;
+          }
         });
 
-        runDuplicateCheck();
+        appData.imports.unshift(importStats);
         saveToLocalStorage();
         renderSections(globalSearch.value);
         updateDashboard();
 
-        alert(`${questions.length} questions added to ${section.name}`);
+        alert(`Added: ${added}, Blocked Duplicates: ${blocked}`);
       } catch (err) {
         console.error(err);
         alert("Error processing files.");
@@ -1194,6 +1386,7 @@
           const text = await extractTextFromFile(file);
           const questions = splitQuestionsFromText(text);
           allQuestions.push(...questions);
+          await uploadSourceFileToFirebase(file);
         }
 
         if (!allQuestions.length) {
@@ -1202,25 +1395,40 @@
           return;
         }
 
+        let added = 0;
+        let blocked = 0;
+
+        const importStats = {
+          fileName: files.map(f => f.name).join(", "),
+          importedAt: new Date().toISOString(),
+          totalExtracted: allQuestions.length,
+          newAdded: 0,
+          duplicatesBlocked: 0
+        };
+
         allQuestions.forEach(questionText => {
           const sectionIndex = detectLikelySection(questionText);
-          appData.sections[sectionIndex].questions.unshift({
-            id: uid(),
-            text: questionText,
-            answer: "",
-            createdAt: new Date().toISOString(),
-            isDuplicate: false,
-            duplicateOf: null,
-            duplicateOfPreview: ""
-          });
+          const result = smartAddQuestionToSection(
+            sectionIndex,
+            questionText,
+            files[0]?.name || "upload"
+          );
+
+          if (result.status === "added_new") {
+            added++;
+            importStats.newAdded++;
+          } else {
+            blocked++;
+            importStats.duplicatesBlocked++;
+          }
         });
 
-        runDuplicateCheck();
+        appData.imports.unshift(importStats);
         saveToLocalStorage();
         renderSections(globalSearch.value);
         updateDashboard();
 
-        alert(`${allQuestions.length} questions processed and distributed into sections.`);
+        alert(`Processed. Added: ${added}, Blocked Duplicates: ${blocked}`);
       } catch (err) {
         console.error(err);
         alert("Error processing uploaded files.");
@@ -1258,12 +1466,10 @@
       for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
         const page = await pdf.getPage(pageNum);
 
-        // Try text layer first
         const textContent = await page.getTextContent();
         const textItems = textContent.items.map(item => item.str).join(" ");
         fullText += "\n" + textItems;
 
-        // OCR fallback if text layer is weak
         if (textItems.trim().length < 50) {
           const viewport = page.getViewport({ scale: 2 });
           const canvas = document.createElement("canvas");
@@ -1287,6 +1493,97 @@
 
     function showLoader(show) {
       globalLoader.style.display = show ? "flex" : "none";
+    }
+
+    // ===============================
+    // FIREBASE
+    // ===============================
+    async function saveToFirebase() {
+      try {
+        const { db, doc, setDoc, collection, addDoc, serverTimestamp } = window.firebaseServices || {};
+        if (!db) {
+          updateFirebaseStatus("Firebase config missing.", false);
+          alert("Firebase config missing.");
+          return;
+        }
+
+        const bankId = sanitizeFileName(appData.title || "default_question_bank");
+
+        await setDoc(doc(db, "questionBanks", bankId), {
+          ...appData,
+          updatedAt: new Date().toISOString(),
+          savedAtServer: serverTimestamp()
+        });
+
+        await addDoc(collection(db, "questionBankLogs"), {
+          bankId,
+          action: "save",
+          title: appData.title || "Untitled Bank",
+          totalQuestions: getAllQuestionsFlat().length,
+          createdAt: serverTimestamp()
+        });
+
+        updateFirebaseStatus("Saved to Firebase successfully ✔️", true);
+        alert("Saved to Firebase successfully.");
+      } catch (err) {
+        console.error(err);
+        updateFirebaseStatus("Firebase save failed.", false);
+        alert("Firebase save failed. Check console.");
+      }
+    }
+
+    async function loadFromFirebase() {
+      try {
+        const { db, doc, getDoc } = window.firebaseServices || {};
+        if (!db) {
+          updateFirebaseStatus("Firebase config missing.", false);
+          alert("Firebase config missing.");
+          return;
+        }
+
+        const bankId = sanitizeFileName(appData.title || prompt("Enter bank title to load:", "default_question_bank"));
+        if (!bankId) return;
+
+        const snap = await getDoc(doc(db, "questionBanks", bankId));
+
+        if (!snap.exists()) {
+          updateFirebaseStatus("No Firebase data found.", false);
+          alert("No Firebase data found.");
+          return;
+        }
+
+        appData = snap.data();
+        bankTitleInput.value = appData.title || "";
+        saveToLocalStorage();
+        renderSections(globalSearch.value);
+        updateDashboard();
+        renderImportHistory();
+
+        updateFirebaseStatus("Loaded from Firebase successfully ✔️", true);
+        alert("Loaded from Firebase.");
+      } catch (err) {
+        console.error(err);
+        updateFirebaseStatus("Firebase load failed.", false);
+        alert("Firebase load failed. Check console.");
+      }
+    }
+
+    async function uploadSourceFileToFirebase(file) {
+      try {
+        const { storage, ref, uploadBytes, getDownloadURL } = window.firebaseServices || {};
+        if (!storage) return null;
+
+        const safeBank = sanitizeFileName(appData.title || "question_bank");
+        const filePath = `question-bank-uploads/${safeBank}/${Date.now()}_${file.name}`;
+        const storageRef = ref(storage, filePath);
+
+        await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(storageRef);
+        return url;
+      } catch (err) {
+        console.warn("Storage upload skipped/failed:", err);
+        return null;
+      }
     }
 
     // ===============================
@@ -1317,7 +1614,7 @@
       doc.setFont("helvetica", "normal");
       doc.setFontSize(11);
 
-      const questions = section.questions.filter(q => !q.isDuplicate);
+      const questions = section.questions;
 
       if (!questions.length) {
         doc.text("No questions available.", margin, y);
@@ -1325,7 +1622,6 @@
 
       for (let i = 0; i < questions.length; i++) {
         const q = questions[i];
-
         const qLines = doc.splitTextToSize(`${i + 1}. ${q.text}`, pageWidth - margin * 2);
 
         if (y + qLines.length * 6 > pageHeight - 20) {
@@ -1377,7 +1673,7 @@
 
       for (let s = 0; s < appData.sections.length; s++) {
         const section = appData.sections[s];
-        const questions = section.questions.filter(q => !q.isDuplicate);
+        const questions = section.questions;
 
         if (y > pageHeight - 30) {
           doc.addPage();
@@ -1454,7 +1750,7 @@
         })
       );
 
-      const questions = section.questions.filter(q => !q.isDuplicate);
+      const questions = section.questions;
 
       questions.forEach((q, idx) => {
         children.push(
@@ -1510,7 +1806,7 @@
           })
         );
 
-        const questions = section.questions.filter(q => !q.isDuplicate);
+        const questions = section.questions;
 
         questions.forEach((q, idx) => {
           children.push(
@@ -1580,7 +1876,7 @@
           doc.setFont("helvetica", "normal");
           doc.setFontSize(11);
 
-          const questions = section.questions.filter(q => !q.isDuplicate);
+          const questions = section.questions;
 
           for (let i = 0; i < questions.length; i++) {
             const q = questions[i];
@@ -1640,10 +1936,10 @@
           if (!parsed.sections) throw new Error("Invalid backup file");
           appData = parsed;
           bankTitleInput.value = appData.title || "";
-          runDuplicateCheck();
           saveToLocalStorage();
           renderSections(globalSearch.value);
           updateDashboard();
+          renderImportHistory();
           alert("Backup restored successfully.");
         } catch (err) {
           console.error(err);
@@ -1674,17 +1970,17 @@
         .trim();
     }
 
-    // Make functions global for inline onclick
+    // Global access for inline handlers
     window.toggleManualAdd = toggleManualAdd;
     window.addManualQuestion = addManualQuestion;
     window.editQuestionText = editQuestionText;
     window.updateAnswer = updateAnswer;
     window.deleteQuestion = deleteQuestion;
+    window.deleteAllSectionQuestions = deleteAllSectionQuestions;
     window.copyQuestion = copyQuestion;
     window.duplicateQuestionToAnotherSection = duplicateQuestionToAnotherSection;
     window.toggleAnswer = toggleAnswer;
     window.sortSectionQuestions = sortSectionQuestions;
-    window.removeSectionDuplicates = removeSectionDuplicates;
     window.exportSectionPDF = exportSectionPDF;
     window.exportSectionDOCX = exportSectionDOCX;
     window.processSectionFiles = processSectionFiles;
