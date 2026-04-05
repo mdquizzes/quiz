@@ -1,0 +1,1693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Question Bank Builder</title>
+
+  <!-- PDF / OCR / DOC / ZIP Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/index.umd.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  <style>
+    :root{
+      --bg:#0f172a;
+      --panel:#111827;
+      --panel2:#1f2937;
+      --card:#ffffff;
+      --muted:#64748b;
+      --text:#0f172a;
+      --light:#f8fafc;
+      --primary:#2563eb;
+      --primary2:#1d4ed8;
+      --success:#16a34a;
+      --danger:#dc2626;
+      --warning:#f59e0b;
+      --border:#dbeafe;
+      --dup:#fff7ed;
+      --dupBorder:#fb923c;
+      --shadow:0 10px 25px rgba(0,0,0,0.12);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(135deg,#e0f2fe,#dbeafe,#f8fafc);
+      color:#0f172a;
+    }
+
+    .app{
+      max-width:1600px;
+      margin:auto;
+      padding:20px;
+    }
+
+    .topbar{
+      background:linear-gradient(135deg,#0f172a,#1e3a8a);
+      color:white;
+      padding:24px;
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      margin-bottom:20px;
+    }
+
+    .topbar h1{
+      margin:0 0 8px 0;
+      font-size:32px;
+      line-height:1.2;
+    }
+
+    .topbar p{
+      margin:0;
+      opacity:0.92;
+      font-size:15px;
+    }
+
+    .controls{
+      margin-top:20px;
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+      gap:14px;
+    }
+
+    .control-card{
+      background:rgba(255,255,255,0.08);
+      border:1px solid rgba(255,255,255,0.12);
+      padding:16px;
+      border-radius:18px;
+      backdrop-filter: blur(8px);
+    }
+
+    .control-card h3{
+      margin:0 0 10px 0;
+      font-size:16px;
+    }
+
+    .control-card input,
+    .control-card select,
+    .control-card textarea{
+      width:100%;
+      padding:12px 14px;
+      border:none;
+      outline:none;
+      border-radius:12px;
+      font-size:14px;
+      background:#fff;
+      color:#111827;
+    }
+
+    .btn{
+      border:none;
+      outline:none;
+      padding:11px 16px;
+      border-radius:12px;
+      font-weight:700;
+      cursor:pointer;
+      transition:0.2s ease;
+      margin:4px 4px 0 0;
+      font-size:14px;
+    }
+
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{background:var(--primary); color:white;}
+    .btn-primary:hover{background:var(--primary2);}
+    .btn-success{background:var(--success); color:white;}
+    .btn-danger{background:var(--danger); color:white;}
+    .btn-warning{background:var(--warning); color:#111827;}
+    .btn-dark{background:#111827; color:white;}
+    .btn-light{background:#e2e8f0; color:#111827;}
+    .btn-purple{background:#7c3aed; color:white;}
+    .btn-teal{background:#0f766e; color:white;}
+
+    .grid{
+      display:grid;
+      grid-template-columns:330px 1fr;
+      gap:20px;
+      margin-top:20px;
+    }
+
+    .sidebar{
+      background:rgba(255,255,255,0.75);
+      border:1px solid rgba(255,255,255,0.7);
+      border-radius:24px;
+      padding:18px;
+      box-shadow:var(--shadow);
+      position:sticky;
+      top:18px;
+      height:fit-content;
+    }
+
+    .sidebar h2{
+      margin:0 0 16px 0;
+      font-size:22px;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-bottom:16px;
+    }
+
+    .stat{
+      background:#eff6ff;
+      border:1px solid #bfdbfe;
+      border-radius:16px;
+      padding:14px;
+    }
+
+    .stat .num{
+      font-size:26px;
+      font-weight:800;
+      color:#1d4ed8;
+    }
+
+    .stat .label{
+      font-size:12px;
+      color:#475569;
+      margin-top:6px;
+    }
+
+    .sidebar-section{
+      margin-top:18px;
+      border-top:1px dashed #cbd5e1;
+      padding-top:16px;
+    }
+
+    .sidebar-section h3{
+      margin:0 0 10px 0;
+      font-size:16px;
+    }
+
+    .small{
+      font-size:13px;
+      color:#475569;
+    }
+
+    .main{
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
+
+    .section-card{
+      background:rgba(255,255,255,0.78);
+      border:1px solid rgba(255,255,255,0.75);
+      border-radius:24px;
+      padding:18px;
+      box-shadow:var(--shadow);
+    }
+
+    .section-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+
+    .section-title-wrap{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .section-badge{
+      width:48px;
+      height:48px;
+      border-radius:14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:22px;
+      font-weight:800;
+      color:white;
+      background:linear-gradient(135deg,#2563eb,#7c3aed);
+    }
+
+    .section-title-wrap h2{
+      margin:0;
+      font-size:24px;
+    }
+
+    .section-tools{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .section-inputs{
+      display:grid;
+      grid-template-columns:1.2fr 0.8fr;
+      gap:14px;
+      margin-bottom:16px;
+    }
+
+    .panel{
+      background:#f8fafc;
+      border:1px solid #e2e8f0;
+      border-radius:18px;
+      padding:16px;
+    }
+
+    .panel h4{
+      margin:0 0 10px 0;
+      font-size:16px;
+    }
+
+    textarea.big{
+      min-height:130px;
+      resize:vertical;
+      width:100%;
+      padding:14px;
+      border-radius:14px;
+      border:1px solid #cbd5e1;
+      font-size:14px;
+      outline:none;
+    }
+
+    input[type="text"], input[type="search"], select{
+      width:100%;
+      padding:12px 14px;
+      border-radius:12px;
+      border:1px solid #cbd5e1;
+      outline:none;
+      font-size:14px;
+    }
+
+    .questions-list{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    .question-card{
+      background:white;
+      border:1px solid #e2e8f0;
+      border-radius:20px;
+      padding:16px;
+      box-shadow:0 8px 20px rgba(15,23,42,0.06);
+      position:relative;
+    }
+
+    .question-card.duplicate{
+      background:var(--dup);
+      border:2px solid var(--dupBorder);
+    }
+
+    .q-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      margin-bottom:12px;
+      flex-wrap:wrap;
+    }
+
+    .q-meta{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      background:#eff6ff;
+      color:#1d4ed8;
+      border:1px solid #bfdbfe;
+    }
+
+    .chip.warning{
+      background:#fff7ed;
+      color:#c2410c;
+      border:1px solid #fdba74;
+    }
+
+    .chip.success{
+      background:#ecfdf5;
+      color:#15803d;
+      border:1px solid #86efac;
+    }
+
+    .q-text{
+      font-size:16px;
+      line-height:1.75;
+      white-space:pre-wrap;
+      margin-bottom:14px;
+      font-weight:600;
+    }
+
+    .answer-box textarea{
+      width:100%;
+      min-height:120px;
+      resize:vertical;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid #cbd5e1;
+      outline:none;
+      font-size:14px;
+      background:#fcfcff;
+    }
+
+    .q-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:12px;
+    }
+
+    .duplicate-panel{
+      margin-top:10px;
+      padding:10px 12px;
+      background:#fff1f2;
+      border:1px solid #fda4af;
+      border-radius:14px;
+      font-size:13px;
+      color:#9f1239;
+    }
+
+    .loader{
+      display:none;
+      align-items:center;
+      gap:10px;
+      background:#eff6ff;
+      color:#1d4ed8;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid #bfdbfe;
+      font-weight:700;
+      margin-top:10px;
+    }
+
+    .spinner{
+      width:18px;
+      height:18px;
+      border:3px solid #93c5fd;
+      border-top-color:#1d4ed8;
+      border-radius:50%;
+      animation:spin 1s linear infinite;
+    }
+
+    @keyframes spin{
+      to{transform:rotate(360deg)}
+    }
+
+    .footer-note{
+      margin-top:20px;
+      text-align:center;
+      color:#475569;
+      font-size:13px;
+    }
+
+    .search-row{
+      display:grid;
+      grid-template-columns:1fr auto auto;
+      gap:10px;
+      margin-bottom:14px;
+    }
+
+    .drop-zone{
+      border:2px dashed #93c5fd;
+      background:#eff6ff;
+      padding:16px;
+      border-radius:16px;
+      text-align:center;
+      cursor:pointer;
+      transition:0.2s;
+    }
+
+    .drop-zone.dragover{
+      background:#dbeafe;
+      border-color:#2563eb;
+    }
+
+    .mini-note{
+      margin-top:8px;
+      font-size:12px;
+      color:#475569;
+    }
+
+    @media (max-width:1100px){
+      .grid{grid-template-columns:1fr}
+      .sidebar{position:relative; top:0}
+      .section-inputs{grid-template-columns:1fr}
+      .search-row{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <h1>📚 AI Question Bank Builder</h1>
+      <p>
+        Screenshot / Image / PDF se automatic question extract karo, section-wise save karo,
+        duplicate detect karo, answer likho, aur chapter-wise PDF export karo.
+      </p>
+
+      <div class="controls">
+        <div class="control-card">
+          <h3>📥 Import Files</h3>
+          <input type="file" id="globalFileInput" accept="image/*,.pdf" multiple />
+          <div class="mini-note">Images, screenshots, scanned pages, PDFs supported.</div>
+        </div>
+
+        <div class="control-card">
+          <h3>🧠 OCR / AI Parsing</h3>
+          <button class="btn btn-primary" id="processGlobalFilesBtn">Process Uploaded Files</button>
+          <button class="btn btn-light" id="clearUploadsBtn">Clear Upload Queue</button>
+          <div class="loader" id="globalLoader">
+            <div class="spinner"></div>
+            Processing files...
+          </div>
+        </div>
+
+        <div class="control-card">
+          <h3>⚙️ Global Actions</h3>
+          <button class="btn btn-success" id="backupBtn">Backup JSON</button>
+          <button class="btn btn-purple" id="restoreBtn">Restore JSON</button>
+          <button class="btn btn-danger" id="clearAllBtn">Clear All Data</button>
+          <input type="file" id="restoreInput" accept=".json" style="display:none;">
+        </div>
+
+        <div class="control-card">
+          <h3>📝 Bank Title</h3>
+          <input type="text" id="bankTitle" placeholder="e.g. Class 10 Science Mega Question Bank" />
+          <div class="mini-note">Ye title exported PDFs me bhi aayega.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <aside class="sidebar">
+        <h2>📊 Dashboard</h2>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="num" id="totalQuestions">0</div>
+            <div class="label">Total Questions</div>
+          </div>
+          <div class="stat">
+            <div class="num" id="totalDuplicates">0</div>
+            <div class="label">Duplicates</div>
+          </div>
+          <div class="stat">
+            <div class="num" id="totalWithAnswers">0</div>
+            <div class="label">With Solutions</div>
+          </div>
+          <div class="stat">
+            <div class="num" id="totalWithoutAnswers">0</div>
+            <div class="label">Without Solutions</div>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>🔍 Search All Questions</h3>
+          <input type="search" id="globalSearch" placeholder="Search by question text..." />
+        </div>
+
+        <div class="sidebar-section">
+          <h3>📤 Export All</h3>
+          <button class="btn btn-dark" id="exportAllWithoutPdfBtn">All PDF (Without Solution)</button>
+          <button class="btn btn-success" id="exportAllWithPdfBtn">All PDF (With Solution)</button>
+          <button class="btn btn-teal" id="exportAllDocBtn">All DOCX</button>
+          <button class="btn btn-warning" id="exportAllZipBtn">ZIP (All Section PDFs)</button>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>🧹 Duplicate Manager</h3>
+          <button class="btn btn-warning" id="markDuplicatesBtn">Re-check Duplicates</button>
+          <button class="btn btn-danger" id="deleteAllDuplicatesBtn">Delete All Duplicates</button>
+          <p class="small">Same / almost same questions ko detect karke highlight karega.</p>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>💾 Auto Save</h3>
+          <p class="small">
+            Sab data automatically browser me save hota rahega.  
+            Agar browser close ho jaye tab bhi data wapas milega.
+          </p>
+        </div>
+      </aside>
+
+      <main class="main" id="sectionsContainer"></main>
+    </div>
+
+    <div class="footer-note">
+      Built for huge question-bank workflow • Offline local save • OCR + PDF + Export
+    </div>
+  </div>
+
+  <script>
+    // ===============================
+    // APP STATE
+    // ===============================
+    const SECTION_NAMES = [
+      "Section 1",
+      "Section 2",
+      "Section 3",
+      "Section 4"
+    ];
+
+    let appData = {
+      title: "",
+      uploadedFilesQueue: [],
+      sections: SECTION_NAMES.map((name, index) => ({
+        id: "section_" + (index + 1),
+        name,
+        icon: ["①","②","③","④"][index],
+        questions: []
+      }))
+    };
+
+    const sectionsContainer = document.getElementById("sectionsContainer");
+    const bankTitleInput = document.getElementById("bankTitle");
+    const globalFileInput = document.getElementById("globalFileInput");
+    const processGlobalFilesBtn = document.getElementById("processGlobalFilesBtn");
+    const clearUploadsBtn = document.getElementById("clearUploadsBtn");
+    const globalLoader = document.getElementById("globalLoader");
+    const globalSearch = document.getElementById("globalSearch");
+
+    // ===============================
+    // INIT
+    // ===============================
+    init();
+
+    function init() {
+      loadFromLocalStorage();
+      renderSections();
+      updateDashboard();
+      bindGlobalEvents();
+      runDuplicateCheck();
+    }
+
+    // ===============================
+    // UTILITIES
+    // ===============================
+    function uid() {
+      return "q_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    }
+
+    function saveToLocalStorage() {
+      localStorage.setItem("questionBankAppData", JSON.stringify(appData));
+    }
+
+    function loadFromLocalStorage() {
+      const saved = localStorage.getItem("questionBankAppData");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed && parsed.sections) {
+            appData = parsed;
+          }
+        } catch (e) {
+          console.error("Failed to parse saved data", e);
+        }
+      }
+      bankTitleInput.value = appData.title || "";
+    }
+
+    function escapeHtml(str = "") {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function normalizeText(text = "") {
+      return text
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .replace(/[^\w\s\u0900-\u097F]/g, "")
+        .trim();
+    }
+
+    function similarity(a, b) {
+      a = normalizeText(a);
+      b = normalizeText(b);
+      if (!a || !b) return 0;
+      if (a === b) return 1;
+
+      const aWords = new Set(a.split(" "));
+      const bWords = new Set(b.split(" "));
+      let common = 0;
+
+      aWords.forEach(word => {
+        if (bWords.has(word)) common++;
+      });
+
+      const union = new Set([...aWords, ...bWords]).size;
+      return union ? common / union : 0;
+    }
+
+    function splitQuestionsFromText(text) {
+      if (!text) return [];
+
+      let cleaned = text
+        .replace(/\r/g, "\n")
+        .replace(/\t/g, " ")
+        .replace(/[ ]{2,}/g, " ")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
+
+      // Try numbered question patterns first
+      const numberedRegex = /(?:^|\n)(?:Q\.?\s*\d+|Question\s*\d+|\d+[.)]|[A-D][.)])\s+/gim;
+      const matches = [...cleaned.matchAll(numberedRegex)];
+
+      let parts = [];
+
+      if (matches.length > 1) {
+        for (let i = 0; i < matches.length; i++) {
+          const start = matches[i].index;
+          const end = i + 1 < matches.length ? matches[i + 1].index : cleaned.length;
+          const part = cleaned.slice(start, end).trim();
+          if (part.length > 20) parts.push(part);
+        }
+      } else {
+        // fallback split by blank lines
+        parts = cleaned
+          .split(/\n\s*\n/)
+          .map(p => p.trim())
+          .filter(p => p.length > 20);
+      }
+
+      // Cleanup tiny / invalid chunks
+      parts = parts
+        .map(p => p.replace(/\n+/g, "\n").trim())
+        .filter(p => p.length > 15);
+
+      return parts;
+    }
+
+    function detectLikelySection(text) {
+      const t = normalizeText(text);
+
+      if (/physics|force|motion|light|electric|current|gravity/.test(t)) return 0;
+      if (/chemistry|acid|base|salt|reaction|atom|molecule/.test(t)) return 1;
+      if (/biology|cell|plant|animal|human|organ|blood/.test(t)) return 2;
+      if (/math|algebra|equation|triangle|geometry|percentage|profit/.test(t)) return 3;
+
+      // fallback: shortest section count
+      let minIndex = 0;
+      let minCount = appData.sections[0].questions.length;
+      for (let i = 1; i < appData.sections.length; i++) {
+        if (appData.sections[i].questions.length < minCount) {
+          minCount = appData.sections[i].questions.length;
+          minIndex = i;
+        }
+      }
+      return minIndex;
+    }
+
+    function getAllQuestionsFlat() {
+      return appData.sections.flatMap(section =>
+        section.questions.map(q => ({ ...q, sectionId: section.id, sectionName: section.name }))
+      );
+    }
+
+    function getQuestionById(sectionId, qId) {
+      const section = appData.sections.find(s => s.id === sectionId);
+      if (!section) return null;
+      return section.questions.find(q => q.id === qId);
+    }
+
+    function formatDate(dateString) {
+      const d = new Date(dateString);
+      return d.toLocaleString();
+    }
+
+    // ===============================
+    // RENDER
+    // ===============================
+    function renderSections(filterText = "") {
+      sectionsContainer.innerHTML = "";
+
+      appData.sections.forEach((section, sectionIndex) => {
+        const filteredQuestions = section.questions.filter(q =>
+          normalizeText(q.text).includes(normalizeText(filterText)) ||
+          normalizeText(q.answer || "").includes(normalizeText(filterText))
+        );
+
+        const sectionCard = document.createElement("div");
+        sectionCard.className = "section-card";
+
+        sectionCard.innerHTML = `
+          <div class="section-header">
+            <div class="section-title-wrap">
+              <div class="section-badge">${section.icon}</div>
+              <div>
+                <h2 contenteditable="false">${escapeHtml(section.name)}</h2>
+                <div class="small">${filteredQuestions.length} questions in this section</div>
+              </div>
+            </div>
+
+            <div class="section-tools">
+              <button class="btn btn-primary" onclick="toggleManualAdd('${section.id}')">+ Add Question</button>
+              <button class="btn btn-success" onclick="exportSectionPDF('${section.id}', false)">PDF Without Solution</button>
+              <button class="btn btn-dark" onclick="exportSectionPDF('${section.id}', true)">PDF With Solution</button>
+              <button class="btn btn-purple" onclick="exportSectionDOCX('${section.id}')">DOCX</button>
+            </div>
+          </div>
+
+          <div class="section-inputs">
+            <div class="panel">
+              <h4>✍️ Manual Question Entry</h4>
+              <div id="manualAdd_${section.id}" style="display:none;">
+                <textarea class="big" id="manualQuestion_${section.id}" placeholder="Paste one or multiple questions here..."></textarea>
+                <textarea class="big" id="manualAnswer_${section.id}" placeholder="Optional: solution / answer"></textarea>
+                <div style="margin-top:10px;">
+                  <button class="btn btn-primary" onclick="addManualQuestion('${section.id}')">Add Question(s)</button>
+                </div>
+              </div>
+              <div class="small">
+                Ek ya multiple questions paste kar sakte ho. Agar numbering hai to auto split ho jayega.
+              </div>
+            </div>
+
+            <div class="panel">
+              <h4>📎 Section Upload</h4>
+              <div class="drop-zone" data-section-id="${section.id}" onclick="document.getElementById('sectionFile_${section.id}').click()">
+                Click / Drop image or PDF here
+              </div>
+              <input type="file" id="sectionFile_${section.id}" accept="image/*,.pdf" multiple style="display:none;" onchange="processSectionFiles('${section.id}', this.files)">
+              <div class="mini-note">OCR karke is section me auto questions add ho jayenge.</div>
+            </div>
+          </div>
+
+          <div class="search-row">
+            <input type="search" id="sectionSearch_${section.id}" placeholder="Search inside ${escapeHtml(section.name)}..." oninput="renderSections(globalSearch.value)" />
+            <button class="btn btn-warning" onclick="removeSectionDuplicates('${section.id}')">Delete Duplicates</button>
+            <button class="btn btn-light" onclick="sortSectionQuestions('${section.id}')">Sort A-Z</button>
+          </div>
+
+          <div class="questions-list">
+            ${
+              filteredQuestions.length === 0
+                ? `<div class="panel"><div class="small">No questions yet in this section.</div></div>`
+                : filteredQuestions.map((q, index) => renderQuestionCard(section.id, q, index)).join("")
+            }
+          </div>
+        `;
+
+        sectionsContainer.appendChild(sectionCard);
+
+        setupDropZone(sectionCard.querySelector(".drop-zone"));
+      });
+    }
+
+    function renderQuestionCard(sectionId, q, index) {
+      const duplicateLabel = q.isDuplicate
+        ? `<span class="chip warning">⚠ Duplicate</span>`
+        : `<span class="chip success">✔ Unique</span>`;
+
+      const answerStatus = q.answer && q.answer.trim()
+        ? `<span class="chip success">📝 Solution Added</span>`
+        : `<span class="chip">📝 No Solution</span>`;
+
+      return `
+        <div class="question-card ${q.isDuplicate ? "duplicate" : ""}" id="${q.id}">
+          <div class="q-top">
+            <div class="q-meta">
+              <span class="chip">#${index + 1}</span>
+              ${duplicateLabel}
+              ${answerStatus}
+              <span class="chip">Added: ${formatDate(q.createdAt)}</span>
+            </div>
+          </div>
+
+          <div class="q-text" contenteditable="true" onblur="editQuestionText('${sectionId}','${q.id}', this.innerText)">
+            ${escapeHtml(q.text)}
+          </div>
+
+          ${
+            q.duplicateOf && q.isDuplicate
+              ? `<div class="duplicate-panel">Similar to: ${escapeHtml(q.duplicateOfPreview || "Another question")}</div>`
+              : ""
+          }
+
+          <div class="answer-box">
+            <textarea placeholder="Write solution / answer here..." oninput="updateAnswer('${sectionId}','${q.id}', this.value)">${escapeHtml(q.answer || "")}</textarea>
+          </div>
+
+          <div class="q-actions">
+            <button class="btn btn-light" onclick="toggleAnswer('${q.id}')">Toggle Answer View</button>
+            <button class="btn btn-primary" onclick="copyQuestion('${sectionId}','${q.id}', false)">Copy Question</button>
+            <button class="btn btn-success" onclick="copyQuestion('${sectionId}','${q.id}', true)">Copy With Solution</button>
+            <button class="btn btn-warning" onclick="duplicateQuestionToAnotherSection('${sectionId}','${q.id}')">Move / Copy</button>
+            <button class="btn btn-danger" onclick="deleteQuestion('${sectionId}','${q.id}')">Delete</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateDashboard() {
+      const all = getAllQuestionsFlat();
+      const duplicates = all.filter(q => q.isDuplicate).length;
+      const withAnswers = all.filter(q => q.answer && q.answer.trim()).length;
+      const withoutAnswers = all.length - withAnswers;
+
+      document.getElementById("totalQuestions").textContent = all.length;
+      document.getElementById("totalDuplicates").textContent = duplicates;
+      document.getElementById("totalWithAnswers").textContent = withAnswers;
+      document.getElementById("totalWithoutAnswers").textContent = withoutAnswers;
+    }
+
+    // ===============================
+    // EVENTS
+    // ===============================
+    function bindGlobalEvents() {
+      bankTitleInput.addEventListener("input", () => {
+        appData.title = bankTitleInput.value;
+        saveToLocalStorage();
+      });
+
+      processGlobalFilesBtn.addEventListener("click", async () => {
+        const files = Array.from(globalFileInput.files || []);
+        if (!files.length) {
+          alert("Please select image or PDF files first.");
+          return;
+        }
+        await processFilesAndAutoDistribute(files);
+      });
+
+      clearUploadsBtn.addEventListener("click", () => {
+        globalFileInput.value = "";
+        alert("Upload queue cleared.");
+      });
+
+      globalSearch.addEventListener("input", () => {
+        renderSections(globalSearch.value);
+      });
+
+      document.getElementById("markDuplicatesBtn").addEventListener("click", () => {
+        runDuplicateCheck();
+        alert("Duplicate check completed.");
+      });
+
+      document.getElementById("deleteAllDuplicatesBtn").addEventListener("click", () => {
+        if (!confirm("Are you sure you want to delete ALL duplicate questions?")) return;
+        appData.sections.forEach(section => {
+          section.questions = section.questions.filter(q => !q.isDuplicate);
+        });
+        runDuplicateCheck();
+        saveToLocalStorage();
+        renderSections(globalSearch.value);
+        updateDashboard();
+      });
+
+      document.getElementById("clearAllBtn").addEventListener("click", () => {
+        if (!confirm("This will delete ALL data. Continue?")) return;
+        localStorage.removeItem("questionBankAppData");
+        appData = {
+          title: "",
+          uploadedFilesQueue: [],
+          sections: SECTION_NAMES.map((name, index) => ({
+            id: "section_" + (index + 1),
+            name,
+            icon: ["①","②","③","④"][index],
+            questions: []
+          }))
+        };
+        bankTitleInput.value = "";
+        renderSections();
+        updateDashboard();
+      });
+
+      document.getElementById("backupBtn").addEventListener("click", backupJSON);
+      document.getElementById("restoreBtn").addEventListener("click", () => {
+        document.getElementById("restoreInput").click();
+      });
+
+      document.getElementById("restoreInput").addEventListener("change", restoreJSON);
+
+      document.getElementById("exportAllWithoutPdfBtn").addEventListener("click", () => exportAllPDF(false));
+      document.getElementById("exportAllWithPdfBtn").addEventListener("click", () => exportAllPDF(true));
+      document.getElementById("exportAllDocBtn").addEventListener("click", exportAllDOCX);
+      document.getElementById("exportAllZipBtn").addEventListener("click", exportAllSectionsZip);
+    }
+
+    function setupDropZone(zone) {
+      if (!zone) return;
+      zone.addEventListener("dragover", e => {
+        e.preventDefault();
+        zone.classList.add("dragover");
+      });
+      zone.addEventListener("dragleave", () => {
+        zone.classList.remove("dragover");
+      });
+      zone.addEventListener("drop", e => {
+        e.preventDefault();
+        zone.classList.remove("dragover");
+        const sectionId = zone.dataset.sectionId;
+        const files = e.dataTransfer.files;
+        processSectionFiles(sectionId, files);
+      });
+    }
+
+    // ===============================
+    // QUESTION CRUD
+    // ===============================
+    function toggleManualAdd(sectionId) {
+      const box = document.getElementById(`manualAdd_${sectionId}`);
+      box.style.display = box.style.display === "none" ? "block" : "none";
+    }
+
+    function addManualQuestion(sectionId) {
+      const qText = document.getElementById(`manualQuestion_${sectionId}`).value.trim();
+      const answer = document.getElementById(`manualAnswer_${sectionId}`).value.trim();
+
+      if (!qText) {
+        alert("Please enter question text.");
+        return;
+      }
+
+      const section = appData.sections.find(s => s.id === sectionId);
+      const parts = splitQuestionsFromText(qText);
+
+      if (parts.length <= 1) {
+        section.questions.unshift({
+          id: uid(),
+          text: qText,
+          answer: answer,
+          createdAt: new Date().toISOString(),
+          isDuplicate: false,
+          duplicateOf: null,
+          duplicateOfPreview: ""
+        });
+      } else {
+        parts.forEach((part, idx) => {
+          section.questions.unshift({
+            id: uid(),
+            text: part,
+            answer: idx === 0 ? answer : "",
+            createdAt: new Date().toISOString(),
+            isDuplicate: false,
+            duplicateOf: null,
+            duplicateOfPreview: ""
+          });
+        });
+      }
+
+      document.getElementById(`manualQuestion_${sectionId}`).value = "";
+      document.getElementById(`manualAnswer_${sectionId}`).value = "";
+
+      runDuplicateCheck();
+      saveToLocalStorage();
+      renderSections(globalSearch.value);
+      updateDashboard();
+    }
+
+    function editQuestionText(sectionId, qId, newText) {
+      const q = getQuestionById(sectionId, qId);
+      if (!q) return;
+      q.text = newText.trim();
+      runDuplicateCheck();
+      saveToLocalStorage();
+      renderSections(globalSearch.value);
+      updateDashboard();
+    }
+
+    function updateAnswer(sectionId, qId, value) {
+      const q = getQuestionById(sectionId, qId);
+      if (!q) return;
+      q.answer = value;
+      saveToLocalStorage();
+      updateDashboard();
+    }
+
+    function deleteQuestion(sectionId, qId) {
+      if (!confirm("Delete this question?")) return;
+      const section = appData.sections.find(s => s.id === sectionId);
+      section.questions = section.questions.filter(q => q.id !== qId);
+      runDuplicateCheck();
+      saveToLocalStorage();
+      renderSections(globalSearch.value);
+      updateDashboard();
+    }
+
+    function copyQuestion(sectionId, qId, withAnswer = false) {
+      const q = getQuestionById(sectionId, qId);
+      if (!q) return;
+      const text = withAnswer
+        ? `${q.text}\n\nAnswer:\n${q.answer || ""}`
+        : q.text;
+
+      navigator.clipboard.writeText(text).then(() => {
+        alert(withAnswer ? "Question + solution copied." : "Question copied.");
+      });
+    }
+
+    function duplicateQuestionToAnotherSection(sectionId, qId) {
+      const q = getQuestionById(sectionId, qId);
+      if (!q) return;
+
+      const target = prompt("Enter target section number (1-4):", "1");
+      if (!target || !["1","2","3","4"].includes(target)) return;
+
+      const targetSection = appData.sections[parseInt(target) - 1];
+      targetSection.questions.unshift({
+        ...structuredClone(q),
+        id: uid(),
+        createdAt: new Date().toISOString()
+      });
+
+      runDuplicateCheck();
+      saveToLocalStorage();
+      renderSections(globalSearch.value);
+      updateDashboard();
+      alert("Question copied to " + targetSection.name);
+    }
+
+    function toggleAnswer(qId) {
+      const card = document.getElementById(qId);
+      if (!card) return;
+      const answerBox = card.querySelector(".answer-box");
+      answerBox.style.display = answerBox.style.display === "none" ? "block" : "none";
+    }
+
+    function sortSectionQuestions(sectionId) {
+      const section = appData.sections.find(s => s.id === sectionId);
+      section.questions.sort((a, b) => a.text.localeCompare(b.text));
+      saveToLocalStorage();
+      renderSections(globalSearch.value);
+    }
+
+    function removeSectionDuplicates(sectionId) {
+      if (!confirm("Delete all duplicate questions in this section?")) return;
+      const section = appData.sections.find(s => s.id === sectionId);
+      section.questions = section.questions.filter(q => !q.isDuplicate);
+      runDuplicateCheck();
+      saveToLocalStorage();
+      renderSections(globalSearch.value);
+      updateDashboard();
+    }
+
+    // ===============================
+    // DUPLICATE DETECTION
+    // ===============================
+    function runDuplicateCheck() {
+      const all = [];
+
+      appData.sections.forEach(section => {
+        section.questions.forEach(q => {
+          q.isDuplicate = false;
+          q.duplicateOf = null;
+          q.duplicateOfPreview = "";
+          all.push({ section, q });
+        });
+      });
+
+      for (let i = 0; i < all.length; i++) {
+        for (let j = 0; j < i; j++) {
+          const current = all[i];
+          const previous = all[j];
+          const score = similarity(current.q.text, previous.q.text);
+
+          if (score >= 0.82) {
+            current.q.isDuplicate = true;
+            current.q.duplicateOf = previous.q.id;
+            current.q.duplicateOfPreview = previous.q.text.slice(0, 120);
+            break;
+          }
+        }
+      }
+
+      saveToLocalStorage();
+      updateDashboard();
+    }
+
+    // ===============================
+    // OCR / PDF PROCESSING
+    // ===============================
+    async function processSectionFiles(sectionId, fileList) {
+      const files = Array.from(fileList || []);
+      if (!files.length) return;
+
+      showLoader(true);
+
+      try {
+        let allExtractedText = "";
+
+        for (const file of files) {
+          const text = await extractTextFromFile(file);
+          allExtractedText += "\n\n" + text;
+        }
+
+        const questions = splitQuestionsFromText(allExtractedText);
+        if (!questions.length) {
+          alert("No clear questions found in uploaded files.");
+          showLoader(false);
+          return;
+        }
+
+        const section = appData.sections.find(s => s.id === sectionId);
+
+        questions.forEach(questionText => {
+          section.questions.unshift({
+            id: uid(),
+            text: questionText,
+            answer: "",
+            createdAt: new Date().toISOString(),
+            isDuplicate: false,
+            duplicateOf: null,
+            duplicateOfPreview: ""
+          });
+        });
+
+        runDuplicateCheck();
+        saveToLocalStorage();
+        renderSections(globalSearch.value);
+        updateDashboard();
+
+        alert(`${questions.length} questions added to ${section.name}`);
+      } catch (err) {
+        console.error(err);
+        alert("Error processing files.");
+      }
+
+      showLoader(false);
+    }
+
+    async function processFilesAndAutoDistribute(files) {
+      showLoader(true);
+
+      try {
+        let allQuestions = [];
+
+        for (const file of files) {
+          const text = await extractTextFromFile(file);
+          const questions = splitQuestionsFromText(text);
+          allQuestions.push(...questions);
+        }
+
+        if (!allQuestions.length) {
+          alert("No questions found.");
+          showLoader(false);
+          return;
+        }
+
+        allQuestions.forEach(questionText => {
+          const sectionIndex = detectLikelySection(questionText);
+          appData.sections[sectionIndex].questions.unshift({
+            id: uid(),
+            text: questionText,
+            answer: "",
+            createdAt: new Date().toISOString(),
+            isDuplicate: false,
+            duplicateOf: null,
+            duplicateOfPreview: ""
+          });
+        });
+
+        runDuplicateCheck();
+        saveToLocalStorage();
+        renderSections(globalSearch.value);
+        updateDashboard();
+
+        alert(`${allQuestions.length} questions processed and distributed into sections.`);
+      } catch (err) {
+        console.error(err);
+        alert("Error processing uploaded files.");
+      }
+
+      showLoader(false);
+    }
+
+    async function extractTextFromFile(file) {
+      const type = file.type.toLowerCase();
+      const name = file.name.toLowerCase();
+
+      if (type.includes("pdf") || name.endsWith(".pdf")) {
+        return await extractTextFromPDF(file);
+      } else if (type.startsWith("image/")) {
+        return await extractTextFromImage(file);
+      } else {
+        throw new Error("Unsupported file type: " + file.name);
+      }
+    }
+
+    async function extractTextFromImage(file) {
+      const result = await Tesseract.recognize(file, "eng", {
+        logger: m => console.log(m)
+      });
+      return result.data.text || "";
+    }
+
+    async function extractTextFromPDF(file) {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+      let fullText = "";
+
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+
+        // Try text layer first
+        const textContent = await page.getTextContent();
+        const textItems = textContent.items.map(item => item.str).join(" ");
+        fullText += "\n" + textItems;
+
+        // OCR fallback if text layer is weak
+        if (textItems.trim().length < 50) {
+          const viewport = page.getViewport({ scale: 2 });
+          const canvas = document.createElement("canvas");
+          const context = canvas.getContext("2d");
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+
+          await page.render({
+            canvasContext: context,
+            viewport
+          }).promise;
+
+          const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+          const ocrText = await extractTextFromImage(blob);
+          fullText += "\n" + ocrText;
+        }
+      }
+
+      return fullText;
+    }
+
+    function showLoader(show) {
+      globalLoader.style.display = show ? "flex" : "none";
+    }
+
+    // ===============================
+    // EXPORT PDF
+    // ===============================
+    async function exportSectionPDF(sectionId, includeAnswers = false) {
+      const section = appData.sections.find(s => s.id === sectionId);
+      if (!section) return;
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF("p", "mm", "a4");
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 15;
+      let y = 20;
+
+      const title = appData.title || "Question Bank";
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(18);
+      doc.text(title, margin, y);
+      y += 10;
+
+      doc.setFontSize(14);
+      doc.text(section.name + (includeAnswers ? " (With Solutions)" : " (Without Solutions)"), margin, y);
+      y += 10;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(11);
+
+      const questions = section.questions.filter(q => !q.isDuplicate);
+
+      if (!questions.length) {
+        doc.text("No questions available.", margin, y);
+      }
+
+      for (let i = 0; i < questions.length; i++) {
+        const q = questions[i];
+
+        const qLines = doc.splitTextToSize(`${i + 1}. ${q.text}`, pageWidth - margin * 2);
+
+        if (y + qLines.length * 6 > pageHeight - 20) {
+          doc.addPage();
+          y = 20;
+        }
+
+        doc.setFont("helvetica", "bold");
+        doc.text(qLines, margin, y);
+        y += qLines.length * 6 + 3;
+
+        if (includeAnswers && q.answer && q.answer.trim()) {
+          const ansLines = doc.splitTextToSize(`Answer: ${q.answer}`, pageWidth - margin * 2 - 5);
+
+          if (y + ansLines.length * 6 > pageHeight - 20) {
+            doc.addPage();
+            y = 20;
+          }
+
+          doc.setFont("helvetica", "normal");
+          doc.text(ansLines, margin + 4, y);
+          y += ansLines.length * 6 + 6;
+        } else {
+          y += 4;
+        }
+      }
+
+      doc.save(`${sanitizeFileName(title)}_${sanitizeFileName(section.name)}_${includeAnswers ? "with_solution" : "without_solution"}.pdf`);
+    }
+
+    async function exportAllPDF(includeAnswers = false) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF("p", "mm", "a4");
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 15;
+      let y = 20;
+
+      const title = appData.title || "Question Bank";
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(18);
+      doc.text(title, margin, y);
+      y += 10;
+
+      doc.setFontSize(14);
+      doc.text(includeAnswers ? "All Sections (With Solutions)" : "All Sections (Without Solutions)", margin, y);
+      y += 12;
+
+      for (let s = 0; s < appData.sections.length; s++) {
+        const section = appData.sections[s];
+        const questions = section.questions.filter(q => !q.isDuplicate);
+
+        if (y > pageHeight - 30) {
+          doc.addPage();
+          y = 20;
+        }
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
+        doc.text(section.name, margin, y);
+        y += 8;
+
+        doc.setFontSize(11);
+
+        if (!questions.length) {
+          doc.setFont("helvetica", "normal");
+          doc.text("No questions available.", margin, y);
+          y += 10;
+          continue;
+        }
+
+        for (let i = 0; i < questions.length; i++) {
+          const q = questions[i];
+          const qLines = doc.splitTextToSize(`${i + 1}. ${q.text}`, pageWidth - margin * 2);
+
+          if (y + qLines.length * 6 > pageHeight - 20) {
+            doc.addPage();
+            y = 20;
+          }
+
+          doc.setFont("helvetica", "bold");
+          doc.text(qLines, margin, y);
+          y += qLines.length * 6 + 3;
+
+          if (includeAnswers && q.answer && q.answer.trim()) {
+            const ansLines = doc.splitTextToSize(`Answer: ${q.answer}`, pageWidth - margin * 2 - 5);
+
+            if (y + ansLines.length * 6 > pageHeight - 20) {
+              doc.addPage();
+              y = 20;
+            }
+
+            doc.setFont("helvetica", "normal");
+            doc.text(ansLines, margin + 4, y);
+            y += ansLines.length * 6 + 6;
+          } else {
+            y += 4;
+          }
+        }
+
+        y += 8;
+      }
+
+      doc.save(`${sanitizeFileName(title)}_${includeAnswers ? "all_with_solution" : "all_without_solution"}.pdf`);
+    }
+
+    // ===============================
+    // EXPORT DOCX
+    // ===============================
+    async function exportSectionDOCX(sectionId) {
+      const section = appData.sections.find(s => s.id === sectionId);
+      if (!section) return;
+
+      const { Document, Packer, Paragraph, TextRun, HeadingLevel } = window.docx;
+      const children = [];
+
+      children.push(
+        new Paragraph({
+          text: appData.title || "Question Bank",
+          heading: HeadingLevel.TITLE
+        }),
+        new Paragraph({
+          text: section.name,
+          heading: HeadingLevel.HEADING_1
+        })
+      );
+
+      const questions = section.questions.filter(q => !q.isDuplicate);
+
+      questions.forEach((q, idx) => {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: `${idx + 1}. ${q.text}`,
+                bold: true
+              })
+            ]
+          })
+        );
+
+        if (q.answer && q.answer.trim()) {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `Answer: ${q.answer}`
+                })
+              ]
+            })
+          );
+        }
+
+        children.push(new Paragraph({ text: "" }));
+      });
+
+      const doc = new Document({
+        sections: [{ properties: {}, children }]
+      });
+
+      const blob = await Packer.toBlob(doc);
+      downloadBlob(blob, `${sanitizeFileName(appData.title || "Question_Bank")}_${sanitizeFileName(section.name)}.docx`);
+    }
+
+    async function exportAllDOCX() {
+      const { Document, Packer, Paragraph, TextRun, HeadingLevel, PageBreak } = window.docx;
+      const children = [];
+
+      children.push(
+        new Paragraph({
+          text: appData.title || "Question Bank",
+          heading: HeadingLevel.TITLE
+        })
+      );
+
+      appData.sections.forEach((section, sIndex) => {
+        children.push(
+          new Paragraph({
+            text: section.name,
+            heading: HeadingLevel.HEADING_1
+          })
+        );
+
+        const questions = section.questions.filter(q => !q.isDuplicate);
+
+        questions.forEach((q, idx) => {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `${idx + 1}. ${q.text}`,
+                  bold: true
+                })
+              ]
+            })
+          );
+
+          if (q.answer && q.answer.trim()) {
+            children.push(
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: `Answer: ${q.answer}`
+                  })
+                ]
+              })
+            );
+          }
+
+          children.push(new Paragraph({ text: "" }));
+        });
+
+        if (sIndex < appData.sections.length - 1) {
+          children.push(new Paragraph({ children: [new PageBreak()] }));
+        }
+      });
+
+      const doc = new Document({
+        sections: [{ properties: {}, children }]
+      });
+
+      const blob = await Packer.toBlob(doc);
+      downloadBlob(blob, `${sanitizeFileName(appData.title || "Question_Bank")}_ALL.docx`);
+    }
+
+    // ===============================
+    // EXPORT ZIP
+    // ===============================
+    async function exportAllSectionsZip() {
+      const zip = new JSZip();
+      const { jsPDF } = window.jspdf;
+      const title = appData.title || "Question Bank";
+
+      for (const section of appData.sections) {
+        for (const includeAnswers of [false, true]) {
+          const doc = new jsPDF("p", "mm", "a4");
+          const pageWidth = doc.internal.pageSize.getWidth();
+          const pageHeight = doc.internal.pageSize.getHeight();
+          const margin = 15;
+          let y = 20;
+
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(18);
+          doc.text(title, margin, y);
+          y += 10;
+
+          doc.setFontSize(14);
+          doc.text(section.name + (includeAnswers ? " (With Solutions)" : " (Without Solutions)"), margin, y);
+          y += 10;
+
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(11);
+
+          const questions = section.questions.filter(q => !q.isDuplicate);
+
+          for (let i = 0; i < questions.length; i++) {
+            const q = questions[i];
+            const qLines = doc.splitTextToSize(`${i + 1}. ${q.text}`, pageWidth - margin * 2);
+
+            if (y + qLines.length * 6 > pageHeight - 20) {
+              doc.addPage();
+              y = 20;
+            }
+
+            doc.setFont("helvetica", "bold");
+            doc.text(qLines, margin, y);
+            y += qLines.length * 6 + 3;
+
+            if (includeAnswers && q.answer && q.answer.trim()) {
+              const ansLines = doc.splitTextToSize(`Answer: ${q.answer}`, pageWidth - margin * 2 - 5);
+
+              if (y + ansLines.length * 6 > pageHeight - 20) {
+                doc.addPage();
+                y = 20;
+              }
+
+              doc.setFont("helvetica", "normal");
+              doc.text(ansLines, margin + 4, y);
+              y += ansLines.length * 6 + 6;
+            } else {
+              y += 4;
+            }
+          }
+
+          const blob = doc.output("blob");
+          const fileName = `${sanitizeFileName(section.name)}_${includeAnswers ? "with_solution" : "without_solution"}.pdf`;
+          zip.file(fileName, blob);
+        }
+      }
+
+      const zipBlob = await zip.generateAsync({ type: "blob" });
+      downloadBlob(zipBlob, `${sanitizeFileName(title)}_All_Sections_PDFs.zip`);
+    }
+
+    // ===============================
+    // BACKUP / RESTORE
+    // ===============================
+    function backupJSON() {
+      const blob = new Blob([JSON.stringify(appData, null, 2)], { type: "application/json" });
+      downloadBlob(blob, `${sanitizeFileName(appData.title || "question_bank_backup")}.json`);
+    }
+
+    function restoreJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (!parsed.sections) throw new Error("Invalid backup file");
+          appData = parsed;
+          bankTitleInput.value = appData.title || "";
+          runDuplicateCheck();
+          saveToLocalStorage();
+          renderSections(globalSearch.value);
+          updateDashboard();
+          alert("Backup restored successfully.");
+        } catch (err) {
+          console.error(err);
+          alert("Invalid backup file.");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // ===============================
+    // HELPERS
+    // ===============================
+    function downloadBlob(blob, fileName) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function sanitizeFileName(name) {
+      return (name || "file")
+        .replace(/[\\/:*?"<>|]+/g, "_")
+        .replace(/\s+/g, "_")
+        .trim();
+    }
+
+    // Make functions global for inline onclick
+    window.toggleManualAdd = toggleManualAdd;
+    window.addManualQuestion = addManualQuestion;
+    window.editQuestionText = editQuestionText;
+    window.updateAnswer = updateAnswer;
+    window.deleteQuestion = deleteQuestion;
+    window.copyQuestion = copyQuestion;
+    window.duplicateQuestionToAnotherSection = duplicateQuestionToAnotherSection;
+    window.toggleAnswer = toggleAnswer;
+    window.sortSectionQuestions = sortSectionQuestions;
+    window.removeSectionDuplicates = removeSectionDuplicates;
+    window.exportSectionPDF = exportSectionPDF;
+    window.exportSectionDOCX = exportSectionDOCX;
+    window.processSectionFiles = processSectionFiles;
+  </script>
+</body>
+</html>
