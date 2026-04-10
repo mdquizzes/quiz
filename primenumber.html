@@ -2,57 +2,32 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Prime Number Activity</title>
+<title>Prime Activity Advanced</title>
 
 <style>
-body {
-    font-family: Arial;
-    display: flex;
-    margin: 0;
-}
-.container {
-    width: 70%;
-    padding: 20px;
-}
-.sidebar {
-    width: 30%;
-    background: #f4f4f4;
-    padding: 20px;
-    border-left: 2px solid #ccc;
-}
+body { font-family: Arial; display: flex; margin: 0; }
+.container { width: 70%; padding: 20px; }
+.sidebar { width: 30%; background: #f4f4f4; padding: 20px; }
+
 .number-btn {
-    width: 60px;
-    height: 60px;
-    margin: 5px;
-    font-size: 18px;
+    width: 60px; height: 60px; margin: 5px; font-size: 18px;
 }
-.selected {
-    background: lightgreen;
-}
-#timer {
-    font-size: 24px;
-    color: red;
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-td, th {
-    border: 1px solid #ccc;
-    padding: 5px;
-    text-align: center;
-}
-button {
-    padding: 8px 12px;
-    margin: 5px;
-    cursor: pointer;
-}
+.selected { background: lightgreen; }
+
+#timer { font-size: 24px; color: red; }
+
+table { width: 100%; border-collapse: collapse; }
+td, th { border: 1px solid #ccc; padding: 5px; text-align: center; }
+
 .top1 { background: gold; }
 .top2 { background: silver; }
 .top3 { background: #cd7f32; color: white; }
-</style>
 
+input { padding: 5px; margin: 5px; }
+button { padding: 8px; cursor: pointer; }
+</style>
 </head>
+
 <body>
 
 <div class="container">
@@ -60,12 +35,16 @@ button {
 <h2>Prime Number Activity</h2>
 
 <div id="startScreen">
-    <input type="text" id="studentName" placeholder="Enter your name">
+    <input type="text" id="studentName" placeholder="Student Name">
+    <br>
+    <label>Set Time (mm:ss):</label>
+    <input type="text" id="setTime" placeholder="02:00">
+    <br>
     <button onclick="startGame()">Start</button>
 </div>
 
 <div id="gameScreen" style="display:none;">
-    <p>Time Left: <span id="timer">02:00</span></p>
+    <p>Time Left: <span id="timer">00:00</span></p>
     <div id="numbers"></div>
     <br>
     <button onclick="finishGame()">Finish</button>
@@ -79,9 +58,9 @@ button {
 </div>
 
 <div class="sidebar">
-<h3>🏆 Score Board</h3>
 
-<button onclick="clearData()">🗑 Clear All Data</button>
+<h3>🏆 Score Board</h3>
+<button onclick="clearData()">🗑 Clear Data</button>
 
 <table>
 <thead>
@@ -89,10 +68,10 @@ button {
 <th>Rank</th>
 <th>Name</th>
 <th>Score</th>
+<th>Time</th>
 </tr>
 </thead>
-<tbody id="scoreTable">
-</tbody>
+<tbody id="scoreTable"></tbody>
 </table>
 
 </div>
@@ -102,28 +81,27 @@ button {
 let numbers = [];
 let selected = new Set();
 let timer;
+let totalTime = 120;
 let timeLeft;
+let startTime;
 
-// Load scores from browser
 let scores = JSON.parse(localStorage.getItem("primeScores")) || [];
 
 // Prime check
-function isPrime(num) {
-    if (num < 2) return false;
-    for (let i = 2; i <= Math.sqrt(num); i++) {
-        if (num % i === 0) return false;
+function isPrime(n) {
+    if (n < 2) return false;
+    for (let i = 2; i <= Math.sqrt(n); i++) {
+        if (n % i === 0) return false;
     }
     return true;
 }
 
 // Generate numbers (50% primes)
 function generateNumbers() {
-    let primes = [];
-    let nonPrimes = [];
-
+    let primes = [], non = [];
     for (let i = 1; i <= 100; i++) {
         if (isPrime(i)) primes.push(i);
-        else nonPrimes.push(i);
+        else non.push(i);
     }
 
     numbers = [];
@@ -134,7 +112,7 @@ function generateNumbers() {
     }
 
     while (numbers.length < 20) {
-        let n = nonPrimes[Math.floor(Math.random() * nonPrimes.length)];
+        let n = non[Math.floor(Math.random() * non.length)];
         if (!numbers.includes(n)) numbers.push(n);
     }
 
@@ -143,8 +121,8 @@ function generateNumbers() {
 
 // Display numbers
 function displayNumbers() {
-    let container = document.getElementById("numbers");
-    container.innerHTML = "";
+    let box = document.getElementById("numbers");
+    box.innerHTML = "";
 
     numbers.forEach(num => {
         let btn = document.createElement("button");
@@ -161,24 +139,30 @@ function displayNumbers() {
             }
         };
 
-        container.appendChild(btn);
+        box.appendChild(btn);
     });
 }
 
 // Start game
 function startGame() {
     let name = document.getElementById("studentName").value.trim();
-    if (!name) {
-        alert("Enter name");
+    let timeInput = document.getElementById("setTime").value.trim();
+
+    if (!name || !timeInput) {
+        alert("Enter name and time");
         return;
     }
 
+    let parts = timeInput.split(":");
+    totalTime = parseInt(parts[0]) * 60 + parseInt(parts[1]);
+
+    timeLeft = totalTime;
+    startTime = Date.now();
+
     selected.clear();
-    timeLeft = 120;
 
     document.getElementById("startScreen").style.display = "none";
     document.getElementById("gameScreen").style.display = "block";
-    document.getElementById("resultScreen").style.display = "none";
 
     generateNumbers();
     displayNumbers();
@@ -207,13 +191,19 @@ function finishGame() {
     clearInterval(timer);
 
     let name = document.getElementById("studentName").value;
-    let score = 0;
 
-    selected.forEach(num => {
-        if (isPrime(num)) score++;
+    let score = 0;
+    selected.forEach(n => {
+        if (isPrime(n)) score++;
     });
 
-    scores.push({ name, score });
+    let timeTaken = totalTime - timeLeft;
+
+    let formattedTime =
+        String(Math.floor(timeTaken / 60)).padStart(2, '0') + ":" +
+        String(timeTaken % 60).padStart(2, '0');
+
+    scores.push({ name, score, time: timeTaken, displayTime: formattedTime });
 
     saveScores();
     updateScoreboard();
@@ -221,45 +211,49 @@ function finishGame() {
     document.getElementById("gameScreen").style.display = "none";
     document.getElementById("resultScreen").style.display = "block";
     document.getElementById("resultText").innerText =
-        `${name}, you found ${score} prime numbers!`;
+        `${name}, Score: ${score}, Time: ${formattedTime}`;
 }
 
-// Save to browser
+// Save
 function saveScores() {
     localStorage.setItem("primeScores", JSON.stringify(scores));
 }
 
-// Update scoreboard with ranking
+// Ranking logic
 function updateScoreboard() {
     let table = document.getElementById("scoreTable");
 
-    // Sort by score DESC
-    scores.sort((a, b) => b.score - a.score);
+    // Sort:
+    // 1. Score DESC
+    // 2. Time ASC
+    scores.sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        return a.time - b.time;
+    });
 
     table.innerHTML = "";
 
-    scores.forEach((s, index) => {
-        let rank = index + 1;
+    scores.forEach((s, i) => {
+        let rank = i + 1;
 
-        let className = "";
-        if (rank === 1) className = "top1";
-        else if (rank === 2) className = "top2";
-        else if (rank === 3) className = "top3";
+        let cls = "";
+        if (rank === 1) cls = "top1";
+        else if (rank === 2) cls = "top2";
+        else if (rank === 3) cls = "top3";
 
-        let row = `
-            <tr class="${className}">
-                <td>${rank}</td>
-                <td>${s.name}</td>
-                <td>${s.score}</td>
-            </tr>
-        `;
-        table.innerHTML += row;
+        table.innerHTML += `
+        <tr class="${cls}">
+            <td>${rank}</td>
+            <td>${s.name}</td>
+            <td>${s.score}</td>
+            <td>${s.displayTime}</td>
+        </tr>`;
     });
 }
 
-// Clear all stored data
+// Clear
 function clearData() {
-    if (confirm("Are you sure you want to delete all scores?")) {
+    if (confirm("Clear all data?")) {
         localStorage.removeItem("primeScores");
         scores = [];
         updateScoreboard();
@@ -273,7 +267,7 @@ function restart() {
     document.getElementById("resultScreen").style.display = "none";
 }
 
-// Load scoreboard on page load
+// Load
 updateScoreboard();
 
 </script>
