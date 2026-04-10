@@ -3,79 +3,98 @@
 <head>
 <meta charset="UTF-8">
 <title>Prime Number Activity</title>
+
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        display: flex;
-        margin: 0;
-    }
-    .container {
-        width: 70%;
-        padding: 20px;
-    }
-    .sidebar {
-        width: 30%;
-        background: #f4f4f4;
-        padding: 20px;
-        border-left: 2px solid #ccc;
-    }
-    button {
-        padding: 10px 15px;
-        margin: 5px;
-        font-size: 16px;
-        cursor: pointer;
-    }
-    .number-btn {
-        width: 60px;
-        height: 60px;
-        margin: 5px;
-        font-size: 18px;
-    }
-    .selected {
-        background-color: lightgreen;
-    }
-    #timer {
-        font-size: 24px;
-        font-weight: bold;
-        color: red;
-    }
+body {
+    font-family: Arial;
+    display: flex;
+    margin: 0;
+}
+.container {
+    width: 70%;
+    padding: 20px;
+}
+.sidebar {
+    width: 30%;
+    background: #f4f4f4;
+    padding: 20px;
+    border-left: 2px solid #ccc;
+}
+.number-btn {
+    width: 60px;
+    height: 60px;
+    margin: 5px;
+    font-size: 18px;
+}
+.selected {
+    background: lightgreen;
+}
+#timer {
+    font-size: 24px;
+    color: red;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+td, th {
+    border: 1px solid #ccc;
+    padding: 5px;
+    text-align: center;
+}
 </style>
+
 </head>
 <body>
 
 <div class="container">
-    <h2>Prime Number Activity</h2>
 
-    <div id="startScreen">
-        <input type="text" id="studentName" placeholder="Enter your name">
-        <button onclick="startGame()">Start</button>
-    </div>
+<h2>Prime Number Activity</h2>
 
-    <div id="gameScreen" style="display:none;">
-        <p>Time Left: <span id="timer">02:00</span></p>
-        <div id="numbers"></div>
-        <br>
-        <button onclick="finishGame()">Finish</button>
-    </div>
+<div id="startScreen">
+    <input type="text" id="studentName" placeholder="Enter your name">
+    <button onclick="startGame()">Start</button>
+</div>
 
-    <div id="resultScreen" style="display:none;">
-        <h3>Result</h3>
-        <p id="resultText"></p>
-    </div>
+<div id="gameScreen" style="display:none;">
+    <p>Time Left: <span id="timer">02:00</span></p>
+    <div id="numbers"></div>
+    <br>
+    <button onclick="finishGame()">Finish</button>
+</div>
+
+<div id="resultScreen" style="display:none;">
+    <h3 id="resultText"></h3>
+    <button onclick="restart()">Next Student</button>
+</div>
+
 </div>
 
 <div class="sidebar">
-    <h3>Score Board</h3>
-    <p><strong>Name:</strong> <span id="displayName">-</span></p>
-    <p><strong>Score:</strong> <span id="displayScore">0</span></p>
+<h3>Score Board</h3>
+
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Score</th>
+</tr>
+</thead>
+<tbody id="scoreTable">
+</tbody>
+</table>
+
 </div>
 
 <script>
+
 let numbers = [];
 let selected = new Set();
 let timer;
-let timeLeft = 120; // 2 minutes
+let timeLeft;
+let scores = [];
 
+// Prime check
 function isPrime(num) {
     if (num < 2) return false;
     for (let i = 2; i <= Math.sqrt(num); i++) {
@@ -84,14 +103,43 @@ function isPrime(num) {
     return true;
 }
 
-function generateNumbers() {
-    numbers = [];
-    while (numbers.length < 20) {
-        let n = Math.floor(Math.random() * 100) + 1;
-        if (!numbers.includes(n)) numbers.push(n);
+// Get all primes 1–100
+function getPrimes() {
+    let primes = [];
+    for (let i = 1; i <= 100; i++) {
+        if (isPrime(i)) primes.push(i);
     }
+    return primes;
 }
 
+// Generate numbers (>=50% primes)
+function generateNumbers() {
+    let primes = getPrimes();
+    let nonPrimes = [];
+
+    for (let i = 1; i <= 100; i++) {
+        if (!isPrime(i)) nonPrimes.push(i);
+    }
+
+    numbers = [];
+
+    // Add 10 primes
+    while (numbers.length < 10) {
+        let p = primes[Math.floor(Math.random() * primes.length)];
+        if (!numbers.includes(p)) numbers.push(p);
+    }
+
+    // Add 10 non-primes
+    while (numbers.length < 20) {
+        let n = nonPrimes[Math.floor(Math.random() * nonPrimes.length)];
+        if (!numbers.includes(n)) numbers.push(n);
+    }
+
+    // Shuffle
+    numbers.sort(() => Math.random() - 0.5);
+}
+
+// Display numbers
 function displayNumbers() {
     let container = document.getElementById("numbers");
     container.innerHTML = "";
@@ -115,29 +163,35 @@ function displayNumbers() {
     });
 }
 
+// Start game
 function startGame() {
-    let name = document.getElementById("studentName").value;
+    let name = document.getElementById("studentName").value.trim();
     if (!name) {
-        alert("Please enter your name");
+        alert("Enter name");
         return;
     }
 
-    document.getElementById("displayName").innerText = name;
+    selected.clear();
+    timeLeft = 120;
 
     document.getElementById("startScreen").style.display = "none";
     document.getElementById("gameScreen").style.display = "block";
+    document.getElementById("resultScreen").style.display = "none";
 
     generateNumbers();
     displayNumbers();
     startTimer();
 }
 
+// Timer
 function startTimer() {
     timer = setInterval(() => {
         timeLeft--;
-        let minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
-        let seconds = String(timeLeft % 60).padStart(2, '0');
-        document.getElementById("timer").innerText = `${minutes}:${seconds}`;
+
+        let m = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+        let s = String(timeLeft % 60).padStart(2, '0');
+
+        document.getElementById("timer").innerText = `${m}:${s}`;
 
         if (timeLeft <= 0) {
             clearInterval(timer);
@@ -146,22 +200,46 @@ function startTimer() {
     }, 1000);
 }
 
+// Finish game
 function finishGame() {
     clearInterval(timer);
 
+    let name = document.getElementById("studentName").value;
     let score = 0;
+
     selected.forEach(num => {
         if (isPrime(num)) score++;
     });
 
-    document.getElementById("displayScore").innerText = score;
+    // Save score
+    scores.push({ name, score });
+
+    updateScoreboard();
 
     document.getElementById("gameScreen").style.display = "none";
     document.getElementById("resultScreen").style.display = "block";
-
     document.getElementById("resultText").innerText =
-        `You found ${score} prime numbers!`;
+        `${name}, you found ${score} prime numbers!`;
 }
+
+// Update scoreboard
+function updateScoreboard() {
+    let table = document.getElementById("scoreTable");
+    table.innerHTML = "";
+
+    scores.forEach(s => {
+        let row = `<tr><td>${s.name}</td><td>${s.score}</td></tr>`;
+        table.innerHTML += row;
+    });
+}
+
+// Restart for next student
+function restart() {
+    document.getElementById("studentName").value = "";
+    document.getElementById("startScreen").style.display = "block";
+    document.getElementById("resultScreen").style.display = "none";
+}
+
 </script>
 
 </body>
