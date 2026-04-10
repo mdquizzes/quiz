@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Prime Number Activity</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        margin: 0;
+    }
+    .container {
+        width: 70%;
+        padding: 20px;
+    }
+    .sidebar {
+        width: 30%;
+        background: #f4f4f4;
+        padding: 20px;
+        border-left: 2px solid #ccc;
+    }
+    button {
+        padding: 10px 15px;
+        margin: 5px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    .number-btn {
+        width: 60px;
+        height: 60px;
+        margin: 5px;
+        font-size: 18px;
+    }
+    .selected {
+        background-color: lightgreen;
+    }
+    #timer {
+        font-size: 24px;
+        font-weight: bold;
+        color: red;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Prime Number Activity</h2>
+
+    <div id="startScreen">
+        <input type="text" id="studentName" placeholder="Enter your name">
+        <button onclick="startGame()">Start</button>
+    </div>
+
+    <div id="gameScreen" style="display:none;">
+        <p>Time Left: <span id="timer">02:00</span></p>
+        <div id="numbers"></div>
+        <br>
+        <button onclick="finishGame()">Finish</button>
+    </div>
+
+    <div id="resultScreen" style="display:none;">
+        <h3>Result</h3>
+        <p id="resultText"></p>
+    </div>
+</div>
+
+<div class="sidebar">
+    <h3>Score Board</h3>
+    <p><strong>Name:</strong> <span id="displayName">-</span></p>
+    <p><strong>Score:</strong> <span id="displayScore">0</span></p>
+</div>
+
+<script>
+let numbers = [];
+let selected = new Set();
+let timer;
+let timeLeft = 120; // 2 minutes
+
+function isPrime(num) {
+    if (num < 2) return false;
+    for (let i = 2; i <= Math.sqrt(num); i++) {
+        if (num % i === 0) return false;
+    }
+    return true;
+}
+
+function generateNumbers() {
+    numbers = [];
+    while (numbers.length < 20) {
+        let n = Math.floor(Math.random() * 100) + 1;
+        if (!numbers.includes(n)) numbers.push(n);
+    }
+}
+
+function displayNumbers() {
+    let container = document.getElementById("numbers");
+    container.innerHTML = "";
+
+    numbers.forEach(num => {
+        let btn = document.createElement("button");
+        btn.innerText = num;
+        btn.className = "number-btn";
+
+        btn.onclick = () => {
+            if (selected.has(num)) {
+                selected.delete(num);
+                btn.classList.remove("selected");
+            } else {
+                selected.add(num);
+                btn.classList.add("selected");
+            }
+        };
+
+        container.appendChild(btn);
+    });
+}
+
+function startGame() {
+    let name = document.getElementById("studentName").value;
+    if (!name) {
+        alert("Please enter your name");
+        return;
+    }
+
+    document.getElementById("displayName").innerText = name;
+
+    document.getElementById("startScreen").style.display = "none";
+    document.getElementById("gameScreen").style.display = "block";
+
+    generateNumbers();
+    displayNumbers();
+    startTimer();
+}
+
+function startTimer() {
+    timer = setInterval(() => {
+        timeLeft--;
+        let minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+        let seconds = String(timeLeft % 60).padStart(2, '0');
+        document.getElementById("timer").innerText = `${minutes}:${seconds}`;
+
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            finishGame();
+        }
+    }, 1000);
+}
+
+function finishGame() {
+    clearInterval(timer);
+
+    let score = 0;
+    selected.forEach(num => {
+        if (isPrime(num)) score++;
+    });
+
+    document.getElementById("displayScore").innerText = score;
+
+    document.getElementById("gameScreen").style.display = "none";
+    document.getElementById("resultScreen").style.display = "block";
+
+    document.getElementById("resultText").innerText =
+        `You found ${score} prime numbers!`;
+}
+</script>
+
+</body>
+</html>
