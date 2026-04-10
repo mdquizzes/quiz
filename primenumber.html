@@ -42,6 +42,14 @@ td, th {
     padding: 5px;
     text-align: center;
 }
+button {
+    padding: 8px 12px;
+    margin: 5px;
+    cursor: pointer;
+}
+.top1 { background: gold; }
+.top2 { background: silver; }
+.top3 { background: #cd7f32; color: white; }
 </style>
 
 </head>
@@ -71,11 +79,14 @@ td, th {
 </div>
 
 <div class="sidebar">
-<h3>Score Board</h3>
+<h3>🏆 Score Board</h3>
+
+<button onclick="clearData()">🗑 Clear All Data</button>
 
 <table>
 <thead>
 <tr>
+<th>Rank</th>
 <th>Name</th>
 <th>Score</th>
 </tr>
@@ -92,7 +103,9 @@ let numbers = [];
 let selected = new Set();
 let timer;
 let timeLeft;
-let scores = [];
+
+// Load scores from browser
+let scores = JSON.parse(localStorage.getItem("primeScores")) || [];
 
 // Prime check
 function isPrime(num) {
@@ -103,39 +116,28 @@ function isPrime(num) {
     return true;
 }
 
-// Get all primes 1–100
-function getPrimes() {
-    let primes = [];
-    for (let i = 1; i <= 100; i++) {
-        if (isPrime(i)) primes.push(i);
-    }
-    return primes;
-}
-
-// Generate numbers (>=50% primes)
+// Generate numbers (50% primes)
 function generateNumbers() {
-    let primes = getPrimes();
+    let primes = [];
     let nonPrimes = [];
 
     for (let i = 1; i <= 100; i++) {
-        if (!isPrime(i)) nonPrimes.push(i);
+        if (isPrime(i)) primes.push(i);
+        else nonPrimes.push(i);
     }
 
     numbers = [];
 
-    // Add 10 primes
     while (numbers.length < 10) {
         let p = primes[Math.floor(Math.random() * primes.length)];
         if (!numbers.includes(p)) numbers.push(p);
     }
 
-    // Add 10 non-primes
     while (numbers.length < 20) {
         let n = nonPrimes[Math.floor(Math.random() * nonPrimes.length)];
         if (!numbers.includes(n)) numbers.push(n);
     }
 
-    // Shuffle
     numbers.sort(() => Math.random() - 0.5);
 }
 
@@ -211,9 +213,9 @@ function finishGame() {
         if (isPrime(num)) score++;
     });
 
-    // Save score
     scores.push({ name, score });
 
+    saveScores();
     updateScoreboard();
 
     document.getElementById("gameScreen").style.display = "none";
@@ -222,23 +224,57 @@ function finishGame() {
         `${name}, you found ${score} prime numbers!`;
 }
 
-// Update scoreboard
+// Save to browser
+function saveScores() {
+    localStorage.setItem("primeScores", JSON.stringify(scores));
+}
+
+// Update scoreboard with ranking
 function updateScoreboard() {
     let table = document.getElementById("scoreTable");
+
+    // Sort by score DESC
+    scores.sort((a, b) => b.score - a.score);
+
     table.innerHTML = "";
 
-    scores.forEach(s => {
-        let row = `<tr><td>${s.name}</td><td>${s.score}</td></tr>`;
+    scores.forEach((s, index) => {
+        let rank = index + 1;
+
+        let className = "";
+        if (rank === 1) className = "top1";
+        else if (rank === 2) className = "top2";
+        else if (rank === 3) className = "top3";
+
+        let row = `
+            <tr class="${className}">
+                <td>${rank}</td>
+                <td>${s.name}</td>
+                <td>${s.score}</td>
+            </tr>
+        `;
         table.innerHTML += row;
     });
 }
 
-// Restart for next student
+// Clear all stored data
+function clearData() {
+    if (confirm("Are you sure you want to delete all scores?")) {
+        localStorage.removeItem("primeScores");
+        scores = [];
+        updateScoreboard();
+    }
+}
+
+// Restart
 function restart() {
     document.getElementById("studentName").value = "";
     document.getElementById("startScreen").style.display = "block";
     document.getElementById("resultScreen").style.display = "none";
 }
+
+// Load scoreboard on page load
+updateScoreboard();
 
 </script>
 
