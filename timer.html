@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Countdown Timer</title>
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #111;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        text-align: center;
+    }
+
+    #setup {
+        display: block;
+    }
+
+    input {
+        padding: 12px;
+        font-size: 20px;
+        width: 200px;
+        text-align: center;
+        border-radius: 8px;
+        border: none;
+        outline: none;
+    }
+
+    #timer {
+        display: none;
+        font-size: 100px;
+        font-weight: bold;
+    }
+
+    @media(max-width:600px){
+        #timer {
+            font-size: 60px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div id="setup">
+    <h2>Enter Time (HH:MM:SS)</h2>
+    <input type="text" id="timeInput" placeholder="00:05:00" />
+    <p>Press Enter to Start</p>
+</div>
+
+<div id="timer">00:00</div>
+
+<script>
+let interval;
+
+document.getElementById("timeInput").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+        startTimer(this.value);
+    }
+});
+
+function startTimer(timeStr) {
+    let parts = timeStr.split(":").map(Number);
+
+    if (parts.length !== 3) {
+        alert("Please enter time in HH:MM:SS format");
+        return;
+    }
+
+    let totalSeconds = parts[0]*3600 + parts[1]*60 + parts[2];
+
+    if (totalSeconds <= 0) return;
+
+    document.getElementById("setup").style.display = "none";
+    document.getElementById("timer").style.display = "block";
+
+    updateDisplay(totalSeconds);
+
+    interval = setInterval(() => {
+        totalSeconds--;
+
+        if (totalSeconds <= 0) {
+            clearInterval(interval);
+            document.getElementById("timer").innerText = "00";
+            return;
+        }
+
+        updateDisplay(totalSeconds);
+
+    }, 1000);
+}
+
+function updateDisplay(seconds) {
+    let h = Math.floor(seconds / 3600);
+    let m = Math.floor((seconds % 3600) / 60);
+    let s = seconds % 60;
+
+    let display = "";
+
+    if (h > 0) {
+        display = 
+            String(h).padStart(2, '0') + ":" +
+            String(m).padStart(2, '0') + ":" +
+            String(s).padStart(2, '0');
+    } else if (m > 0) {
+        display = 
+            String(m).padStart(2, '0') + ":" +
+            String(s).padStart(2, '0');
+    } else {
+        display = String(s).padStart(2, '0');
+    }
+
+    document.getElementById("timer").innerText = display;
+}
+</script>
+
+</body>
+</html>
