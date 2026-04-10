@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Big Countdown Timer</title>
+<title>Pro Countdown Timer</title>
 
 <style>
     body {
         margin: 0;
         background: black;
-        color: #00ffcc;
-        font-family: 'Arial', sans-serif;
+        color: #ffff00; /* bright yellow */
+        font-family: Arial, sans-serif;
         height: 100vh;
         display: flex;
         justify-content: center;
@@ -19,6 +19,7 @@
 
     #setup {
         text-align: center;
+        color: white;
     }
 
     input {
@@ -28,29 +29,32 @@
         text-align: center;
         border-radius: 10px;
         border: none;
-        outline: none;
     }
 
     #timer {
         display: none;
-        font-size: 18vw; /* 🔥 auto fullscreen scaling */
+        font-size: 18vw;
         font-weight: bold;
+        letter-spacing: 8px;
         text-align: center;
-        letter-spacing: 5px;
 
-        /* Glow Effect */
+        /* Strong glow for distance visibility */
         text-shadow: 
-            0 0 10px #00ffcc,
-            0 0 20px #00ffcc,
-            0 0 40px #00ffcc,
-            0 0 80px #00ffcc;
+            0 0 10px #fff,
+            0 0 20px #ff0,
+            0 0 40px #ff0,
+            0 0 80px #ff0,
+            0 0 120px #ff0;
     }
 
-    #label {
-        position: absolute;
-        top: 20px;
-        font-size: 18px;
-        color: #aaa;
+    .blink {
+        animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+        0% { opacity: 1; }
+        50% { opacity: 0.2; }
+        100% { opacity: 1; }
     }
 </style>
 </head>
@@ -63,11 +67,15 @@
     <p>Press Enter</p>
 </div>
 
-<div id="label">Countdown</div>
 <div id="timer">00:00</div>
 
 <script>
 let interval;
+
+// Ask notification permission
+if ("Notification" in window) {
+    Notification.requestPermission();
+}
 
 document.getElementById("timeInput").addEventListener("keydown", function(e) {
     if (e.key === "Enter") {
@@ -97,10 +105,7 @@ function startTimer(timeStr) {
 
         if (totalSeconds <= 0) {
             clearInterval(interval);
-            document.getElementById("timer").innerText = "00";
-
-            // Flash effect on finish
-            document.body.style.background = "red";
+            timeUp();
             return;
         }
 
@@ -130,6 +135,22 @@ function updateDisplay(seconds) {
     }
 
     document.getElementById("timer").innerText = display;
+}
+
+function timeUp() {
+    document.body.style.background = "red";
+    let timer = document.getElementById("timer");
+    timer.innerText = "TIME UP!";
+    timer.classList.add("blink");
+
+    // 🔔 Browser Notification
+    if (Notification.permission === "granted") {
+        new Notification("⏰ Time is up!");
+    }
+
+    // 🔊 Beep sound
+    let audio = new Audio("https://www.soundjay.com/buttons/beep-07.wav");
+    audio.play();
 }
 </script>
 
