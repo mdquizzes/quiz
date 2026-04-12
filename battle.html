@@ -3,252 +3,150 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FINAL CINEMATIC WAR GAME - FIXED</title>
+<title>ADVANCED REALISTIC WAR GAME</title>
 <style>
 body{margin:0;background:#000;color:#fff;font-family:sans-serif;text-align:center;overflow:auto}
 
-/* Background */
-body::before{
-content:"";
-position:fixed;
-width:100%;height:100%;
-background:url('https://images.unsplash.com/photo-1608889175119-1f5c0c91f2c2') center/cover no-repeat;
-opacity:0.25;
-z-index:-1;
-}
+.container{display:flex;justify-content:space-around}
+.team{width:40%;position:relative}
 
-h1{margin:10px}
-
-.container{display:flex;justify-content:space-around;align-items:flex-start}
-.team{width:40%;position:relative;transition:.3s}
-
-/* TURN GLOW */
-.active{
-box-shadow:0 0 20px #00ffcc;
-border-radius:10px;
-}
-
-/* Tank */
 .tank{
 width:100px;
-transition:transform .5s ease;
-filter:drop-shadow(0 0 10px orange);
+position:relative;
+transition:transform .4s ease;
 }
-.rotate{transform:rotate(var(--angle));}
 
-.grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
-.cell{background:#1a2d3a;padding:8px;border-radius:6px;cursor:pointer;position:relative;overflow:hidden}
-.cell:hover{transform:scale(1.1)}
+.grid{display:grid;grid-template-columns:repeat(10,1fr);gap:5px}
+.cell{background:#1a2d3a;padding:8px;border-radius:6px;cursor:pointer;position:relative}
 
 /* Missile */
 .missile{
-position:absolute;width:10px;height:10px;background:yellow;border-radius:50%;
-box-shadow:0 0 12px orange;
-animation:fly .9s linear forwards;
-}
-
-.missile::after{
-content:'';position:absolute;width:18px;height:3px;background:orange;left:-12px;top:3px;filter:blur(2px);
-}
-
-@keyframes fly{
-0%{transform:translate(var(--sx),var(--sy));}
-100%{transform:translate(var(--tx),var(--ty));}
+position:absolute;
+width:10px;height:10px;
+background:yellow;
+border-radius:50%;
+box-shadow:0 0 10px orange;
+pointer-events:none;
 }
 
 /* Explosion */
 .explosion{
-position:absolute;width:20px;height:20px;background:orange;border-radius:50%;
-animation:explode .6s ease-out forwards;
+position:absolute;
+width:20px;height:20px;
+background:orange;
+border-radius:50%;
+animation:explode .5s forwards;
 }
 
-.explosion::before{
-content:'';position:absolute;width:10px;height:10px;background:red;border-radius:50%;
-animation:scatter .6s forwards;
-}
-
-@keyframes explode{to{transform:scale(5);opacity:0}}
-@keyframes scatter{to{transform:translate(30px,-30px);opacity:0}}
-
-/* Smoke */
-.smoke{
-background:url('https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif') center/cover;
+@keyframes explode{
+to{transform:scale(5);opacity:0}
 }
 
 .hit{background:#00ffcc;color:#000}
-
-/* SIDE PANEL */
-.panel{display:flex;justify-content:space-around;margin:10px}
-.box{background:#111;padding:10px;border-radius:10px;width:40%}
-
-input{width:60px;text-align:center;padding:5px;border:none;border-radius:5px}
-
-/* DOT STYLE */
-.dot{
-display:inline-block;
-width:14px;height:14px;
-background:#00ffcc;
-border-radius:50%;
-margin:3px;
-}
-
-.revealed{
-background:yellow;
-color:#000;
-font-size:10px;
-display:flex;
-align-items:center;
-justify-content:center;
-}
-
-/* WIN */
-.win{
-position:fixed;top:0;left:0;width:100%;height:100%;
-background:rgba(0,0,0,.9);
-display:flex;justify-content:center;align-items:center;
-font-size:40px;color:#00ffcc;z-index:20;
-}
 
 </style>
 </head>
 <body>
 
-<h1>🔥 FINAL WAR GAME 🔥</h1>
+<h2>🚀 REALISTIC WAR GAME</h2>
 <button onclick="startGame()">Start</button>
 
-<div class="panel">
-<div class="box">
-<h3>Group A Secret</h3>
-<input type="text" inputmode="numeric" maxlength="2" autocomplete="off" style="-webkit-text-security:disc" onkeydown="addNum(event,'A')">
-<div id="listA"></div>
-</div>
-<div class="box">
-<h3>Group B Secret</h3>
-<input type="text" inputmode="numeric" maxlength="2" autocomplete="off" style="-webkit-text-security:disc" onkeydown="addNum(event,'B')">
-<div id="listB"></div>
-</div>
-</div>
-
 <div class="container">
-<div class="team active" id="teamABox">
-<img src="https://mdquizzes.github.io/mdquizzes/images/tank.png" class="tank" id="tankA">
+<div class="team">
+<img src="https://cdn.pixabay.com/photo/2017/01/31/13/14/tank-2027322_1280.png" id="tankA" class="tank">
 <div id="teamA" class="grid"></div>
 </div>
 
-<div class="team" id="teamBBox">
-<img src="https://mdquizzes.github.io/mdquizzes/images/tank.png" class="tank" id="tankB">
+<div class="team">
+<img src="https://cdn.pixabay.com/photo/2017/01/31/13/14/tank-2027322_1280.png" id="tankB" class="tank">
 <div id="teamB" class="grid"></div>
 </div>
 </div>
 
 <script>
-let A=new Set(),B=new Set();
 let turn='A',start=false;
-
-function format(n){return n.toString().padStart(2,'0');}
-
-function addNum(e,t){
-if(e.key==='Enter'){
-let v=parseInt(e.target.value);
-if(v>=1&&v<=100){
-(t==='A'?A:B).add(v);
-addDot(t==='A'?'listA':'listB');
-}
-e.target.value='';
-}}
-
-function addDot(id){
-let d=document.createElement('div');
-d.className='dot';
-d.innerText='';
-document.getElementById(id).appendChild(d);
-}
+let A=new Set([5,10,15,20]);
+let B=new Set([3,8,12,25]);
 
 function createGrid(id,t){
 let g=document.getElementById(id);
 for(let i=1;i<=100;i++){
 let c=document.createElement('div');
-c.className='cell';c.innerText=format(i);
+c.className='cell';c.innerText=i;
 c.onclick=()=>attack(i,c,t);
 g.appendChild(c);
 }}
 
 function attack(num,cell,target){
-if(!start||cell.classList.contains('smoke'))return;
+if(!start)return;
 
 if((turn==='A'&&target==='teamB')||(turn==='B'&&target==='teamA')){
-rotateTank(target,cell);
-launchMissile(cell,()=>{
-cell.innerText='';
-cell.classList.add('smoke');
 
-let hit=false;
-if(target==='teamA'&&A.has(num)){hit=true;A.delete(num);reveal('listA',num)}
-if(target==='teamB'&&B.has(num)){hit=true;B.delete(num);reveal('listB',num)}
+let attackerTank = document.getElementById(turn==='A'?'tankA':'tankB');
+let rectTarget = cell.getBoundingClientRect();
+let rectTank = attackerTank.getBoundingClientRect();
 
-if(hit)cell.classList.add('hit');
+let dx = rectTarget.left - rectTank.left;
+let dy = rectTarget.top - rectTank.top;
 
-if(A.size===0)win('Group B');
-if(B.size===0)win('Group A');
+// ROTATE TANK
+let angle = Math.atan2(dy,dx) * 180/Math.PI;
+attackerTank.style.transform = `rotate(${angle}deg)`;
 
-turn=turn==='A'?'B':'A';
-updateTurn();
-});
+// MISSILE CREATE
+let missile = document.createElement('div');
+missile.className='missile';
+
+document.body.appendChild(missile);
+
+let startX = rectTank.left + 50;
+let startY = rectTank.top + 50;
+let endX = rectTarget.left + 20;
+let endY = rectTarget.top + 20;
+
+let progress = 0;
+
+let interval = setInterval(()=>{
+progress += 0.03;
+
+let currentX = startX + (endX - startX) * progress;
+let currentY = startY + (endY - startY) * progress;
+
+missile.style.left = currentX + 'px';
+missile.style.top = currentY + 'px';
+
+if(progress >= 1){
+clearInterval(interval);
+missile.remove();
+explode(endX,endY,cell,target,num);
+}
+
+},16);
+
+turn = turn==='A'?'B':'A';
 }
 }
 
-function updateTurn(){
-document.getElementById('teamABox').classList.toggle('active',turn==='A');
-document.getElementById('teamBBox').classList.toggle('active',turn==='B');
+function explode(x,y,cell,target,num){
+let exp = document.createElement('div');
+exp.className='explosion';
+exp.style.left = x+'px';
+exp.style.top = y+'px';
+
+document.body.appendChild(exp);
+
+setTimeout(()=>exp.remove(),500);
+
+// HIT CHECK
+if(target==='teamA' && A.has(num)){
+cell.classList.add('hit');
+A.delete(num);
 }
 
-function rotateTank(target,cell){
-let tank=document.getElementById(target==='teamA'?'tankB':'tankA');
-let r=cell.getBoundingClientRect();
-let angle=Math.atan2(r.top,r.left)*180/Math.PI;
-tank.style.setProperty('--angle',angle+'deg');
-tank.classList.add('rotate');
+if(target==='teamB' && B.has(num)){
+cell.classList.add('hit');
+B.delete(num);
 }
-
-function launchMissile(cell,cb){
-let m=document.createElement('div');m.className='missile';
-let r=cell.getBoundingClientRect();
-let sx=turn==='A'?0:window.innerWidth;
-m.style.setProperty('--sx',sx+'px');
-m.style.setProperty('--sy','120px');
-m.style.setProperty('--tx',r.left+'px');
-m.style.setProperty('--ty',r.top+'px');
-document.body.appendChild(m);
-
-setTimeout(()=>{
-m.remove();
-explode(r.left,r.top);
-cb();
-},900);
-}
-
-function explode(x,y){
-let e=document.createElement('div');
-e.className='explosion';
-e.style.left=x+'px';e.style.top=y+'px';
-document.body.appendChild(e);
-setTimeout(()=>e.remove(),600);
-}
-
-function reveal(id,num){
-let list=document.getElementById(id);
-for(let d of list.children){
-if(!d.classList.contains('revealed')){
-d.innerText=format(num);
-d.classList.add('revealed');
-break;
-}}}
-
-function win(team){
-let d=document.createElement('div');
-d.className='win';
-d.innerText='🏆 '+team+' WINS';
-document.body.appendChild(d);
 }
 
 function startGame(){start=true}
