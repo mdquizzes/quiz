@@ -3,50 +3,84 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Student Battle Game PRO</title>
+<title>Student Battle Game ULTRA</title>
 <style>
 body{margin:0;font-family:'Segoe UI',sans-serif;background:radial-gradient(circle,#0f2027,#203a43,#2c5364);color:#fff;text-align:center}
 h1{margin:10px}
 .container{display:flex;justify-content:space-around;padding:10px}
-.team{width:45%}
+.team{width:45%;position:relative}
 .grid{display:grid;grid-template-columns:repeat(10,1fr);gap:6px}
 .cell{background:#162d3b;padding:12px 0;border-radius:8px;cursor:pointer;font-weight:bold;transition:.3s}
 .cell:hover{background:#00c6ff;transform:scale(1.1)}
-.destroyed{background:red!important;animation:blast .5s}
+.destroyed{background:red!important}
 .hit{background:#00ffcc!important;color:#000}
-@keyframes blast{50%{transform:scale(1.4);background:yellow}}
+
+/* TURN INDICATOR */
+.active{box-shadow:0 0 20px #00ffcc;border-radius:12px}
+
+/* MISSILE */
+.missile{
+position:absolute;
+width:10px;height:10px;
+background:yellow;
+border-radius:50%;
+animation:fly 0.6s linear forwards;
+z-index:10;
+}
+
+@keyframes fly{
+0%{transform:translate(var(--sx),var(--sy));}
+100%{transform:translate(var(--tx),var(--ty));}
+}
+
+/* BLAST */
+.blast{
+position:absolute;
+width:20px;height:20px;
+background:orange;
+border-radius:50%;
+animation:explode 0.4s ease-out forwards;
+z-index:9;
+}
+
+@keyframes explode{
+0%{transform:scale(1);opacity:1}
+100%{transform:scale(3);opacity:0}
+}
+
 .panel{display:flex;justify-content:space-around;margin:10px}
 .box{background:#0d1f2a;padding:12px;border-radius:12px;width:40%;box-shadow:0 0 15px rgba(0,0,0,.6)}
 input{width:60px;padding:6px;border-radius:6px;border:none;text-align:center}
-.star-list{margin-top:8px}
 .star{margin:2px;color:#00ffcc;font-size:18px}
 .revealed{color:yellow;font-weight:bold}
 button{margin:5px;padding:8px 16px;border:none;border-radius:8px;background:#00c6ff;font-weight:bold;cursor:pointer}
 .winner{font-size:24px;color:#00ffcc;margin-top:10px}
+.turnText{font-size:18px;margin:5px;color:#ffd700}
 </style>
 </head>
 <body>
 
-<h1>💣 Student Battle Game PRO</h1>
+<h1>🚀 Student Battle Game ULTRA WAR</h1>
+<div class="turnText" id="turnText">Turn: Group A</div>
 <button onclick="startGame()">Start Game</button>
 <button onclick="resetGame()">Reset</button>
 
 <div class="panel">
 <div class="box">
 <h3>Group A Secret</h3>
-<input type="password" id="inputA" autocomplete="off" inputmode="numeric" maxlength="2" onkeydown="handleInput(event,'A')">
-<div id="listA" class="star-list"></div>
+<input type="password" autocomplete="off" maxlength="2" id="inputA" onkeydown="handleInput(event,'A')">
+<div id="listA"></div>
 </div>
 <div class="box">
 <h3>Group B Secret</h3>
-<input type="password" id="inputB" autocomplete="off" inputmode="numeric" maxlength="2" onkeydown="handleInput(event,'B')">
-<div id="listB" class="star-list"></div>
+<input type="password" autocomplete="off" maxlength="2" id="inputB" onkeydown="handleInput(event,'B')">
+<div id="listB"></div>
 </div>
 </div>
 
 <div class="container">
-<div class="team"><h2>Group A Area</h2><div id="teamA" class="grid"></div></div>
-<div class="team"><h2>Group B Area</h2><div id="teamB" class="grid"></div></div>
+<div id="teamABox" class="team active"><h2>Group A</h2><div id="teamA" class="grid"></div></div>
+<div id="teamBBox" class="team"><h2>Group B</h2><div id="teamB" class="grid"></div></div>
 </div>
 
 <div id="winner" class="winner"></div>
@@ -77,7 +111,7 @@ document.getElementById(id).appendChild(s);
 }
 
 function createGrid(id,team){
-let grid=document.getElementById(id);grid.innerHTML='';
+let grid=document.getElementById(id);
 for(let i=1;i<=100;i++){
 let c=document.createElement('div');
 c.className='cell';
@@ -88,26 +122,65 @@ grid.appendChild(c);
 
 function attack(num,cell,target){
 if(!gameStarted||cell.classList.contains('destroyed'))return;
+
 if((turn==='A'&&target==='teamB')||(turn==='B'&&target==='teamA')){
+
+launchMissile(cell,()=>{
 cell.classList.add('destroyed');
-let hit=false;
 
 if(target==='teamA'&&soldiersA.has(num)){
 cell.classList.add('hit');
 reveal('listA',num);
-soldiersA.delete(num);hit=true;
+soldiersA.delete(num);
 }
 if(target==='teamB'&&soldiersB.has(num)){
 cell.classList.add('hit');
 reveal('listB',num);
-soldiersB.delete(num);hit=true;
+soldiersB.delete(num);
 }
 
 if(soldiersA.size===0)document.getElementById('winner').innerText='🏆 Group B Wins';
 if(soldiersB.size===0)document.getElementById('winner').innerText='🏆 Group A Wins';
 
 turn=turn==='A'?'B':'A';
-}}
+updateTurnUI();
+});
+}
+}
+
+function launchMissile(targetCell,callback){
+let missile=document.createElement('div');
+missile.className='missile';
+
+let rect=targetCell.getBoundingClientRect();
+let startX=turn==='A'?0:window.innerWidth;
+let startY=0;
+
+missile.style.setProperty('--sx',startX+'px');
+missile.style.setProperty('--sy',startY+'px');
+missile.style.setProperty('--tx',rect.left+'px');
+missile.style.setProperty('--ty',rect.top+'px');
+
+
+
+
+document.body.appendChild(missile);
+
+setTimeout(()=>{
+missile.remove();
+createBlast(rect.left,rect.top);
+callback();
+},600);
+}
+
+function createBlast(x,y){
+let b=document.createElement('div');
+b.className='blast';
+b.style.left=x+'px';
+b.style.top=y+'px';
+document.body.appendChild(b);
+setTimeout(()=>b.remove(),400);
+}
 
 function reveal(id,num){
 let list=document.getElementById(id);
@@ -118,6 +191,12 @@ s.classList.add('revealed');
 break;
 }}}
 
+function updateTurnUI(){
+document.getElementById('turnText').innerText='Turn: Group '+turn;
+document.getElementById('teamABox').classList.toggle('active',turn==='A');
+document.getElementById('teamBBox').classList.toggle('active',turn==='B');
+}
+
 function startGame(){gameStarted=true}
 
 function resetGame(){
@@ -125,13 +204,13 @@ soldiersA.clear();soldiersB.clear();
 document.getElementById('listA').innerHTML='';
 document.getElementById('listB').innerHTML='';
 document.getElementById('winner').innerText='';
-gameStarted=false;
-createGrid('teamA','teamA');
-createGrid('teamB','teamB');
+turn='A';
+updateTurnUI();
 }
 
 createGrid('teamA','teamA');
 createGrid('teamB','teamB');
+updateTurnUI();
 </script>
 
 </body>
