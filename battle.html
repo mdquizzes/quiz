@@ -99,12 +99,24 @@ font-size:40px;color:#00ffcc;z-index:20;
 <div class="panel">
 <div class="box">
 <h3>Group A Secret</h3>
-<input type="password" autocomplete="new-password" onkeydown="addNum(event,'A')">
+<input 
+  type="text"
+  inputmode="numeric"
+  maxlength="2"
+  autocomplete="off"
+  style="-webkit-text-security: disc;"
+>
 <div id="listA"></div>
 </div>
 <div class="box">
 <h3>Group B Secret</h3>
-<input type="password" autocomplete="new-password" onkeydown="addNum(event,'B')">
+<input 
+  type="text"
+  inputmode="numeric"
+  maxlength="2"
+  autocomplete="off"
+  style="-webkit-text-security: disc;"
+>
 <div id="listB"></div>
 </div>
 </div>
