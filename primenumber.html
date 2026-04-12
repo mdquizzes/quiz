@@ -1,4 +1,6 @@
+
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -26,6 +28,7 @@ td, th { border: 1px solid #ccc; padding: 5px; text-align: center; }
 input { padding: 5px; margin: 5px; }
 button { padding: 8px; cursor: pointer; }
 </style>
+
 </head>
 
 <body>
@@ -83,7 +86,6 @@ let selected = new Set();
 let timer;
 let totalTime = 120;
 let timeLeft;
-let startTime;
 
 let scores = JSON.parse(localStorage.getItem("primeScores")) || [];
 
@@ -96,7 +98,7 @@ function isPrime(n) {
     return true;
 }
 
-// Generate numbers (50% primes)
+// Generate numbers
 function generateNumbers() {
     let primes = [], non = [];
     for (let i = 1; i <= 100; i++) {
@@ -157,8 +159,6 @@ function startGame() {
     totalTime = parseInt(parts[0]) * 60 + parseInt(parts[1]);
 
     timeLeft = totalTime;
-    startTime = Date.now();
-
     selected.clear();
 
     document.getElementById("startScreen").style.display = "none";
@@ -186,15 +186,20 @@ function startTimer() {
     }, 1000);
 }
 
-// Finish game
+// ✅ UPDATED SCORING
 function finishGame() {
     clearInterval(timer);
 
     let name = document.getElementById("studentName").value;
 
     let score = 0;
+
     selected.forEach(n => {
-        if (isPrime(n)) score++;
+        if (isPrime(n)) {
+            score += 4;
+        } else {
+            score -= 1;
+        }
     });
 
     let timeTaken = totalTime - timeLeft;
@@ -219,13 +224,10 @@ function saveScores() {
     localStorage.setItem("primeScores", JSON.stringify(scores));
 }
 
-// Ranking logic
+// Scoreboard
 function updateScoreboard() {
     let table = document.getElementById("scoreTable");
 
-    // Sort:
-    // 1. Score DESC
-    // 2. Time ASC
     scores.sort((a, b) => {
         if (b.score !== a.score) return b.score - a.score;
         return a.time - b.time;
@@ -251,7 +253,7 @@ function updateScoreboard() {
     });
 }
 
-// Clear
+// Clear data
 function clearData() {
     if (confirm("Clear all data?")) {
         localStorage.removeItem("primeScores");
@@ -267,7 +269,7 @@ function restart() {
     document.getElementById("resultScreen").style.display = "none";
 }
 
-// Load
+// Load scoreboard
 updateScoreboard();
 
 </script>
