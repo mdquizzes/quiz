@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cinematic War Game</title>
+<style>
+body{margin:0;background:#000;color:#fff;font-family:sans-serif;text-align:center;overflow:hidden}
+
+/* Background */
+body::before{
+content:"";
+position:fixed;
+width:100%;height:100%;
+background:url('https://images.unsplash.com/photo-1504711434969-e33886168f5c') center/cover no-repeat;
+opacity:0.2;
+z-index:-1;
+}
+
+h1{margin:10px}
+
+.container{display:flex;justify-content:space-around}
+.team{width:45%;position:relative}
+
+/* Tank Image */
+.tank{
+width:120px;
+transition: transform 0.5s ease;
+}
+
+/* Rotating turret */
+.rotate{
+transform: rotate(var(--angle));
+}
+
+.grid{display:grid;grid-template-columns:repeat(10,1fr);gap:5px}
+.cell{background:#1a2d3a;padding:10px;border-radius:5px;cursor:pointer;position:relative}
+
+/* Missile */
+.missile{
+position:absolute;width:12px;height:12px;background:yellow;border-radius:50%;
+box-shadow:0 0 10px orange;
+animation:fly 0.8s linear forwards;
+}
+
+@keyframes fly{
+0%{transform:translate(var(--sx),var(--sy));}
+100%{transform:translate(var(--tx),var(--ty));}
+}
+
+/* Explosion */
+.explosion{
+position:absolute;width:20px;height:20px;background:orange;border-radius:50%;
+animation:explode 0.5s ease-out forwards;
+}
+
+@keyframes explode{
+0%{transform:scale(1);opacity:1}
+100%{transform:scale(5);opacity:0}
+}
+
+/* Smoke */
+.smoke{
+background:radial-gradient(circle,rgba(255,255,255,0.3),transparent);
+animation:smoke 2s infinite;
+}
+
+@keyframes smoke{
+0%{opacity:0.8}
+100%{opacity:0}
+}
+
+input{width:60px;text-align:center}
+.star{color:#0f0}
+.revealed{color:yellow}
+
+</style>
+</head>
+<body>
+
+<h1>🚀 Cinematic Battle Game</h1>
+<button onclick="startGame()">Start</button>
+
+<div>
+<input type="password" autocomplete="new-password" placeholder="A" onkeydown="addNum(event,'A')">
+<input type="password" autocomplete="new-password" placeholder="B" onkeydown="addNum(event,'B')">
+</div>
+
+<div class="container">
+
+<div class="team">
+<img src="/mnt/data/f29331ad-35f5-4c61-b6a4-a0c8bce3e3f1.png" class="tank" id="tankA">
+<div id="teamA" class="grid"></div>
+</div>
+
+<div class="team">
+<img src="/mnt/data/f29331ad-35f5-4c61-b6a4-a0c8bce3e3f1.png" class="tank" id="tankB">
+<div id="teamB" class="grid"></div>
+</div>
+
+</div>
+
+<script>
+let A=new Set(),B=new Set();
+let turn='A',start=false;
+
+function addNum(e,t){
+if(e.key==='Enter'){
+let v=parseInt(e.target.value);
+if(v>=1&&v<=100){(t==='A'?A:B).add(v);} 
+e.target.value='';
+}}
+
+function createGrid(id,t){
+let g=document.getElementById(id);
+for(let i=1;i<=100;i++){
+let c=document.createElement('div');
+c.className='cell';c.innerText=i;
+c.onclick=()=>attack(i,c,t);
+g.appendChild(c);
+}}
+
+function attack(num,cell,target){
+if(!start)return;
+if((turn==='A'&&target==='teamB')||(turn==='B'&&target==='teamA')){
+
+rotateTank(target,cell);
+launchMissile(cell,()=>{
+cell.innerText='';
+cell.classList.add('smoke');
+
+let hit=false;
+if(target==='teamA'&&A.has(num)){hit=true;A.delete(num)}
+if(target==='teamB'&&B.has(num)){hit=true;B.delete(num)}
+
+if(hit)cell.style.background='lime';
+
+turn=turn==='A'?'B':'A';
+});
+}
+}
+
+function rotateTank(target,cell){
+let tank=document.getElementById(target==='teamA'?'tankB':'tankA');
+let rect=cell.getBoundingClientRect();
+let angle=Math.atan2(rect.top,rect.left)*180/Math.PI;
+tank.style.setProperty('--angle',angle+'deg');
+tank.classList.add('rotate');
+}
+
+function launchMissile(cell,cb){
+let m=document.createElement('div');m.className='missile';
+let r=cell.getBoundingClientRect();
+let sx=turn==='A'?0:window.innerWidth;
+m.style.setProperty('--sx',sx+'px');
+m.style.setProperty('--sy','100px');
+m.style.setProperty('--tx',r.left+'px');
+m.style.setProperty('--ty',r.top+'px');
+document.body.appendChild(m);
+
+setTimeout(()=>{
+m.remove();
+explode(r.left,r.top);
+cb();
+},800);
+}
+
+function explode(x,y){
+let e=document.createElement('div');e.className='explosion';
+e.style.left=x+'px';e.style.top=y+'px';
+document.body.appendChild(e);
+setTimeout(()=>e.remove(),500);
+}
+
+function startGame(){start=true}
+
+createGrid('teamA','teamA');
+createGrid('teamB','teamB');
+</script>
+
+</body>
+</html>
