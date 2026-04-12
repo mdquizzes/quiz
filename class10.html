@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Prime Master Challenge</title>
+
+<style>
+body { font-family: Arial; margin: 0; display: flex; }
+.container { width: 70%; padding: 20px; }
+.sidebar { width: 30%; background: #f0f0f0; padding: 20px; }
+
+.number-btn {
+    width: 60px; height: 60px; margin: 5px;
+    font-size: 18px; border-radius: 10px;
+}
+.selected { background: lightgreen; }
+
+.correct { background: #4CAF50 !important; color: white; }
+.wrong { background: #f44336 !important; color: white; }
+
+#timer { font-size: 22px; color: red; }
+#liveScore { font-size: 18px; color: green; }
+
+button { padding: 8px; margin: 5px; cursor: pointer; }
+
+table { width: 100%; border-collapse: collapse; }
+td, th { border: 1px solid #ccc; padding: 5px; text-align: center; }
+
+.top1 { background: gold; }
+.top2 { background: silver; }
+.top3 { background: #cd7f32; color: white; }
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>🎯 Prime Master Challenge</h2>
+
+<div id="startScreen">
+    <input type="text" id="studentName" placeholder="Student Name"><br>
+
+```
+<label>Difficulty:</label>
+<select id="level">
+    <option value="50">Easy (1–50)</option>
+    <option value="100">Medium (1–100)</option>
+    <option value="200">Hard (1–200)</option>
+</select><br>
+
+<label>Time (mm:ss):</label>
+<input type="text" id="setTime" value="02:00"><br>
+
+<button onclick="startGame()">Start Game</button>
+```
+
+</div>
+
+<div id="gameScreen" style="display:none;">
+    ⏳ Time: <span id="timer">00:00</span> |
+    ⭐ Score: <span id="liveScore">0</span>
+    <br><br>
+
+```
+<button onclick="useHint()">💡 Hint (3 left)</button>
+
+<div id="numbers"></div>
+
+<button onclick="finishGame()">Finish</button>
+```
+
+</div>
+
+<div id="resultScreen" style="display:none;">
+    <h3 id="resultText"></h3>
+    <button onclick="restart()">Next Student</button>
+</div>
+
+</div>
+
+<div class="sidebar">
+<h3>🏆 Leaderboard</h3>
+<table>
+<thead>
+<tr><th>Rank</th><th>Name</th><th>Score</th><th>Accuracy</th></tr>
+</thead>
+<tbody id="scoreTable"></tbody>
+</table>
+</div>
+
+<script>
+
+let numbers = [];
+let selected = new Set();
+let timer, totalTime, timeLeft;
+let score = 0;
+let hintsLeft = 3;
+let correctCount = 0, wrongCount = 0;
+
+let scores = JSON.parse(localStorage.getItem("primeScores")) || [];
+
+// sounds
+let correctSound = new Audio("https://www.soundjay.com/buttons/sounds/button-3.mp3");
+let wrongSound = new Audio("https://www.soundjay.com/buttons/sounds/button-10.mp3");
+
+function isPrime(n){
+    if(n<2) return false;
+    for(let i=2;i<=Math.sqrt(n);i++){
+        if(n%i===0) return false;
+    }
+    return true;
+}
+
+function generateNumbers(max){
+    let arr = [];
+    while(arr.length < 20){
+        let n = Math.floor(Math.random()*max)+1;
+        if(!arr.includes(n)) arr.push(n);
+    }
+    numbers = arr;
+}
+
+function displayNumbers(){
+    let box = document.getElementById("numbers");
+    box.innerHTML = "";
+
+    numbers.forEach(num=>{
+        let btn = document.createElement("button");
+        btn.innerText = num;
+        btn.className = "number-btn";
+
+        btn.onclick = ()=>{
+            if(selected.has(num)){
+                selected.delete(num);
+                btn.classList.remove("selected");
+            } else {
+                selected.add(num);
+
+                if(isPrime(num)){
+                    score += 4;
+                    correctCount++;
+                    correctSound.play();
+                    btn.classList.add("correct");
+                } else {
+                    score -= 1;
+                    wrongCount++;
+                    wrongSound.play();
+                    btn.classList.add("wrong");
+                }
+
+                document.getElementById("liveScore").innerText = score;
+            }
+        };
+
+        box.appendChild(btn);
+    });
+}
+
+function startGame(){
+    let name = document.getElementById("studentName").value.trim();
+    if(!name){ alert("Enter name"); return; }
+
+    let max = parseInt(document.getElementById("level").value);
+    let t = document.getElementById("setTime").value.split(":");
+    totalTime = parseInt(t[0])*60 + parseInt(t[1]);
+
+    timeLeft = totalTime;
+    score = 0;
+    hintsLeft = 3;
+    correctCount = 0;
+    wrongCount = 0;
+    selected.clear();
+
+    document.getElementById("startScreen").style.display="none";
+    document.getElementById("gameScreen").style.display="block";
+
+    generateNumbers(max);
+    displayNumbers();
+    startTimer();
+}
+
+function startTimer(){
+    timer = setInterval(()=>{
+        timeLeft--;
+
+        let m = String(Math.floor(timeLeft/60)).padStart(2,'0');
+        let s = String(timeLeft%60).padStart(2,'0');
+
+        document.getElementById("timer").innerText = `${m}:${s}`;
+
+        if(timeLeft<=0){
+            clearInterval(timer);
+            finishGame();
+        }
+    },1000);
+}
+
+function useHint(){
+    if(hintsLeft<=0) return;
+
+    hintsLeft--;
+
+    numbers.forEach(n=>{
+        if(isPrime(n) && !selected.has(n)){
+            alert("Hint: " + n + " is prime!");
+        }
+    });
+}
+
+function finishGame(){
+    clearInterval(timer);
+
+    let name = document.getElementById("studentName").value;
+
+    let accuracy = correctCount + wrongCount === 0 ? 0 :
+        Math.round((correctCount/(correctCount+wrongCount))*100);
+
+    scores.push({name, score, accuracy});
+
+    localStorage.setItem("primeScores", JSON.stringify(scores));
+    updateBoard();
+
+    document.getElementById("gameScreen").style.display="none";
+    document.getElementById("resultScreen").style.display="block";
+
+    document.getElementById("resultText").innerHTML =
+        `🎉 ${name}<br>Score: ${score}<br>Accuracy: ${accuracy}%`;
+}
+
+function updateBoard(){
+    let table = document.getElementById("scoreTable");
+    scores.sort((a,b)=>b.score-a.score);
+
+    table.innerHTML="";
+    scores.forEach((s,i)=>{
+        table.innerHTML+=`
+        <tr>
+            <td>${i+1}</td>
+            <td>${s.name}</td>
+            <td>${s.score}</td>
+            <td>${s.accuracy}%</td>
+        </tr>`;
+    });
+}
+
+function restart(){
+    document.getElementById("startScreen").style.display="block";
+    document.getElementById("resultScreen").style.display="none";
+}
+
+updateBoard();
+
+</script>
+
+</body>
+</html>
