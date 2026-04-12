@@ -3,139 +3,131 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Student Battle Game - Advanced</title>
+<title>Student Battle Game PRO</title>
 <style>
-body { margin:0; font-family:'Segoe UI',sans-serif; background:linear-gradient(135deg,#0f2027,#203a43,#2c5364); color:#fff; text-align:center; }
-h1 { margin:15px 0; }
-.container { display:flex; justify-content:space-around; padding:10px; }
-.team { width:45%; }
-.grid { display:grid; grid-template-columns:repeat(10,1fr); gap:6px; }
-.cell { background:#1e3c52; padding:12px 0; border-radius:6px; cursor:pointer; transition:.3s; font-weight:bold; }
-.cell:hover { background:#00c6ff; transform:scale(1.1); }
-.destroyed { background:red !important; animation:blast .6s ease; }
-@keyframes blast { 50%{ transform:scale(1.5); background:yellow;} }
-.panel { display:flex; justify-content:space-around; margin:10px; }
-.input-box { background:#102733; padding:10px; border-radius:10px; width:40%; }
-input { padding:8px; border-radius:6px; border:none; width:70%; }
-.star-list { margin-top:10px; min-height:20px; }
-.star { color:#00ffcc; margin:2px; display:inline-block; }
-.revealed { color:yellow; }
-button { padding:8px 15px; border:none; border-radius:8px; background:#00c6ff; font-weight:bold; cursor:pointer; }
-.winner { font-size:26px; margin-top:10px; color:#00ffcc; }
+body{margin:0;font-family:'Segoe UI',sans-serif;background:radial-gradient(circle,#0f2027,#203a43,#2c5364);color:#fff;text-align:center}
+h1{margin:10px}
+.container{display:flex;justify-content:space-around;padding:10px}
+.team{width:45%}
+.grid{display:grid;grid-template-columns:repeat(10,1fr);gap:6px}
+.cell{background:#162d3b;padding:12px 0;border-radius:8px;cursor:pointer;font-weight:bold;transition:.3s}
+.cell:hover{background:#00c6ff;transform:scale(1.1)}
+.destroyed{background:red!important;animation:blast .5s}
+.hit{background:#00ffcc!important;color:#000}
+@keyframes blast{50%{transform:scale(1.4);background:yellow}}
+.panel{display:flex;justify-content:space-around;margin:10px}
+.box{background:#0d1f2a;padding:12px;border-radius:12px;width:40%;box-shadow:0 0 15px rgba(0,0,0,.6)}
+input{width:60px;padding:6px;border-radius:6px;border:none;text-align:center}
+.star-list{margin-top:8px}
+.star{margin:2px;color:#00ffcc;font-size:18px}
+.revealed{color:yellow;font-weight:bold}
+button{margin:5px;padding:8px 16px;border:none;border-radius:8px;background:#00c6ff;font-weight:bold;cursor:pointer}
+.winner{font-size:24px;color:#00ffcc;margin-top:10px}
 </style>
 </head>
 <body>
 
-<h1>💣 Student Battle Game (Secret Mode)</h1>
+<h1>💣 Student Battle Game PRO</h1>
 <button onclick="startGame()">Start Game</button>
 <button onclick="resetGame()">Reset</button>
 
 <div class="panel">
-  <div class="input-box">
-    <h3>Group A Secret Numbers</h3>
-    <input type="password" id="inputA" placeholder="Enter number" onkeydown="handleInput(event,'A')">
-    <div class="star-list" id="listA"></div>
-  </div>
-  <div class="input-box">
-    <h3>Group B Secret Numbers</h3>
-    <input type="password" id="inputB" placeholder="Enter number" onkeydown="handleInput(event,'B')">
-    <div class="star-list" id="listB"></div>
-  </div>
+<div class="box">
+<h3>Group A Secret</h3>
+<input type="password" id="inputA" autocomplete="off" inputmode="numeric" maxlength="2" onkeydown="handleInput(event,'A')">
+<div id="listA" class="star-list"></div>
+</div>
+<div class="box">
+<h3>Group B Secret</h3>
+<input type="password" id="inputB" autocomplete="off" inputmode="numeric" maxlength="2" onkeydown="handleInput(event,'B')">
+<div id="listB" class="star-list"></div>
+</div>
 </div>
 
 <div class="container">
-  <div class="team">
-    <h2>Group A Area</h2>
-    <div class="grid" id="teamA"></div>
-  </div>
-  <div class="team">
-    <h2>Group B Area</h2>
-    <div class="grid" id="teamB"></div>
-  </div>
+<div class="team"><h2>Group A Area</h2><div id="teamA" class="grid"></div></div>
+<div class="team"><h2>Group B Area</h2><div id="teamB" class="grid"></div></div>
 </div>
 
-<div class="winner" id="winner"></div>
+<div id="winner" class="winner"></div>
 
 <script>
-let soldiersA = new Set();
-let soldiersB = new Set();
-let turn = 'A';
-let gameStarted = false;
+let soldiersA=new Set();
+let soldiersB=new Set();
+let turn='A';
+let gameStarted=false;
 
-function handleInput(e, team){
-  if(e.key === 'Enter'){
-    const val = parseInt(e.target.value);
-    if(val>=1 && val<=100){
-      if(team==='A'){ soldiersA.add(val); addStar('listA'); }
-      else { soldiersB.add(val); addStar('listB'); }
-    }
-    e.target.value='';
-  }
+function format(n){return n.toString().padStart(2,'0');}
+
+function handleInput(e,team){
+if(e.key==='Enter'){
+let val=parseInt(e.target.value);
+if(val>=1&&val<=100){
+if(team==='A'){soldiersA.add(val);addStar('listA');}
+else{soldiersB.add(val);addStar('listB');}
+}
+e.target.value='';
+}}
+
+function addStar(id){
+let s=document.createElement('span');
+s.className='star';
+s.innerText='★ ★';
+document.getElementById(id).appendChild(s);
 }
 
-function addStar(listId){
-  const star = document.createElement('span');
-  star.className='star';
-  star.innerText='★';
-  document.getElementById(listId).appendChild(star);
+function createGrid(id,team){
+let grid=document.getElementById(id);grid.innerHTML='';
+for(let i=1;i<=100;i++){
+let c=document.createElement('div');
+c.className='cell';
+c.innerText=format(i);
+c.onclick=()=>attack(i,c,team);
+grid.appendChild(c);
+}}
+
+function attack(num,cell,target){
+if(!gameStarted||cell.classList.contains('destroyed'))return;
+if((turn==='A'&&target==='teamB')||(turn==='B'&&target==='teamA')){
+cell.classList.add('destroyed');
+let hit=false;
+
+if(target==='teamA'&&soldiersA.has(num)){
+cell.classList.add('hit');
+reveal('listA',num);
+soldiersA.delete(num);hit=true;
+}
+if(target==='teamB'&&soldiersB.has(num)){
+cell.classList.add('hit');
+reveal('listB',num);
+soldiersB.delete(num);hit=true;
 }
 
-function createGrid(id, team){
-  const grid=document.getElementById(id);
-  grid.innerHTML='';
-  for(let i=1;i<=100;i++){
-    const cell=document.createElement('div');
-    cell.className='cell';
-    cell.innerText=i;
-    cell.onclick=()=>attack(i,cell,team);
-    grid.appendChild(cell);
-  }
-}
+if(soldiersA.size===0)document.getElementById('winner').innerText='🏆 Group B Wins';
+if(soldiersB.size===0)document.getElementById('winner').innerText='🏆 Group A Wins';
 
-function attack(num, cell, targetTeam){
-  if(!gameStarted || cell.classList.contains('destroyed')) return;
+turn=turn==='A'?'B':'A';
+}}
 
-  if((turn==='A' && targetTeam==='teamB') || (turn==='B' && targetTeam==='teamA')){
-    cell.classList.add('destroyed');
+function reveal(id,num){
+let list=document.getElementById(id);
+for(let s of list.children){
+if(s.innerText==='★ ★'){
+s.innerText=format(num);
+s.classList.add('revealed');
+break;
+}}}
 
-    let hit=false;
-    if(targetTeam==='teamA' && soldiersA.has(num)){
-      reveal('listA', num, soldiersA);
-      soldiersA.delete(num);
-      hit=true;
-    }
-    if(targetTeam==='teamB' && soldiersB.has(num)){
-      reveal('listB', num, soldiersB);
-      soldiersB.delete(num);
-      hit=true;
-    }
-
-    if(soldiersA.size===0){ document.getElementById('winner').innerText='🎉 Group B Wins'; }
-    if(soldiersB.size===0){ document.getElementById('winner').innerText='🎉 Group A Wins'; }
-
-    turn = turn==='A'?'B':'A';
-  }
-}
-
-function reveal(listId, num, set){
-  const list=document.getElementById(listId);
-  for(let star of list.children){
-    if(star.innerText==='★'){
-      star.innerText=num;
-      star.classList.add('revealed');
-      break;
-    }
-  }
-}
-
-function startGame(){ gameStarted=true; }
+function startGame(){gameStarted=true}
 
 function resetGame(){
-  soldiersA.clear(); soldiersB.clear();
-  document.getElementById('listA').innerHTML='';
-  document.getElementById('listB').innerHTML='';
-  document.getElementById('winner').innerText='';
-  gameStarted=false;
+soldiersA.clear();soldiersB.clear();
+document.getElementById('listA').innerHTML='';
+document.getElementById('listB').innerHTML='';
+document.getElementById('winner').innerText='';
+gameStarted=false;
+createGrid('teamA','teamA');
+createGrid('teamB','teamB');
 }
 
 createGrid('teamA','teamA');
