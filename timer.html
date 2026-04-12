@@ -5,11 +5,11 @@
 <title>Pro Countdown Timer</title>
 
 <style>
-    body {
+    body {  
         margin: 0;
-        background: black;
-        color: #ffff00; /* bright yellow */
-        font-family: Arial, sans-serif;
+        background: white; /* changed to white */
+        color: black; /* changed to black */
+        font-family: "Georgia", "Times New Roman", serif; /* antique style */
         height: 100vh;
         display: flex;
         justify-content: center;
@@ -19,7 +19,7 @@
 
     #setup {
         text-align: center;
-        color: white;
+        color: black;
     }
 
     input {
@@ -28,7 +28,8 @@
         width: 250px;
         text-align: center;
         border-radius: 10px;
-        border: none;
+        border: 1px solid black;
+        font-family: inherit;
     }
 
     #timer {
@@ -38,13 +39,9 @@
         letter-spacing: 8px;
         text-align: center;
 
-        /* Strong glow for distance visibility */
+        /* Elegant subtle shadow instead of neon glow */
         text-shadow: 
-            0 0 10px #fff,
-            0 0 20px #ff0,
-            0 0 40px #ff0,
-            0 0 80px #ff0,
-            0 0 120px #ff0;
+            2px 2px 5px rgba(0,0,0,0.3);
     }
 
     .blink {
@@ -138,17 +135,19 @@ function updateDisplay(seconds) {
 }
 
 function timeUp() {
-    document.body.style.background = "red";
+    document.body.style.background = "black";
+    document.body.style.color = "white";
+
     let timer = document.getElementById("timer");
     timer.innerText = "TIME UP!";
     timer.classList.add("blink");
 
-    // 🔔 Browser Notification
+    // Notification
     if (Notification.permission === "granted") {
         new Notification("⏰ Time is up!");
     }
 
-    // 🔊 Beep sound
+    // Sound
     let audio = new Audio("https://www.soundjay.com/buttons/beep-07.wav");
     audio.play();
 }
