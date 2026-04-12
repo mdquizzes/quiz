@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CLASSROOM BATTLE</title>
+<title>CINEMATIC PRO WAR GAME</title>
 <style>
 body{margin:0;background:#000;color:#fff;font-family:sans-serif;text-align:center;overflow:auto;cursor:crosshair}
 
@@ -204,7 +204,71 @@ function updateTurn(){
 document.getElementById('teamABox').classList.toggle('active',turn==='A');
 document.getElementById('teamBBox').classList.toggle('active',turn==='B')}
 
-function win(team){let d=document.createElement('div');d.className='win';d.innerText=team+' WINS';document.body.appendChild(d)}
+function win(team){
+  // overlay
+  let d=document.createElement('div');
+  d.className='win';
+  d.innerHTML=`<div style="text-align:center">
+    <div style="font-size:48px;margin-bottom:10px">🏆 ${team} WINS!</div>
+    <div style="font-size:18px;opacity:.8">Victory Achieved • Battlefield Secured</div>
+  </div>`;
+  document.body.appendChild(d);
+
+  // fireworks bursts
+  for(let i=0;i<8;i++){
+    setTimeout(()=>fireworkBurst(window.innerWidth*Math.random(), window.innerHeight*Math.random()*0.6+50), i*150);
+  }
+
+  // confetti rain
+  startConfetti();
+
+  // victory sound (lightweight)
+  try{ new Audio('https://www.fesliyanstudios.com/play-mp3/6677').play(); }catch(e){}
+}
+
+// --- FIREWORKS ---
+function fireworkBurst(x,y){
+  for(let i=0;i<24;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    const angle=Math.random()*Math.PI*2;
+    const dist=60+Math.random()*80;
+    p.style.setProperty('--x', Math.cos(angle)*dist+'px');
+    p.style.setProperty('--y', Math.sin(angle)*dist+'px');
+    p.style.left=x+'px';
+    p.style.top=y+'px';
+    p.style.background = `hsl(${Math.floor(Math.random()*360)},100%,60%)`;
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),700);
+  }
+}
+
+// --- CONFETTI ---
+let confettiInterval;
+function startConfetti(){
+  stopConfetti();
+  confettiInterval = setInterval(()=>{
+    for(let i=0;i<20;i++){
+      const c=document.createElement('div');
+      c.style.position='fixed';
+      c.style.width='6px';
+      c.style.height='10px';
+      c.style.left=Math.random()*100+'vw';
+      c.style.top='-10px';
+      c.style.background=`hsl(${Math.random()*360},90%,60%)`;
+      c.style.transform=`rotate(${Math.random()*360}deg)`;
+      c.style.zIndex=30;
+      c.animate([
+        {transform:`translateY(0) rotate(0deg)`},
+        {transform:`translateY(${window.innerHeight+20}px) rotate(${720*Math.random()}deg)`}
+      ],{duration:2000+Math.random()*1500, easing:'linear'});
+      document.body.appendChild(c);
+      setTimeout(()=>c.remove(),3500);
+    }
+  },200);
+}
+function stopConfetti(){ if(confettiInterval) clearInterval(confettiInterval); }
+
 
 function startGame(){start=true}
 
