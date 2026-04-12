@@ -3,83 +3,86 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FINAL PRO WAR GAME</title>
+<title>CINEMATIC PRO WAR GAME</title>
 <style>
 body{margin:0;background:#000;color:#fff;font-family:sans-serif;text-align:center;overflow:auto;cursor:crosshair}
 
-/* BACKGROUND */
 body::before{
 content:"";position:fixed;width:100%;height:100%;
-background:url('https://images.unsplash.com/photo-1549924231-f129b911e442') center/cover no-repeat;
-opacity:0.25;z-index:-1;
+background:url('https://images.unsplash.com/photo-1504711434969-e33886168f5c') center/cover no-repeat;
+opacity:0.35;z-index:-2;
 }
 
-h1{margin:10px}
+body::after{
+content:"";position:fixed;width:100%;height:100%;
+background:radial-gradient(circle,transparent 40%,black 90%);
+z-index:-1;
+}
 
 .container{display:flex;justify-content:space-around}
 .team{width:40%;transition:.3s}
-.active{box-shadow:0 0 25px #00ffcc;border-radius:10px}
+.active{box-shadow:0 0 30px #00ffcc}
 
-/* LAUNCHER */
-.launcher{
-width:80px;height:20px;background:#333;margin:auto;border-radius:10px;position:relative;
-}
-.barrel{
-width:60px;height:6px;background:#aaa;position:absolute;top:7px;left:20px;
-transform-origin:left center;
-transition:transform .3s ease;
-}
+.launcher{width:90px;height:25px;background:#222;margin:auto;border-radius:10px;position:relative}
+.barrel{width:70px;height:6px;background:#aaa;position:absolute;top:10px;left:20px;transform-origin:left center}
 
 .grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
-.cell{background:#1a2d3a;padding:8px;border-radius:6px;cursor:pointer;position:relative;overflow:hidden}
-.cell:hover{transform:scale(1.1)}
+.cell{background:#1a2d3a;padding:8px;border-radius:6px;position:relative}
 
-/* MISSILE */
-.missile{
-position:absolute;width:10px;height:10px;background:yellow;border-radius:50%;
-box-shadow:0 0 10px orange;
-pointer-events:none;
-}
+.missile{position:absolute;width:10px;height:10px;background:yellow;border-radius:50%;box-shadow:0 0 15px orange}
 
-/* EXPLOSION */
+/* REAL EXPLOSION */
 .explosion{
-position:absolute;width:20px;height:20px;background:orange;border-radius:50%;
-animation:explode .6s forwards;
+position:absolute;width:30px;height:30px;
+background:radial-gradient(circle,yellow,orange,red);
+border-radius:50%;
+animation:explode .7s forwards;
+box-shadow:0 0 40px orange;
 }
-@keyframes explode{to{transform:scale(5);opacity:0}}
 
-/* SMOKE */
+@keyframes explode{
+0%{transform:scale(1);opacity:1}
+100%{transform:scale(6);opacity:0}
+}
+
+/* PARTICLES */
+.particle{
+position:absolute;width:6px;height:6px;background:orange;border-radius:50%;
+animation:particle .6s forwards;
+}
+
+@keyframes particle{
+100%{transform:translate(var(--x),var(--y));opacity:0}
+}
+
 .smoke{background:url('https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif') center/cover}
-
 .hit{background:#00ffcc;color:#000}
 
-/* SIDE PANEL */
 .panel{display:flex;justify-content:space-around;margin:10px}
-.box{background:#111;padding:10px;border-radius:10px;width:40%}
-input{width:60px;text-align:center;padding:5px;border:none;border-radius:5px}
+.box{width:40%;background:#111;padding:10px;border-radius:10px}
+
+input{width:60px;text-align:center;-webkit-text-security:disc}
 .dot{width:14px;height:14px;background:#0f0;border-radius:50%;display:inline-block;margin:3px}
 .revealed{background:yellow;color:#000;font-size:10px;display:flex;align-items:center;justify-content:center}
 
-/* WIN */
-.win{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.9);
-display:flex;justify-content:center;align-items:center;font-size:40px;color:#00ffcc;z-index:20}
+.win{position:fixed;width:100%;height:100%;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;font-size:40px}
 
 </style>
 </head>
 <body>
 
-<h1>🔥 FINAL PRO WAR GAME 🔥</h1>
-<button onclick="startGame()">Start</button>
+<h1>🔥 CINEMATIC WAR GAME 🔥</h1>
+<button onclick="startGame()">START</button>
 
 <div class="panel">
 <div class="box">
 <h3>Group A</h3>
-<input type="text" inputmode="numeric" maxlength="2" autocomplete="off" style="-webkit-text-security:disc" onkeydown="addNum(event,'A')">
+<input type="text" maxlength="2" onkeydown="addNum(event,'A')">
 <div id="listA"></div>
 </div>
 <div class="box">
 <h3>Group B</h3>
-<input type="text" inputmode="numeric" maxlength="2" autocomplete="off" style="-webkit-text-security:disc" onkeydown="addNum(event,'B')">
+<input type="text" maxlength="2" onkeydown="addNum(event,'B')">
 <div id="listB"></div>
 </div>
 </div>
@@ -100,97 +103,91 @@ display:flex;justify-content:center;align-items:center;font-size:40px;color:#00f
 let A=new Set(),B=new Set();
 let turn='A',start=false;
 
-function format(n){return n.toString().padStart(2,'0');}
-
 function addNum(e,t){
 if(e.key==='Enter'){
 let v=parseInt(e.target.value);
-if(v>=1&&v<=100){
-(t==='A'?A:B).add(v);
-addDot(t==='A'?'listA':'listB');
-}
+if(v>=1&&v<=100){(t==='A'?A:B).add(v);addDot(t==='A'?'listA':'listB')}
 e.target.value='';
 }}
 
-function addDot(id){
-let d=document.createElement('div');d.className='dot';
-document.getElementById(id).appendChild(d);
-}
+function addDot(id){let d=document.createElement('div');d.className='dot';document.getElementById(id).appendChild(d)}
 
 function createGrid(id,t){
 let g=document.getElementById(id);
 for(let i=1;i<=100;i++){
 let c=document.createElement('div');
-c.className='cell';c.innerText=format(i);
+c.className='cell';c.innerText=i;
 c.onclick=()=>attack(i,c,t);
 g.appendChild(c);
 }}
 
 function attack(num,cell,target){
-if(!start||cell.classList.contains('smoke'))return;
+if(!start)return;
 
 if((turn==='A'&&target==='teamB')||(turn==='B'&&target==='teamA')){
 
 let barrel=document.getElementById(turn==='A'?'barrelA':'barrelB');
-let rectTarget=cell.getBoundingClientRect();
-let rectBarrel=barrel.getBoundingClientRect();
+let rT=cell.getBoundingClientRect();
+let rB=barrel.getBoundingClientRect();
 
-let dx=rectTarget.left-rectBarrel.left;
-let dy=rectTarget.top-rectBarrel.top;
+let dx=rT.left-rB.left;
+let dy=rT.top-rB.top;
 
 let angle=Math.atan2(dy,dx)*180/Math.PI;
 barrel.style.transform=`rotate(${angle}deg)`;
 
-let missile=document.createElement('div');missile.className='missile';
-document.body.appendChild(missile);
+let missile=document.createElement('div');missile.className='missile';document.body.appendChild(missile);
 
-let startX=rectBarrel.left+30;
-let startY=rectBarrel.top+5;
-let endX=rectTarget.left+20;
-let endY=rectTarget.top+20;
+let sx=rB.left+30, sy=rB.top+10;
+let ex=rT.left+20, ey=rT.top+20;
 
-let progress=0;
-
+let p=0;
 let interval=setInterval(()=>{
-progress+=0.03;
+p+=0.02;
+let arc=120;
+let x=sx+(ex-sx)*p;
+let y=sy+(ey-sy)*p - arc*Math.sin(Math.PI*p);
 
-let arcHeight=80;
-let currentX=startX+(endX-startX)*progress;
-let currentY=startY+(endY-startY)*progress - arcHeight*Math.sin(Math.PI*progress);
+missile.style.left=x+'px';
+missile.style.top=y+'px';
 
-missile.style.left=currentX+'px';
-missile.style.top=currentY+'px';
-
-if(progress>=1){
-clearInterval(interval);
-missile.remove();
-explode(endX,endY,cell,target,num);
-}
-
+if(p>=1){clearInterval(interval);missile.remove();explode(ex,ey,cell,target,num)}
 },16);
 
-turn=turn==='A'?'B':'A';
-updateTurn();
+turn=turn==='A'?'B':'A';updateTurn();
 }
 }
 
 function explode(x,y,cell,target,num){
-let e=document.createElement('div');e.className='explosion';
-e.style.left=x+'px';e.style.top=y+'px';
-document.body.appendChild(e);
+let e=document.createElement('div');e.className='explosion';e.style.left=x+'px';e.style.top=y+'px';document.body.appendChild(e);
+
+// particles
+for(let i=0;i<8;i++){
+let p=document.createElement('div');p.className='particle';
+p.style.setProperty('--x',(Math.random()*100-50)+'px');
+p.style.setProperty('--y',(Math.random()*100-50)+'px');
+p.style.left=x+'px';p.style.top=y+'px';
+document.body.appendChild(p);
+setTimeout(()=>p.remove(),600);
+}
 
 new Audio('https://www.fesliyanstudios.com/play-mp3/387').play();
 
-setTimeout(()=>e.remove(),600);
+document.body.animate([
+{transform:'scale(1)'},
+{transform:'scale(1.05)'},
+{transform:'scale(1)'}
+],{duration:200});
 
-cell.innerText='';
-cell.classList.add('smoke');
+setTimeout(()=>e.remove(),700);
+
+cell.innerText='';cell.classList.add('smoke');
 
 let hit=false;
 if(target==='teamA'&&A.has(num)){hit=true;A.delete(num);reveal('listA',num)}
 if(target==='teamB'&&B.has(num)){hit=true;B.delete(num);reveal('listB',num)}
 
-if(hit){cell.classList.add('hit');shake();}
+if(hit)cell.classList.add('hit');
 
 if(A.size===0)win('Group B');
 if(B.size===0)win('Group A');
@@ -200,29 +197,14 @@ function reveal(id,num){
 let list=document.getElementById(id);
 for(let d of list.children){
 if(!d.classList.contains('revealed')){
-d.innerText=format(num);
-d.classList.add('revealed');
-break;
+d.innerText=num;d.classList.add('revealed');break;
 }}}
 
 function updateTurn(){
 document.getElementById('teamABox').classList.toggle('active',turn==='A');
-document.getElementById('teamBBox').classList.toggle('active',turn==='B');
-}
+document.getElementById('teamBBox').classList.toggle('active',turn==='B')}
 
-function shake(){
-document.body.animate([
-{transform:'translate(0,0)'},
-{transform:'translate(8px,-8px)'},
-{transform:'translate(-8px,8px)'},
-{transform:'translate(0,0)'}
-],{duration:200});
-}
-
-function win(team){
-let d=document.createElement('div');d.className='win';d.innerText='🏆 '+team+' WINS';
-document.body.appendChild(d);
-}
+function win(team){let d=document.createElement('div');d.className='win';d.innerText=team+' WINS';document.body.appendChild(d)}
 
 function startGame(){start=true}
 
