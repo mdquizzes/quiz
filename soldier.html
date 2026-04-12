@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Battle Game</title>
+<style>
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', sans-serif;
+        background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+        color: white;
+        text-align: center;
+    }
+
+    h1 {
+        margin: 20px 0;
+    }
+
+    .container {
+        display: flex;
+        justify-content: space-around;
+        padding: 20px;
+    }
+
+    .team {
+        width: 45%;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        gap: 8px;
+    }
+
+    .cell {
+        background: #1e3c52;
+        padding: 15px 0;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+        position: relative;
+        font-weight: bold;
+    }
+
+    .cell:hover {
+        background: #00c6ff;
+        transform: scale(1.1);
+    }
+
+    .destroyed {
+        background: red !important;
+        animation: blast 0.6s ease;
+    }
+
+    @keyframes blast {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.5); background: yellow; }
+        100% { transform: scale(1); }
+    }
+
+    .winner {
+        font-size: 28px;
+        margin-top: 20px;
+        color: #00ffcc;
+    }
+
+    button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        background: #00c6ff;
+        color: black;
+        font-weight: bold;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+
+<h1>🔥 Student Battle Game 🔥</h1>
+<button onclick="resetGame()">Restart Game</button>
+
+<div class="container">
+
+    <div class="team">
+        <h2>Group A</h2>
+        <div class="grid" id="teamA"></div>
+    </div>
+
+    <div class="team">
+        <h2>Group B</h2>
+        <div class="grid" id="teamB"></div>
+    </div>
+
+</div>
+
+<div class="winner" id="winner"></div>
+
+<script>
+let turn = 'A';
+let destroyedA = 0;
+let destroyedB = 0;
+
+function createGrid(teamId, teamName) {
+    const grid = document.getElementById(teamId);
+    grid.innerHTML = '';
+
+    for (let i = 1; i <= 100; i++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.innerText = i;
+
+        cell.onclick = () => handleClick(cell, teamName);
+
+        grid.appendChild(cell);
+    }
+}
+
+function handleClick(cell, teamName) {
+    if (cell.classList.contains('destroyed')) return;
+
+    if ((turn === 'A' && teamName === 'teamB') ||
+        (turn === 'B' && teamName === 'teamA')) {
+
+        cell.classList.add('destroyed');
+
+        if (teamName === 'teamA') {
+            destroyedA++;
+        } else {
+            destroyedB++;
+        }
+
+        checkWinner();
+        turn = turn === 'A' ? 'B' : 'A';
+    }
+}
+
+function checkWinner() {
+    if (destroyedA === 100) {
+        document.getElementById('winner').innerText = '🎉 Group B Wins!';
+    }
+    if (destroyedB === 100) {
+        document.getElementById('winner').innerText = '🎉 Group A Wins!';
+    }
+}
+
+function resetGame() {
+    turn = 'A';
+    destroyedA = 0;
+    destroyedB = 0;
+    document.getElementById('winner').innerText = '';
+    createGrid('teamA', 'teamA');
+    createGrid('teamB', 'teamB');
+}
+
+createGrid('teamA', 'teamA');
+createGrid('teamB', 'teamB');
+</script>
+
+</body>
+</html>
