@@ -84,6 +84,22 @@ input{width:60px;text-align:center;border:none;border-radius:5px;padding:5px;-we
 /* WIN + CELEBRATION */
 .win{position:fixed;inset:0;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;font-size:40px;z-index:20}
 
+  #startBtn{
+  padding:8px 16px;
+  border:none;
+  border-radius:8px;
+  background:#0099ff;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+#startBtn.active{
+  background:#00aaff;
+  box-shadow:0 0 15px #00aaff;
+}
+
 </style>
 </head>
 <body>
@@ -92,7 +108,7 @@ input{width:60px;text-align:center;border:none;border-radius:5px;padding:5px;-we
 <p style="margin-top:-8px; font-size:14px; opacity:0.7;">
   Prepared By : Mukesh Sir
 </p>
-<button onclick="startGame()">START</button>
+<button id="startBtn" onclick="startGame()">START</button>
 
 <div class="panel">
   <div class="box">
@@ -285,7 +301,10 @@ function startConfetti(){
 }
 function stopConfetti(){ if(confettiInterval) clearInterval(confettiInterval); }
 
-function startGame(){start=true}
+function startGame(){
+  start=true;
+  document.getElementById("startBtn").classList.add("active");
+}
 
 createGrid('teamA','teamA');
 createGrid('teamB','teamB');
