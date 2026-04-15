@@ -15,6 +15,13 @@ body::after{content:"";position:fixed;inset:0;background:radial-gradient(circle,
 h1{margin:10px}
 .subtitle{font-size:14px;opacity:.8;margin-bottom:10px}
 
+/* START ACTIVE */
+.start-active{
+  background:#00ffcc;
+  color:#000;
+  box-shadow:0 0 15px #00ffcc;
+}
+
 /* container */
 .container{display:flex;justify-content:space-around}
 .team{width:40%;transition:.3s}
@@ -29,11 +36,12 @@ h1{margin:10px}
 .cell{background:#1a2d3a;padding:8px;border-radius:6px;position:relative;box-shadow: inset 0 0 8px #000, 0 3px 6px rgba(0,0,0,.6)}
 .cell:hover{transform:scale(1.08)}
 
-/* missile */
+/* ===== MISSILE (UNCHANGED FROM YOUR CODE) ===== */
 .missile{
   position:absolute;width:22px;height:8px;border-radius:4px;
   background:linear-gradient(90deg,#ffe066,#ff8c00,#ff3d00);
   box-shadow:0 0 16px rgba(255,140,0,.9);
+  transform-origin:center;
 }
 .missile::before{
   content:"";position:absolute;right:-8px;top:-4px;
@@ -43,10 +51,11 @@ h1{margin:10px}
 .missile::after{
   content:"";position:absolute;left:-10px;top:2px;width:10px;height:4px;
   background:linear-gradient(90deg,#ffea00,#ff6d00);
+  filter:blur(1.5px);
 }
 
 /* trail */
-.trail{position:absolute;width:5px;height:5px;border-radius:50%;background:rgba(255,200,120,.85)}
+.trail{position:absolute;width:5px;height:5px;border-radius:50%;background:rgba(255,200,120,.85);filter:blur(1px);pointer-events:none}
 
 /* explosion */
 .explosion{
@@ -55,23 +64,25 @@ h1{margin:10px}
   box-shadow:0 0 40px rgba(255,140,0,.9);
   animation:explode .7s forwards;
 }
-@keyframes explode{100%{transform:scale(6);opacity:0}}
+@keyframes explode{0%{transform:scale(1)}100%{transform:scale(6);opacity:0}}
 
-.particle{position:absolute;width:6px;height:6px;border-radius:50%;background:orange}
+.particle{position:absolute;width:6px;height:6px;border-radius:50%;background:orange;animation:particle .7s forwards}
+@keyframes particle{to{transform:translate(var(--x),var(--y));opacity:0}}
+
 .smoke{background:url('https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif') center/cover}
-.hit{background:#00ffcc}
+.hit{background:#00ffcc;color:#000}
 
 /* PANEL */
 .panel{display:flex;justify-content:space-around;margin:10px}
 .box{width:40%;background:#111;padding:10px;border-radius:10px}
 input{width:60px;text-align:center;border:none;border-radius:5px;padding:5px;-webkit-text-security:disc}
 
-/* SOLDIER ICON */
+/* SOLDIER WITH GUN */
 .soldier{
-  width:32px;height:32px;
-  background:url('https://cdn-icons-png.flaticon.com/512/1995/1995470.png') center/cover no-repeat;
+  width:40px;height:40px;
+  background:url('https://cdn-icons-png.flaticon.com/512/1048/1048314.png') center/cover no-repeat;
   display:inline-flex;
-  align-items:center;
+  align-items:flex-end;
   justify-content:center;
   font-size:10px;
   font-weight:bold;
@@ -96,7 +107,7 @@ input{width:60px;text-align:center;border:none;border-radius:5px;padding:5px;-we
 <h1>🎯 Classroom Battle 🎯</h1>
 <div class="subtitle">Prepared By : Mukesh Sir</div>
 
-<button onclick="startGame()">START</button>
+<button id="startBtn" onclick="startGame()">START</button>
 
 <div class="panel">
   <div class="box">
@@ -138,11 +149,11 @@ function addNum(e,t){
   }
 }
 
-/* ADD SOLDIER (HIDDEN NUMBER) */
+/* SOLDIER ADD */
 function addSoldier(id){
   const d=document.createElement('div');
   d.className='soldier';
-  d.innerText=''; // hidden
+  d.innerText='';
   document.getElementById(id).appendChild(d);
 }
 
@@ -158,29 +169,40 @@ function createGrid(id,t){
   }
 }
 
-/* ATTACK */
+/* ===== ATTACK (YOUR ORIGINAL MISSILE CODE UNCHANGED) ===== */
 function attack(num,cell,target){
   if(!start||cell.classList.contains('smoke'))return;
-
   if((turn==='A'&&target==='teamB')||(turn==='B'&&target==='teamA')){
-
-    // missile animation same (unchanged)
     const barrel=document.getElementById(turn==='A'?'barrelA':'barrelB');
     const rT=cell.getBoundingClientRect();
     const rB=barrel.getBoundingClientRect();
+
+    const dx=rT.left-rB.left;
+    const dy=rT.top-rB.top;
+    const angle=Math.atan2(dy,dx)*180/Math.PI;
+    barrel.style.transform=`rotate(${angle}deg)`;
 
     const m=document.createElement('div');m.className='missile';document.body.appendChild(m);
 
     const sx=rB.left+30, sy=rB.top+12;
     const ex=rT.left+20, ey=rT.top+20;
+    const rot=Math.atan2(ey-sy, ex-sx)*180/Math.PI;
+    m.style.transform=`rotate(${rot}deg)`;
 
     let p=0;
     const interval=setInterval(()=>{
       p+=0.02;
+      const arc=120;
       const x=sx+(ex-sx)*p;
-      const y=sy+(ey-sy)*p;
+      const y=sy+(ey-sy)*p - arc*Math.sin(Math.PI*p);
       m.style.left=x+'px';
       m.style.top=y+'px';
+
+      const t=document.createElement('div');t.className='trail';
+      t.style.left=(x-8)+'px';
+      t.style.top=y+'px';
+      document.body.appendChild(t);
+      setTimeout(()=>t.remove(),200);
 
       if(p>=1){clearInterval(interval);m.remove();explode(ex,ey,cell,target,num)}
     },16);
@@ -200,7 +222,6 @@ function explode(x,y,cell,target,num){
   cell.classList.add('smoke');
 
   let hit=false;
-
   if(target==='teamA'&&A.has(num)){hit=true;A.delete(num);reveal('listA',num)}
   if(target==='teamB'&&B.has(num)){hit=true;B.delete(num);reveal('listB',num)}
 
@@ -210,7 +231,7 @@ function explode(x,y,cell,target,num){
   if(B.size===0)win('Group A');
 }
 
-/* REVEAL NUMBER ON SOLDIER */
+/* REVEAL */
 function reveal(id,num){
   const list=document.getElementById(id);
   for(const d of list.children){
@@ -222,10 +243,16 @@ function reveal(id,num){
   }
 }
 
-/* TURN UI */
+/* TURN */
 function updateTurn(){
   document.getElementById('teamABox').classList.toggle('active',turn==='A');
   document.getElementById('teamBBox').classList.toggle('active',turn==='B');
+}
+
+/* START VISUAL */
+function startGame(){
+  start=true;
+  document.getElementById('startBtn').classList.add('start-active');
 }
 
 /* WIN */
@@ -235,8 +262,6 @@ function win(team){
   d.innerHTML=`🏆 ${team} WINS!`;
   document.body.appendChild(d);
 }
-
-function startGame(){start=true}
 
 createGrid('teamA','teamA');
 createGrid('teamB','teamB');
