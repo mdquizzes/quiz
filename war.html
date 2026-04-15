@@ -6,147 +6,69 @@
 <title>Classroom Battle</title>
 
 <style>
-body{
-  margin:0;
-  background:#000;
-  color:#fff;
-  font-family:sans-serif;
-  text-align:center;
-  overflow:auto;
-  cursor:crosshair;
-}
+body{margin:0;background:#000;color:#fff;font-family:sans-serif;text-align:center;overflow:auto;cursor:crosshair}
 
-/* Background */
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  background:url('https://images.unsplash.com/photo-1504711434969-e33886168f5c') center/cover no-repeat;
-  opacity:.35;
-  z-index:-2
-}
-body::after{
-  content:"";
-  position:fixed;
-  inset:0;
-  background:radial-gradient(circle,transparent 40%,black 90%);
-  z-index:-1
-}
+/* BG */
+body::before{content:"";position:fixed;inset:0;background:url('https://images.unsplash.com/photo-1504711434969-e33886168f5c') center/cover no-repeat;opacity:.35;z-index:-2}
+body::after{content:"";position:fixed;inset:0;background:radial-gradient(circle,transparent 40%,black 90%);z-index:-1}
 
 h1{margin:10px}
+.subtitle{font-size:14px;opacity:.8;margin-bottom:10px}
 
-/* Subtitle */
-.subtitle{
-  font-size:14px;
-  opacity:0.8;
-  margin-bottom:10px;
-}
+/* container */
+.container{display:flex;justify-content:space-around}
+.team{width:40%;transition:.3s}
+.active{box-shadow:0 0 30px #00ffcc}
 
-.container{
-  display:flex;
-  justify-content:space-around
-}
+/* launcher */
+.launcher{width:90px;height:25px;background:#222;margin:8px auto;border-radius:10px;position:relative}
+.barrel{width:70px;height:6px;background:#aaa;position:absolute;top:10px;left:20px;transform-origin:left center;transition:transform .2s ease}
 
-.team{
-  width:40%;
-  transition:.3s
-}
-
-.active{
-  box-shadow:0 0 30px #00ffcc
-}
-
-/* Launcher */
-.launcher{
-  width:90px;height:25px;
-  background:#222;
-  margin:8px auto;
-  border-radius:10px;
-  position:relative
-}
-
-.barrel{
-  width:70px;height:6px;
-  background:#aaa;
-  position:absolute;
-  top:10px;left:20px;
-  transform-origin:left center;
-  transition:transform .2s ease
-}
-
-/* Grid */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(10,1fr);
-  gap:4px
-}
-
-.cell{
-  background:#1a2d3a;
-  padding:8px;
-  border-radius:6px;
-  position:relative;
-  box-shadow: inset 0 0 8px #000, 0 3px 6px rgba(0,0,0,.6)
-}
-
+/* grid */
+.grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
+.cell{background:#1a2d3a;padding:8px;border-radius:6px;position:relative;box-shadow: inset 0 0 8px #000, 0 3px 6px rgba(0,0,0,.6)}
 .cell:hover{transform:scale(1.08)}
 
-/* Missile */
+/* missile */
 .missile{
-  position:absolute;
-  width:22px;height:8px;
-  border-radius:4px;
+  position:absolute;width:22px;height:8px;border-radius:4px;
   background:linear-gradient(90deg,#ffe066,#ff8c00,#ff3d00);
   box-shadow:0 0 16px rgba(255,140,0,.9);
-  transform-origin:center;
 }
-
 .missile::before{
-  content:"";
-  position:absolute;
-  right:-8px;top:-4px;
+  content:"";position:absolute;right:-8px;top:-4px;
   border-left:8px solid #ff3d00;
-  border-top:8px solid transparent;
-  border-bottom:8px solid transparent;
+  border-top:8px solid transparent;border-bottom:8px solid transparent;
 }
-
 .missile::after{
-  content:"";
-  position:absolute;
-  left:-10px;top:2px;
-  width:10px;height:4px;
+  content:"";position:absolute;left:-10px;top:2px;width:10px;height:4px;
   background:linear-gradient(90deg,#ffea00,#ff6d00);
-  filter:blur(1.5px);
 }
 
-/* Trail */
-.trail{
-  position:absolute;
-  width:5px;height:5px;
-  border-radius:50%;
-  background:rgba(255,200,120,.85);
-  filter:blur(1px);
-}
+/* trail */
+.trail{position:absolute;width:5px;height:5px;border-radius:50%;background:rgba(255,200,120,.85)}
 
-/* Explosion */
+/* explosion */
 .explosion{
-  position:absolute;
-  width:30px;height:30px;
-  border-radius:50%;
+  position:absolute;width:30px;height:30px;border-radius:50%;
   background:radial-gradient(circle,#fff176,#ff8f00,#d50000);
   box-shadow:0 0 40px rgba(255,140,0,.9);
   animation:explode .7s forwards;
 }
+@keyframes explode{100%{transform:scale(6);opacity:0}}
 
-@keyframes explode{
-  0%{transform:scale(1);opacity:1}
-  100%{transform:scale(6);opacity:0}
-}
+.particle{position:absolute;width:6px;height:6px;border-radius:50%;background:orange}
+.smoke{background:url('https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif') center/cover}
+.hit{background:#00ffcc}
 
-/* Soldier Icon */
-.soldier-dot{
-  width:32px;
-  height:32px;
+/* PANEL */
+.panel{display:flex;justify-content:space-around;margin:10px}
+.box{width:40%;background:#111;padding:10px;border-radius:10px}
+input{width:60px;text-align:center;border:none;border-radius:5px;padding:5px;-webkit-text-security:disc}
+
+/* SOLDIER ICON */
+.soldier{
+  width:32px;height:32px;
   background:url('https://cdn-icons-png.flaticon.com/512/1995/1995470.png') center/cover no-repeat;
   display:inline-flex;
   align-items:center;
@@ -158,47 +80,14 @@ h1{margin:10px}
   text-shadow:0 0 4px #000;
 }
 
-/* Reveal */
+/* reveal */
 .revealed{
   background:yellow !important;
   color:#000 !important;
-  font-size:10px;
 }
 
-/* Panel */
-.panel{
-  display:flex;
-  justify-content:space-around;
-  margin:10px
-}
-
-.box{
-  width:40%;
-  background:#111;
-  padding:10px;
-  border-radius:10px
-}
-
-input{
-  width:60px;
-  text-align:center;
-  border:none;
-  border-radius:5px;
-  padding:5px;
-  -webkit-text-security:disc
-}
-
-/* Win */
-.win{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.9);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:40px;
-  z-index:20
-}
+/* win */
+.win{position:fixed;inset:0;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;font-size:40px;z-index:20}
 </style>
 </head>
 
@@ -215,7 +104,6 @@ input{
     <input type="text" maxlength="2" onkeydown="addNum(event,'A')">
     <div id="listA"></div>
   </div>
-
   <div class="box">
     <h3>Group B</h3>
     <input type="text" maxlength="2" onkeydown="addNum(event,'B')">
@@ -228,7 +116,6 @@ input{
     <div class="launcher"><div class="barrel" id="barrelA"></div></div>
     <div id="teamA" class="grid"></div>
   </div>
-
   <div class="team" id="teamBBox">
     <div class="launcher"><div class="barrel" id="barrelB"></div></div>
     <div id="teamB" class="grid"></div>
@@ -236,30 +123,30 @@ input{
 </div>
 
 <script>
-let A=new Set(), B=new Set();
-let turn='A', start=false;
+let A=new Set(),B=new Set();
+let turn='A',start=false;
 
-/* Add Number */
+/* ADD NUMBER */
 function addNum(e,t){
   if(e.key==='Enter'){
     const v=parseInt(e.target.value);
-    if(v>=1 && v<=100){
+    if(v>=1&&v<=100){
       (t==='A'?A:B).add(v);
-      addSoldier(t==='A'?'listA':'listB', v);
+      addSoldier(t==='A'?'listA':'listB');
     }
     e.target.value='';
   }
 }
 
-/* Add Soldier Icon */
-function addSoldier(id,num){
+/* ADD SOLDIER (HIDDEN NUMBER) */
+function addSoldier(id){
   const d=document.createElement('div');
-  d.className='soldier-dot';
-  d.innerText = String(num).padStart(2,'0');
+  d.className='soldier';
+  d.innerText=''; // hidden
   document.getElementById(id).appendChild(d);
 }
 
-/* Grid */
+/* GRID */
 function createGrid(id,t){
   const g=document.getElementById(id);
   for(let i=1;i<=100;i++){
@@ -271,59 +158,77 @@ function createGrid(id,t){
   }
 }
 
-/* Attack */
+/* ATTACK */
 function attack(num,cell,target){
-  if(!start) return;
+  if(!start||cell.classList.contains('smoke'))return;
 
   if((turn==='A'&&target==='teamB')||(turn==='B'&&target==='teamA')){
-    cell.innerText='';
-    cell.style.background='#333';
 
-    let hit=false;
+    // missile animation same (unchanged)
+    const barrel=document.getElementById(turn==='A'?'barrelA':'barrelB');
+    const rT=cell.getBoundingClientRect();
+    const rB=barrel.getBoundingClientRect();
 
-    if(target==='teamA' && A.has(num)){
-      hit=true;
-      A.delete(num);
-      reveal('listA',num);
-    }
+    const m=document.createElement('div');m.className='missile';document.body.appendChild(m);
 
-    if(target==='teamB' && B.has(num)){
-      hit=true;
-      B.delete(num);
-      reveal('listB',num);
-    }
+    const sx=rB.left+30, sy=rB.top+12;
+    const ex=rT.left+20, ey=rT.top+20;
 
-    if(hit){
-      cell.style.background='#00ffcc';
-    }
+    let p=0;
+    const interval=setInterval(()=>{
+      p+=0.02;
+      const x=sx+(ex-sx)*p;
+      const y=sy+(ey-sy)*p;
+      m.style.left=x+'px';
+      m.style.top=y+'px';
 
-    if(A.size===0) win('Group B');
-    if(B.size===0) win('Group A');
+      if(p>=1){clearInterval(interval);m.remove();explode(ex,ey,cell,target,num)}
+    },16);
 
-    turn = turn==='A'?'B':'A';
+    turn=turn==='A'?'B':'A';
     updateTurn();
   }
 }
 
-/* Reveal */
+/* EXPLODE */
+function explode(x,y,cell,target,num){
+  const e=document.createElement('div');e.className='explosion';
+  e.style.left=x+'px';e.style.top=y+'px';document.body.appendChild(e);
+  setTimeout(()=>e.remove(),700);
+
+  cell.innerText='';
+  cell.classList.add('smoke');
+
+  let hit=false;
+
+  if(target==='teamA'&&A.has(num)){hit=true;A.delete(num);reveal('listA',num)}
+  if(target==='teamB'&&B.has(num)){hit=true;B.delete(num);reveal('listB',num)}
+
+  if(hit)cell.classList.add('hit');
+
+  if(A.size===0)win('Group B');
+  if(B.size===0)win('Group A');
+}
+
+/* REVEAL NUMBER ON SOLDIER */
 function reveal(id,num){
   const list=document.getElementById(id);
   for(const d of list.children){
     if(!d.classList.contains('revealed')){
-      d.innerText = String(num).padStart(2,'0');
+      d.innerText=String(num).padStart(2,'0');
       d.classList.add('revealed');
       break;
     }
   }
 }
 
-/* Turn */
+/* TURN UI */
 function updateTurn(){
   document.getElementById('teamABox').classList.toggle('active',turn==='A');
   document.getElementById('teamBBox').classList.toggle('active',turn==='B');
 }
 
-/* Win */
+/* WIN */
 function win(team){
   const d=document.createElement('div');
   d.className='win';
@@ -331,10 +236,8 @@ function win(team){
   document.body.appendChild(d);
 }
 
-/* Start */
 function startGame(){start=true}
 
-/* Init */
 createGrid('teamA','teamA');
 createGrid('teamB','teamB');
 </script>
