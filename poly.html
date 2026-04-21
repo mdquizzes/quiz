@@ -4,14 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Quadratic Equation Practice Generator</title>
+
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
+
 body{
 font-family:Arial,Helvetica,sans-serif;
 background:#f4f7fb;
 padding:20px;
 color:#222;
 }
+
 .wrapper{
 max-width:760px;
 margin:auto;
@@ -20,22 +23,26 @@ padding:25px;
 border-radius:14px;
 box-shadow:0 8px 30px rgba(0,0,0,.08);
 }
+
 h1{
 text-align:center;
 font-size:30px;
-margin-bottom:18px;
+margin-bottom:10px;
 }
+
 .sub{
 text-align:center;
 color:#666;
 margin-bottom:25px;
 }
+
 .levels{
 display:grid;
 grid-template-columns:repeat(3,1fr);
 gap:10px;
 margin-bottom:20px;
 }
+
 .level-btn{
 padding:12px;
 border:none;
@@ -45,47 +52,55 @@ font-weight:bold;
 cursor:pointer;
 color:#fff;
 }
+
 .easy{background:#16a34a}
 .medium{background:#f59e0b}
 .hard{background:#dc2626}
+
 .active{
 transform:scale(1.03);
 box-shadow:0 5px 18px rgba(0,0,0,.15);
 }
+
 .card{
 background:#f8fafc;
 border-radius:12px;
 padding:25px;
-margin-top:10px;
 text-align:center;
 }
+
 .label{
 font-size:15px;
 color:#666;
 margin-bottom:10px;
 }
+
 .question{
 font-size:34px;
 font-weight:bold;
 margin:15px 0 25px;
 word-break:break-word;
 }
+
 .btns{
 display:flex;
 flex-wrap:wrap;
-gap:10px;
 justify-content:center;
+gap:10px;
 }
+
 button.action{
 padding:12px 18px;
 border:none;
 border-radius:10px;
 font-size:16px;
-cursor:pointer;
 font-weight:bold;
+cursor:pointer;
 }
+
 .show{background:#2563eb;color:#fff}
 .next{background:#111827;color:#fff}
+
 .answer{
 display:none;
 margin-top:22px;
@@ -97,34 +112,37 @@ font-size:24px;
 font-weight:bold;
 color:#065f46;
 }
+
 .stats{
 display:flex;
 justify-content:space-between;
 gap:10px;
 margin-top:18px;
 font-size:15px;
-color:#444;
 flex-wrap:wrap;
 }
+
 .footer{
 margin-top:20px;
 font-size:14px;
 color:#777;
 text-align:center;
 }
+
 @media(max-width:600px){
-.question{font-size:28px}
 .levels{grid-template-columns:1fr}
+.question{font-size:28px}
 .stats{flex-direction:column}
 }
 </style>
 </head>
+
 <body>
 
 <div class="wrapper">
 
 <h1>Quadratic Equation Practice</h1>
-<div class="sub">Unlimited Random Questions • Show Answer • Easy / Medium / Hard</div>
+<div class="sub">Unlimited Random Questions • Easy / Medium / Hard</div>
 
 <div class="levels">
 <button class="level-btn easy active" onclick="setLevel('easy',this)">Easy</button>
@@ -133,6 +151,7 @@ text-align:center;
 </div>
 
 <div class="card">
+
 <div class="label">Solve:</div>
 <div class="question" id="question">Loading...</div>
 
@@ -147,63 +166,48 @@ text-align:center;
 <div>Level: <b id="levelName">Easy</b></div>
 <div>Questions Seen: <b id="count">0</b></div>
 </div>
+
 </div>
 
 <div class="footer">
-Practice factoring, roots, perfect squares and square-root equations.
+Hard level now contains only real advanced 3-term quadratic equations.
 </div>
 
 </div>
 
 <script>
-let currentLevel = "easy";
-let currentAnswer = "";
-let count = 0;
+let currentLevel="easy";
+let currentAnswer="";
+let count=0;
 
 function rand(min,max){
 return Math.floor(Math.random()*(max-min+1))+min;
 }
 
-function gcd(a,b){
-while(b){[a,b]=[b,a%b]}
-return Math.abs(a);
-}
-
-function simplifyRoot(n){
-let outside = 1;
-let inside = n;
-
-for(let i=Math.floor(Math.sqrt(n)); i>=2; i--){
-if(n%(i*i)===0){
-outside = i;
-inside = n/(i*i);
-break;
-}
-}
-
-if(inside===1) return outside.toString();
-if(outside===1) return "√" + inside;
-return outside + "√" + inside;
-}
-
 function setLevel(level,btn){
-currentLevel = level;
-document.querySelectorAll(".level-btn").forEach(b=>b.classList.remove("active"));
+currentLevel=level;
+
+document.querySelectorAll(".level-btn").forEach(b=>{
+b.classList.remove("active");
+});
+
 btn.classList.add("active");
+
 document.getElementById("levelName").innerText =
 level.charAt(0).toUpperCase()+level.slice(1);
+
 generateQuestion();
 }
 
 function showAnswer(){
-let ans = document.getElementById("answer");
-ans.style.display="block";
-ans.innerHTML=currentAnswer;
+let box=document.getElementById("answer");
+box.style.display="block";
+box.innerHTML=currentAnswer;
 }
 
 function generateQuestion(){
 count++;
-document.getElementById("count").innerText = count;
+document.getElementById("count").innerText=count;
 document.getElementById("answer").style.display="none";
 
 if(currentLevel==="easy") easyQuestion();
@@ -211,92 +215,106 @@ if(currentLevel==="medium") mediumQuestion();
 if(currentLevel==="hard") hardQuestion();
 }
 
+/* EASY : roots 1 to 10 */
 function easyQuestion(){
-let r1 = rand(1,10);
-let r2 = rand(1,10);
 
-let b = -(r1+r2);
-let c = r1*r2;
+let r1=rand(1,10);
+let r2=rand(1,10);
 
-let signB = b<0 ? "- "+Math.abs(b)+"x" : "+ "+b+"x";
-let signC = c<0 ? "- "+Math.abs(c) : "+ "+c;
+let b=-(r1+r2);
+let c=r1*r2;
 
 document.getElementById("question").innerHTML =
-"x² " + signB + " " + signC + " = 0";
+"x² - "+Math.abs(b)+"x + "+c+" = 0";
 
-currentAnswer = "x = " + r1 + ", " + r2;
+currentAnswer="x = "+r1+", "+r2;
 }
 
+/* MEDIUM : roots 11 to 20 */
 function mediumQuestion(){
-let r1 = rand(11,20);
-let r2 = rand(11,20);
 
-let b = -(r1+r2);
-let c = r1*r2;
+let r1=rand(11,20);
+let r2=rand(11,20);
 
-let signB = "- " + Math.abs(b) + "x";
-let signC = "+ " + c;
+let b=-(r1+r2);
+let c=r1*r2;
 
 document.getElementById("question").innerHTML =
-"x² " + signB + " " + signC + " = 0";
+"x² - "+Math.abs(b)+"x + "+c+" = 0";
 
-currentAnswer = "x = " + r1 + ", " + r2;
+currentAnswer="x = "+r1+", "+r2;
 }
 
+/* HARD : ONLY ADVANCED 3-TERM */
 function hardQuestion(){
 
-let type = rand(1,4);
+let type=rand(1,4);
 
-/* Type 1 : ax²+bx+c factoring */
+/* TYPE 1 : coefficient + large roots */
 if(type===1){
-let a = rand(2,5);
-let r1 = rand(2,12);
-let r2 = rand(2,12);
 
-let b = -a*(r1+r2);
-let c = a*r1*r2;
+let a=rand(2,6);
+let r1=rand(8,18);
+let r2=rand(9,20);
+
+let b=-a*(r1+r2);
+let c=a*r1*r2;
 
 document.getElementById("question").innerHTML =
 a+"x² - "+Math.abs(b)+"x + "+c+" = 0";
 
-currentAnswer = "x = " + r1 + ", " + r2;
+currentAnswer="x = "+r1+", "+r2;
 }
 
-/* Type 2 : x² - n = 0 */
+/* TYPE 2 : mixed sign roots */
 if(type===2){
-let n = rand(2,20)*rand(2,20);
 
-document.getElementById("question").innerHTML =
-"x² - "+n+" = 0";
+let r1=rand(8,18);
+let r2=-rand(5,15);
 
-currentAnswer = "x = ±" + simplifyRoot(n);
-}
-
-/* Type 3 : perfect square */
-if(type===3){
-let a = rand(3,15);
-document.getElementById("question").innerHTML =
-"x² + "+(2*a)+"x + "+(a*a)+" = 0";
-
-currentAnswer = "x = -"+a+" (double root)";
-}
-
-/* Type 4 : x² + bx - c */
-if(type===4){
-let r1 = rand(2,15);
-let r2 = -rand(2,15);
-
-let b = -(r1+r2);
-let c = r1*r2;
+let b=-(r1+r2);
+let c=r1*r2;
 
 let signB = b>=0 ? "- "+b+"x" : "+ "+Math.abs(b)+"x";
-let signC = c<0 ? "- "+Math.abs(c) : "+ "+c;
+let signC = c>=0 ? "+ "+c : "- "+Math.abs(c);
 
 document.getElementById("question").innerHTML =
 "x² "+signB+" "+signC+" = 0";
 
-currentAnswer = "x = " + r1 + ", " + r2;
+currentAnswer="x = "+r1+", "+r2;
 }
+
+/* TYPE 3 : perfect square hard */
+if(type===3){
+
+let a=rand(12,30);
+
+document.getElementById("question").innerHTML =
+"x² + "+(2*a)+"x + "+(a*a)+" = 0";
+
+currentAnswer="x = -"+a+" (double root)";
+}
+
+/* TYPE 4 : bigger coefficient + distinct roots */
+if(type===4){
+
+let a=rand(3,8);
+let r1=rand(6,16);
+let r2=rand(7,17);
+
+while(r1===r2){
+r2=rand(7,17);
+}
+
+let b=-a*(r1+r2);
+let c=a*r1*r2;
+
+document.getElementById("question").innerHTML =
+a+"x² - "+Math.abs(b)+"x + "+c+" = 0";
+
+currentAnswer="x = "+r1+", "+r2;
+}
+
 }
 
 generateQuestion();
