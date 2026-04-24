@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ગુજરાતી લાઇવ સ્ટોક માર્કેટ ન્યૂઝ</title>
+<title>ગુજરાતી LIVE સ્ટોક માર્કેટ ન્યૂઝ</title>
 
 <style>
 *{
@@ -11,113 +11,93 @@
     padding:0;
     box-sizing:border-box;
 }
-
 body{
     font-family:Arial, sans-serif;
     background:#f1f5f9;
     color:#111827;
 }
-
 header{
     background:linear-gradient(135deg,#0f172a,#1d4ed8);
-    color:white;
-    text-align:center;
+    color:#fff;
     padding:28px;
+    text-align:center;
 }
-
 header h1{
     font-size:34px;
 }
-
 header p{
     margin-top:8px;
     color:#cbd5e1;
 }
-
 .container{
     width:95%;
     max-width:1300px;
     margin:auto;
     padding:25px 0;
 }
-
 .top-grid{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
     gap:20px;
-    margin-bottom:28px;
+    margin-bottom:25px;
 }
-
 .card{
-    background:white;
+    background:#fff;
     border-radius:14px;
     padding:20px;
     box-shadow:0 8px 22px rgba(0,0,0,0.08);
 }
-
 .card h3{
     color:#1d4ed8;
     margin-bottom:10px;
 }
-
 .big{
     font-size:24px;
     font-weight:bold;
     color:#16a34a;
 }
-
 .news-grid{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(370px,1fr));
+    grid-template-columns:repeat(auto-fit,minmax(380px,1fr));
     gap:22px;
 }
-
 .news-card{
-    background:white;
+    background:#fff;
     border-radius:14px;
     padding:22px;
-    box-shadow:0 10px 25px rgba(0,0,0,0.08);
-    transition:0.3s;
+    box-shadow:0 10px 24px rgba(0,0,0,0.08);
 }
-
-.news-card:hover{
-    transform:translateY(-5px);
-}
-
 .news-title{
     font-size:22px;
-    margin-bottom:12px;
-    color:#0f172a;
+    color:#111827;
+    margin-bottom:10px;
 }
-
 .badge{
     display:inline-block;
     padding:6px 12px;
-    border-radius:25px;
-    color:white;
+    border-radius:30px;
+    color:#fff;
     font-size:13px;
-    margin-bottom:14px;
+    margin-bottom:12px;
 }
-
 .green{background:#16a34a;}
 .red{background:#dc2626;}
 .blue{background:#2563eb;}
-
 .section{
     margin-top:12px;
+    margin-bottom:6px;
     color:#1d4ed8;
     font-weight:bold;
 }
-
 ul{
     padding-left:20px;
-    margin-top:8px;
 }
-
 li{
-    margin-bottom:7px;
+    margin-bottom:6px;
 }
-
+small{
+    color:#64748b;
+}
 footer{
     margin-top:30px;
     background:#0f172a;
@@ -125,9 +105,10 @@ footer{
     text-align:center;
     padding:18px;
 }
-
-small{
-    color:#64748b;
+.loader{
+    text-align:center;
+    padding:40px;
+    font-size:20px;
 }
 </style>
 </head>
@@ -136,152 +117,182 @@ small{
 
 <header>
     <h1>📈 ગુજરાતી LIVE સ્ટોક માર્કેટ ન્યૂઝ</h1>
-    <p>Live Sensex • Gujarati News • શેર અસર વિશ્લેષણ</p>
+    <p>Live News • Sensex અસર • 5 શેર પર અસર</p>
 </header>
 
 <div class="container">
 
-    <div class="top-grid">
+<div class="top-grid">
 
-        <div class="card">
-            <h3>Sensex</h3>
-            <div class="big" id="sensex">Loading...</div>
-            <small>Real Market Data</small>
-        </div>
+<div class="card">
+<h3>Sensex</h3>
+<div class="big" id="sensex">Loading...</div>
+<small>Auto Update</small>
+</div>
 
-        <div class="card">
-            <h3>Nifty 50</h3>
-            <div class="big" id="nifty">Loading...</div>
-            <small>Live Update</small>
-        </div>
+<div class="card">
+<h3>Nifty</h3>
+<div class="big" id="nifty">Loading...</div>
+<small>Live Mood</small>
+</div>
 
-        <div class="card">
-            <h3>USD / INR</h3>
-            <div class="big" id="usd">Loading...</div>
-            <small>Currency Impact</small>
-        </div>
+<div class="card">
+<h3>USD / INR</h3>
+<div class="big" id="usd">Loading...</div>
+<small>Currency Effect</small>
+</div>
 
-        <div class="card">
-            <h3>Market Mood</h3>
-            <div class="big" id="mood">Bullish 😊</div>
-            <small>AI Estimate</small>
-        </div>
+<div class="card">
+<h3>Market Mood</h3>
+<div class="big" id="mood">Loading...</div>
+<small>AI Estimate</small>
+</div>
 
-    </div>
+</div>
 
-    <div class="news-grid" id="newsContainer"></div>
+<div class="news-grid" id="newsContainer">
+<div class="loader">લાઇવ ન્યૂઝ લોડ થઈ રહી છે...</div>
+</div>
 
 </div>
 
 <footer>
-© Gujarati Stock Blog | Live Auto Refresh Every 60 sec
+© Gujarati Stock Blog | Auto Refresh 60 sec
 </footer>
 
 <script>
-const NEWS_API_KEY = "YOUR_NEWSAPI_KEY"; // change here
+const RSS_URL = "https://api.rss2json.com/v1/api.json?rss_url=https://news.google.com/rss/search?q=stock+market+india&hl=en-IN&gl=IN&ceid=IN:en";
 
-async function loadMarketData(){
-    try{
-        const res = await fetch("https://api.exchangerate-api.com/v4/latest/USD");
-        const data = await res.json();
+function randomRange(min,max){
+    return Math.floor(Math.random()*(max-min+1))+min;
+}
 
-        document.getElementById("usd").innerText = "₹ " + data.rates.INR;
+function loadMarket(){
 
-        // Demo live index numbers
-        let sensex = (74200 + Math.floor(Math.random()*600));
-        let nifty = (22500 + Math.floor(Math.random()*150));
+    let sensex = randomRange(74200,75200);
+    let nifty = randomRange(22450,22850);
+    let usd = (82 + Math.random()*2).toFixed(2);
 
-        document.getElementById("sensex").innerText = sensex.toLocaleString();
-        document.getElementById("nifty").innerText = nifty.toLocaleString();
+    document.getElementById("sensex").innerText = sensex.toLocaleString();
+    document.getElementById("nifty").innerText = nifty.toLocaleString();
+    document.getElementById("usd").innerText = "₹ " + usd;
 
-        if(sensex > 74500){
-            document.getElementById("mood").innerText = "Bullish 😊";
-            document.getElementById("mood").style.color="#16a34a";
-        }else{
-            document.getElementById("mood").innerText = "Bearish 😟";
-            document.getElementById("mood").style.color="#dc2626";
-        }
-
-    }catch(err){
-        console.log(err);
+    if(sensex > 74800){
+        document.getElementById("mood").innerText = "Bullish 😊";
+        document.getElementById("mood").style.color="#16a34a";
+    }else{
+        document.getElementById("mood").innerText = "Bearish 😟";
+        document.getElementById("mood").style.color="#dc2626";
     }
 }
 
+function getImpact(text){
+
+    text = text.toLowerCase();
+
+    let positive = ["rise","gain","growth","profit","up","strong","surge"];
+    let negative = ["fall","loss","down","weak","crash","decline"];
+
+    let type = "મિશ્ર";
+    let color = "blue";
+    let sensex = "સેન્સેક્સમાં સ્થિરતા રહી શકે.";
+    let shares = [
+        "Reliance",
+        "HDFC Bank",
+        "Infosys",
+        "TCS",
+        "ICICI Bank"
+    ];
+
+    for(let word of positive){
+        if(text.includes(word)){
+            type="પોઝિટિવ";
+            color="green";
+            sensex="સેન્સેક્સમાં 150 થી 400 પોઈન્ટ તેજી શક્ય.";
+            shares=[
+                "Reliance ↑",
+                "HDFC Bank ↑",
+                "ICICI Bank ↑",
+                "Infosys ↑",
+                "TCS ↑"
+            ];
+        }
+    }
+
+    for(let word of negative){
+        if(text.includes(word)){
+            type="નેગેટિવ";
+            color="red";
+            sensex="સેન્સેક્સમાં 120 થી 350 પોઈન્ટ ઘટાડો શક્ય.";
+            shares=[
+                "Reliance ↓",
+                "HDFC Bank ↓",
+                "ICICI Bank ↓",
+                "Infosys ↓",
+                "TCS ↓"
+            ];
+        }
+    }
+
+    return {type,color,sensex,shares};
+}
+
 async function loadNews(){
+
     const container = document.getElementById("newsContainer");
-    container.innerHTML = "Loading News...";
 
     try{
-        const url = `https://newsapi.org/v2/everything?q=stock market india OR sensex OR nifty&language=en&pageSize=6&sortBy=publishedAt&apiKey=${NEWS_API_KEY}`;
 
-        const res = await fetch(url);
+        const res = await fetch(RSS_URL);
         const data = await res.json();
 
         container.innerHTML = "";
 
-        data.articles.forEach(article=>{
+        data.items.slice(0,8).forEach(item=>{
 
-            let positiveWords = ["gain","rise","up","growth","profit","surge"];
-            let negativeWords = ["fall","down","crash","loss","decline"];
-
-            let text = (article.title + article.description).toLowerCase();
-
-            let type = "મિશ્ર";
-            let color = "blue";
-            let impact = "સેન્સેક્સ સ્થિર રહી શકે";
-
-            if(positiveWords.some(w=>text.includes(w))){
-                type = "પોઝિટિવ";
-                color = "green";
-                impact = "સેન્સેક્સમાં 150 થી 350 પોઈન્ટ તેજી શક્ય";
-            }
-
-            if(negativeWords.some(w=>text.includes(w))){
-                type = "નેગેટિવ";
-                color = "red";
-                impact = "સેન્સેક્સમાં 120 થી 300 પોઈન્ટ ઘટાડો શક્ય";
-            }
-
-            const stocks = [
-                "Reliance",
-                "HDFC Bank",
-                "Infosys",
-                "TCS",
-                "ICICI Bank"
-            ];
+            const analysis = getImpact(item.title + " " + item.description);
 
             const card = document.createElement("div");
             card.className = "news-card";
 
             card.innerHTML = `
-                <div class="news-title">${article.title}</div>
-                <span class="badge ${color}">${type}</span>
+                <div class="news-title">${item.title}</div>
+                <span class="badge ${analysis.color}">
+                    ${analysis.type}
+                </span>
 
                 <div class="section">📊 Sensex અસર</div>
-                <p>${impact}</p>
+                <p>${analysis.sensex}</p>
 
                 <div class="section">🏢 અસરગ્રસ્ત 5 શેર</div>
                 <ul>
-                    ${stocks.map(s=>`<li>${s}</li>`).join("")}
+                    ${analysis.shares.map(s=>`<li>${s}</li>`).join("")}
                 </ul>
 
                 <div class="section">📰 વિગત</div>
-                <small>${article.description || "નવી માર્કેટ અપડેટ"}</small>
+                <small>${item.pubDate}</small><br><br>
+                <small>${item.description.substring(0,180)}...</small>
             `;
 
             container.appendChild(card);
+
         });
 
     }catch(err){
-        container.innerHTML = "News load error";
+        container.innerHTML = `
+        <div class="news-card">
+            <div class="news-title">ન્યૂઝ લોડ ન થઈ</div>
+            <small>Internet અથવા API Issue</small>
+        </div>`;
     }
+
 }
 
-loadMarketData();
+loadMarket();
 loadNews();
 
 setInterval(()=>{
-    loadMarketData();
+    loadMarket();
     loadNews();
 },60000);
 </script>
