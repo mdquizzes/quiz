@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ગુજરાતી સ્ટોક માર્કેટ ન્યૂઝ બ્લોગ</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f6f9;
+    color:#111;
+}
+
+header{
+    background:linear-gradient(135deg,#0f172a,#1e3a8a);
+    color:white;
+    padding:25px;
+    text-align:center;
+}
+
+header h1{
+    font-size:32px;
+}
+
+header p{
+    margin-top:8px;
+    color:#cbd5e1;
+}
+
+.container{
+    width:95%;
+    max-width:1300px;
+    margin:auto;
+    padding:25px 0;
+}
+
+.top-box{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:20px;
+    margin-bottom:25px;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    border-radius:14px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+}
+
+.card h3{
+    margin-bottom:12px;
+    color:#1e3a8a;
+}
+
+.live{
+    color:#16a34a;
+    font-weight:bold;
+    font-size:22px;
+}
+
+.news-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(350px,1fr));
+    gap:22px;
+}
+
+.news-card{
+    background:white;
+    border-radius:14px;
+    padding:20px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.08);
+    transition:0.3s;
+}
+
+.news-card:hover{
+    transform:translateY(-5px);
+}
+
+.news-title{
+    font-size:22px;
+    color:#0f172a;
+    margin-bottom:12px;
+}
+
+.badge{
+    display:inline-block;
+    padding:6px 10px;
+    border-radius:20px;
+    font-size:13px;
+    margin-bottom:14px;
+    color:white;
+}
+
+.green{ background:#16a34a; }
+.red{ background:#dc2626; }
+.blue{ background:#2563eb; }
+
+.section-title{
+    font-size:16px;
+    margin-top:12px;
+    margin-bottom:8px;
+    color:#1e40af;
+    font-weight:bold;
+}
+
+ul{
+    padding-left:20px;
+}
+
+li{
+    margin-bottom:8px;
+    line-height:1.5;
+}
+
+footer{
+    margin-top:30px;
+    background:#0f172a;
+    color:white;
+    text-align:center;
+    padding:18px;
+}
+
+.small{
+    color:#64748b;
+    font-size:14px;
+    margin-top:8px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>📈 ગુજરાતી સ્ટોક માર્કેટ લાઇવ ન્યૂઝ</h1>
+    <p>લેટેસ્ટ સમાચાર • Sensex અસર • Top 5 શેર અસર વિશ્લેષણ</p>
+</header>
+
+<div class="container">
+
+    <div class="top-box">
+        <div class="card">
+            <h3>સેન્સેક્સ</h3>
+            <div class="live" id="sensex">74,820 ▲ +285</div>
+            <p class="small">આજનો અંદાજિત મૂવમેન્ટ</p>
+        </div>
+
+        <div class="card">
+            <h3>નિફ્ટી</h3>
+            <div class="live">22,640 ▲ +91</div>
+            <p class="small">બેન્કિંગ અને IT સપોર્ટ</p>
+        </div>
+
+        <div class="card">
+            <h3>માર્કેટ સેન્ટિમેન્ટ</h3>
+            <div class="live">Bullish 😊</div>
+            <p class="small">વિદેશી ખરીદી વધતી</p>
+        </div>
+    </div>
+
+    <div class="news-grid" id="newsContainer"></div>
+
+</div>
+
+<footer>
+    © ગુજરાતી માર્કેટ બ્લોગ | Auto Update Demo HTML Page
+</footer>
+
+<script>
+const newsData = [
+{
+    title:"અમેરિકા વ્યાજ દર ઘટાડવાની શક્યતા",
+    badge:"પોઝિટિવ",
+    color:"green",
+    effect:"સેન્સેક્સમાં 250 થી 400 પોઈન્ટ તેજી આવી શકે.",
+    stocks:[
+        "HDFC Bank ↑",
+        "ICICI Bank ↑",
+        "Infosys ↑",
+        "TCS ↑",
+        "Reliance ↑"
+    ]
+},
+{
+    title:"કાચા તેલના ભાવમાં ઉછાળો",
+    badge:"નેગેટિવ",
+    color:"red",
+    effect:"સેન્સેક્સમાં 180 થી 320 પોઈન્ટ દબાણ આવી શકે.",
+    stocks:[
+        "Reliance ↓",
+        "BPCL ↓",
+        "HPCL ↓",
+        "Indigo ↓",
+        "Asian Paints ↓"
+    ]
+},
+{
+    title:"IT સેક્ટરમાં મોટા ઓર્ડર આવ્યા",
+    badge:"પોઝિટિવ",
+    color:"blue",
+    effect:"Sensex ને 150+ પોઈન્ટ સપોર્ટ મળી શકે.",
+    stocks:[
+        "Infosys ↑",
+        "TCS ↑",
+        "Wipro ↑",
+        "Tech Mahindra ↑",
+        "HCL Tech ↑"
+    ]
+},
+{
+    title:"રૂપીયો મજબૂત બન્યો",
+    badge:"મિશ્ર અસર",
+    color:"blue",
+    effect:"સેન્સેક્સ સ્થિર રહી શકે.",
+    stocks:[
+        "Asian Paints ↑",
+        "Maruti ↑",
+        "Infosys ↓",
+        "TCS ↓",
+        "Sun Pharma ↑"
+    ]
+}
+];
+
+const container = document.getElementById("newsContainer");
+
+function renderNews(){
+    container.innerHTML = "";
+
+    newsData.forEach(item=>{
+        const card = document.createElement("div");
+        card.className = "news-card";
+
+        card.innerHTML = `
+            <div class="news-title">${item.title}</div>
+            <span class="badge ${item.color}">${item.badge}</span>
+
+            <div class="section-title">📊 સેન્સેક્સ પર અસર</div>
+            <p>${item.effect}</p>
+
+            <div class="section-title">🏢 અસરગ્રસ્ત 5 શેર</div>
+            <ul>
+                ${item.stocks.map(stock=>`<li>${stock}</li>`).join("")}
+            </ul>
+        `;
+
+        container.appendChild(card);
+    });
+}
+
+renderNews();
+
+setInterval(()=>{
+    const random = Math.floor(Math.random()*600);
+    const sensex = 74800 + random;
+    document.getElementById("sensex").innerHTML =
+        `${sensex.toLocaleString()} ▲ +${random}`;
+},3000);
+
+</script>
+
+</body>
+</html>
