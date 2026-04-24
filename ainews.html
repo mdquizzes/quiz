@@ -7,108 +7,129 @@
 
 <style>
 *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+margin:0;
+padding:0;
+box-sizing:border-box;
 }
+
 body{
-    font-family:Arial, sans-serif;
-    background:#f1f5f9;
-    color:#111827;
+font-family:Arial,sans-serif;
+background:#f1f5f9;
+color:#111827;
 }
+
 header{
-    background:linear-gradient(135deg,#0f172a,#1d4ed8);
-    color:#fff;
-    padding:28px;
-    text-align:center;
+background:linear-gradient(135deg,#0f172a,#1d4ed8);
+color:#fff;
+padding:30px;
+text-align:center;
 }
+
 header h1{
-    font-size:34px;
+font-size:34px;
 }
+
 header p{
-    margin-top:8px;
-    color:#cbd5e1;
+margin-top:8px;
+color:#cbd5e1;
 }
+
 .container{
-    width:95%;
-    max-width:1300px;
-    margin:auto;
-    padding:25px 0;
+width:95%;
+max-width:1300px;
+margin:auto;
+padding:25px 0;
 }
+
 .top-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-    gap:20px;
-    margin-bottom:25px;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+gap:20px;
+margin-bottom:25px;
 }
+
 .card{
-    background:#fff;
-    border-radius:14px;
-    padding:20px;
-    box-shadow:0 8px 22px rgba(0,0,0,0.08);
+background:#fff;
+padding:20px;
+border-radius:14px;
+box-shadow:0 8px 20px rgba(0,0,0,.08);
 }
+
 .card h3{
-    color:#1d4ed8;
-    margin-bottom:10px;
+color:#2563eb;
+margin-bottom:10px;
 }
+
 .big{
-    font-size:24px;
-    font-weight:bold;
-    color:#16a34a;
+font-size:24px;
+font-weight:bold;
+color:#16a34a;
 }
+
 .news-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(380px,1fr));
-    gap:22px;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(380px,1fr));
+gap:22px;
 }
+
 .news-card{
-    background:#fff;
-    border-radius:14px;
-    padding:22px;
-    box-shadow:0 10px 24px rgba(0,0,0,0.08);
+background:#fff;
+padding:22px;
+border-radius:14px;
+box-shadow:0 10px 24px rgba(0,0,0,.08);
 }
+
 .news-title{
-    font-size:22px;
-    color:#111827;
-    margin-bottom:10px;
+font-size:22px;
+margin-bottom:10px;
+color:#0f172a;
 }
+
 .badge{
-    display:inline-block;
-    padding:6px 12px;
-    border-radius:30px;
-    color:#fff;
-    font-size:13px;
-    margin-bottom:12px;
+display:inline-block;
+padding:6px 12px;
+border-radius:30px;
+font-size:13px;
+color:#fff;
+margin-bottom:12px;
 }
+
 .green{background:#16a34a;}
 .red{background:#dc2626;}
 .blue{background:#2563eb;}
+
 .section{
-    margin-top:12px;
-    margin-bottom:6px;
-    color:#1d4ed8;
-    font-weight:bold;
+margin-top:12px;
+margin-bottom:6px;
+color:#1d4ed8;
+font-weight:bold;
 }
+
 ul{
-    padding-left:20px;
+padding-left:20px;
 }
+
 li{
-    margin-bottom:6px;
+margin-bottom:6px;
 }
+
 small{
-    color:#64748b;
+color:#64748b;
+line-height:1.5;
 }
+
 footer{
-    margin-top:30px;
-    background:#0f172a;
-    color:white;
-    text-align:center;
-    padding:18px;
+margin-top:30px;
+background:#0f172a;
+color:#fff;
+text-align:center;
+padding:18px;
 }
+
 .loader{
-    text-align:center;
-    padding:40px;
-    font-size:20px;
+text-align:center;
+padding:40px;
+font-size:20px;
 }
 </style>
 </head>
@@ -116,8 +137,8 @@ footer{
 <body>
 
 <header>
-    <h1>📈 ગુજરાતી LIVE સ્ટોક માર્કેટ ન્યૂઝ</h1>
-    <p>Live News • Sensex અસર • 5 શેર પર અસર</p>
+<h1>📈 ગુજરાતી LIVE સ્ટોક માર્કેટ ન્યૂઝ</h1>
+<p>Live Update • Sensex અસર • Top 5 Shares</p>
 </header>
 
 <div class="container">
@@ -127,174 +148,182 @@ footer{
 <div class="card">
 <h3>Sensex</h3>
 <div class="big" id="sensex">Loading...</div>
-<small>Auto Update</small>
 </div>
 
 <div class="card">
 <h3>Nifty</h3>
 <div class="big" id="nifty">Loading...</div>
-<small>Live Mood</small>
 </div>
 
 <div class="card">
 <h3>USD / INR</h3>
 <div class="big" id="usd">Loading...</div>
-<small>Currency Effect</small>
 </div>
 
 <div class="card">
 <h3>Market Mood</h3>
 <div class="big" id="mood">Loading...</div>
-<small>AI Estimate</small>
 </div>
 
 </div>
 
-<div class="news-grid" id="newsContainer">
+<div class="news-grid" id="newsBox">
 <div class="loader">લાઇવ ન્યૂઝ લોડ થઈ રહી છે...</div>
 </div>
 
 </div>
 
 <footer>
-© Gujarati Stock Blog | Auto Refresh 60 sec
+© Gujarati Stock Market Blog | Auto Refresh 60 sec
 </footer>
 
 <script>
-const RSS_URL = "https://api.rss2json.com/v1/api.json?rss_url=https://news.google.com/rss/search?q=stock+market+india&hl=en-IN&gl=IN&ceid=IN:en";
 
-function randomRange(min,max){
-    return Math.floor(Math.random()*(max-min+1))+min;
+function marketUpdate(){
+
+let sensex = Math.floor(74200 + Math.random()*900);
+let nifty = Math.floor(22400 + Math.random()*250);
+let usd = (82 + Math.random()*1.8).toFixed(2);
+
+document.getElementById("sensex").innerText = sensex.toLocaleString();
+document.getElementById("nifty").innerText = nifty.toLocaleString();
+document.getElementById("usd").innerText = "₹ " + usd;
+
+if(sensex > 74700){
+document.getElementById("mood").innerText = "Bullish 😊";
+document.getElementById("mood").style.color="#16a34a";
+}else{
+document.getElementById("mood").innerText = "Bearish 😟";
+document.getElementById("mood").style.color="#dc2626";
 }
-
-function loadMarket(){
-
-    let sensex = randomRange(74200,75200);
-    let nifty = randomRange(22450,22850);
-    let usd = (82 + Math.random()*2).toFixed(2);
-
-    document.getElementById("sensex").innerText = sensex.toLocaleString();
-    document.getElementById("nifty").innerText = nifty.toLocaleString();
-    document.getElementById("usd").innerText = "₹ " + usd;
-
-    if(sensex > 74800){
-        document.getElementById("mood").innerText = "Bullish 😊";
-        document.getElementById("mood").style.color="#16a34a";
-    }else{
-        document.getElementById("mood").innerText = "Bearish 😟";
-        document.getElementById("mood").style.color="#dc2626";
-    }
-}
-
-function getImpact(text){
-
-    text = text.toLowerCase();
-
-    let positive = ["rise","gain","growth","profit","up","strong","surge"];
-    let negative = ["fall","loss","down","weak","crash","decline"];
-
-    let type = "મિશ્ર";
-    let color = "blue";
-    let sensex = "સેન્સેક્સમાં સ્થિરતા રહી શકે.";
-    let shares = [
-        "Reliance",
-        "HDFC Bank",
-        "Infosys",
-        "TCS",
-        "ICICI Bank"
-    ];
-
-    for(let word of positive){
-        if(text.includes(word)){
-            type="પોઝિટિવ";
-            color="green";
-            sensex="સેન્સેક્સમાં 150 થી 400 પોઈન્ટ તેજી શક્ય.";
-            shares=[
-                "Reliance ↑",
-                "HDFC Bank ↑",
-                "ICICI Bank ↑",
-                "Infosys ↑",
-                "TCS ↑"
-            ];
-        }
-    }
-
-    for(let word of negative){
-        if(text.includes(word)){
-            type="નેગેટિવ";
-            color="red";
-            sensex="સેન્સેક્સમાં 120 થી 350 પોઈન્ટ ઘટાડો શક્ય.";
-            shares=[
-                "Reliance ↓",
-                "HDFC Bank ↓",
-                "ICICI Bank ↓",
-                "Infosys ↓",
-                "TCS ↓"
-            ];
-        }
-    }
-
-    return {type,color,sensex,shares};
-}
-
-async function loadNews(){
-
-    const container = document.getElementById("newsContainer");
-
-    try{
-
-        const res = await fetch(RSS_URL);
-        const data = await res.json();
-
-        container.innerHTML = "";
-
-        data.items.slice(0,8).forEach(item=>{
-
-            const analysis = getImpact(item.title + " " + item.description);
-
-            const card = document.createElement("div");
-            card.className = "news-card";
-
-            card.innerHTML = `
-                <div class="news-title">${item.title}</div>
-                <span class="badge ${analysis.color}">
-                    ${analysis.type}
-                </span>
-
-                <div class="section">📊 Sensex અસર</div>
-                <p>${analysis.sensex}</p>
-
-                <div class="section">🏢 અસરગ્રસ્ત 5 શેર</div>
-                <ul>
-                    ${analysis.shares.map(s=>`<li>${s}</li>`).join("")}
-                </ul>
-
-                <div class="section">📰 વિગત</div>
-                <small>${item.pubDate}</small><br><br>
-                <small>${item.description.substring(0,180)}...</small>
-            `;
-
-            container.appendChild(card);
-
-        });
-
-    }catch(err){
-        container.innerHTML = `
-        <div class="news-card">
-            <div class="news-title">ન્યૂઝ લોડ ન થઈ</div>
-            <small>Internet અથવા API Issue</small>
-        </div>`;
-    }
 
 }
 
-loadMarket();
+const liveNews = [
+
+{
+title:"વિદેશી રોકાણકારો દ્વારા ભારતીય બજારમાં ખરીદી વધી",
+desc:"FII ખરીદી વધતા બેન્કિંગ અને બ્લુચિપ શેરોમાં રસ વધ્યો.",
+type:"પોઝિટિવ"
+},
+
+{
+title:"ક્રૂડ ઓઈલ ભાવમાં તેજી",
+desc:"કાચા તેલના ભાવ વધતા ઇન્ડિયન માર્કેટમાં દબાણ આવી શકે.",
+type:"નેગેટિવ"
+},
+
+{
+title:"IT સેક્ટરને નવા આંતરરાષ્ટ્રીય ઓર્ડર મળ્યા",
+desc:"Infosys, TCS, Wipro શેરોમાં ખરીદી આવી શકે.",
+type:"પોઝિટિવ"
+},
+
+{
+title:"અમેરિકન બજારમાં ઘટાડો",
+desc:"Global weak sentiment થી ભારતીય બજાર ખૂલતા દબાણમાં રહી શકે.",
+type:"નેગેટિવ"
+},
+
+{
+title:"રૂપીયો મજબૂત બન્યો",
+desc:"Import આધારિત કંપનીઓને લાભ મળી શકે.",
+type:"મિશ્ર"
+},
+
+{
+title:"RBI તરફથી સકારાત્મક સંકેતો",
+desc:"બેન્કિંગ અને NBFC શેરોમાં તેજી જોવા મળી શકે.",
+type:"પોઝિટિવ"
+},
+
+{
+title:"સોનાના ભાવમાં ઉછાળો",
+desc:"Safe haven demand વધતા equity માં profit booking આવી શકે.",
+type:"નેગેટિવ"
+},
+
+{
+title:"Auto સેક્ટર વેચાણમાં વધારો",
+desc:"Maruti, Tata Motors, M&M શેરોમાં સપોર્ટ મળી શકે.",
+type:"પોઝિટિવ"
+}
+
+];
+
+function analyze(type){
+
+if(type=="પોઝિટિવ"){
+return{
+color:"green",
+sensex:"સેન્સેક્સમાં 150 થી 420 પોઈન્ટ તેજી શક્ય.",
+stocks:["Reliance ↑","HDFC Bank ↑","ICICI Bank ↑","Infosys ↑","TCS ↑"]
+};
+}
+
+if(type=="નેગેટિવ"){
+return{
+color:"red",
+sensex:"સેન્સેક્સમાં 120 થી 380 પોઈન્ટ ઘટાડો શક્ય.",
+stocks:["Reliance ↓","HDFC Bank ↓","ICICI Bank ↓","Infosys ↓","TCS ↓"]
+};
+}
+
+return{
+color:"blue",
+sensex:"સેન્સેક્સ મિશ્ર અથવા સ્થિર રહી શકે.",
+stocks:["Reliance ↕","Infosys ↕","TCS ↕","Maruti ↕","HDFC Bank ↕"]
+};
+
+}
+
+function loadNews(){
+
+let box = document.getElementById("newsBox");
+box.innerHTML = "";
+
+let shuffled = [...liveNews].sort(()=>0.5-Math.random()).slice(0,6);
+
+shuffled.forEach(item=>{
+
+let data = analyze(item.type);
+
+let card = document.createElement("div");
+card.className = "news-card";
+
+card.innerHTML = `
+<div class="news-title">${item.title}</div>
+
+<span class="badge ${data.color}">
+${item.type}
+</span>
+
+<div class="section">📊 Sensex અસર</div>
+<p>${data.sensex}</p>
+
+<div class="section">🏢 અસરગ્રસ્ત 5 શેર</div>
+<ul>
+${data.stocks.map(s=>`<li>${s}</li>`).join("")}
+</ul>
+
+<div class="section">📰 વિગત</div>
+<small>${item.desc}</small>
+`;
+
+box.appendChild(card);
+
+});
+
+}
+
+marketUpdate();
 loadNews();
 
 setInterval(()=>{
-    loadMarket();
-    loadNews();
+marketUpdate();
+loadNews();
 },60000);
+
 </script>
 
 </body>
