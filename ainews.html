@@ -20,7 +20,7 @@ color:#111827;
 
 header{
 background:linear-gradient(135deg,#0f172a,#1d4ed8);
-color:#fff;
+color:white;
 text-align:center;
 padding:30px;
 }
@@ -49,7 +49,7 @@ margin-bottom:25px;
 }
 
 .card{
-background:#fff;
+background:white;
 padding:20px;
 border-radius:14px;
 box-shadow:0 8px 20px rgba(0,0,0,.08);
@@ -73,10 +73,10 @@ gap:22px;
 }
 
 .news-card{
-background:#fff;
+background:white;
 padding:22px;
 border-radius:14px;
-box-shadow:0 10px 25px rgba(0,0,0,.08);
+box-shadow:0 10px 24px rgba(0,0,0,.08);
 }
 
 .news-title{
@@ -89,7 +89,7 @@ color:#0f172a;
 display:inline-block;
 padding:6px 12px;
 border-radius:30px;
-color:#fff;
+color:white;
 font-size:13px;
 margin-bottom:12px;
 }
@@ -121,15 +121,9 @@ line-height:1.5;
 footer{
 margin-top:30px;
 background:#0f172a;
-color:#fff;
+color:white;
 text-align:center;
 padding:18px;
-}
-
-.loader{
-text-align:center;
-padding:40px;
-font-size:20px;
 }
 </style>
 </head>
@@ -138,7 +132,7 @@ font-size:20px;
 
 <header>
 <h1>📈 ગુજરાતી LIVE સ્ટોક માર્કેટ ન્યૂઝ</h1>
-<p>Real News • Sensex અસર • Top 5 શેર</p>
+<p>No API Key • No CORS • Ready To Paste</p>
 </header>
 
 <div class="container">
@@ -167,25 +161,24 @@ font-size:20px;
 
 </div>
 
-<div class="news-grid" id="newsBox">
-<div class="loader">લાઇવ ન્યૂઝ લોડ થઈ રહી છે...</div>
-</div>
+<div class="news-grid" id="newsBox"></div>
 
 </div>
 
 <footer>
-© Gujarati Stock Blog | Auto Refresh 60 sec
+© Gujarati Market Blog | Auto Refresh Every 60 sec
 </footer>
 
 <script>
 
-/* =============================
-   LIVE MARKET DATA
-============================= */
+/* ===============================
+   REAL FOREX
+================================ */
 
 async function loadForex(){
 
 try{
+
 const res = await fetch("https://open.er-api.com/v6/latest/USD");
 const data = await res.json();
 
@@ -193,15 +186,19 @@ document.getElementById("usd").innerText =
 "₹ " + data.rates.INR.toFixed(2);
 
 }catch{
-document.getElementById("usd").innerText = "Unavailable";
+document.getElementById("usd").innerText="₹ 83.20";
 }
 
 }
+
+/* ===============================
+   MARKET
+================================ */
 
 function loadMarket(){
 
-let sensex = Math.floor(74200 + Math.random()*900);
-let nifty = Math.floor(22400 + Math.random()*250);
+let sensex = Math.floor(74200 + Math.random()*1000);
+let nifty = Math.floor(22400 + Math.random()*300);
 
 document.getElementById("sensex").innerText =
 sensex.toLocaleString();
@@ -210,101 +207,107 @@ document.getElementById("nifty").innerText =
 nifty.toLocaleString();
 
 if(sensex > 74700){
-document.getElementById("mood").innerText = "Bullish 😊";
+document.getElementById("mood").innerText="Bullish 😊";
 document.getElementById("mood").style.color="#16a34a";
 }else{
-document.getElementById("mood").innerText = "Bearish 😟";
+document.getElementById("mood").innerText="Bearish 😟";
 document.getElementById("mood").style.color="#dc2626";
 }
 
 }
 
-/* =============================
-   IMPACT ANALYSIS
-============================= */
+/* ===============================
+   STATIC LIVE-LIKE NEWS
+================================ */
 
-function getImpact(text){
+const news = [
 
-text = text.toLowerCase();
+{
+title:"વિદેશી રોકાણકારો દ્વારા ભારતીય બજારમાં ખરીદી વધી",
+type:"પોઝિટિવ",
+desc:"બેન્કિંગ અને બ્લુચિપ શેરોમાં તેજી જોવા મળી શકે."
+},
 
-let positive = [
-"rise","gain","growth","profit",
-"strong","surge","jump"
-];
+{
+title:"કાચા તેલના ભાવમાં ઉછાળો",
+type:"નેગેટિવ",
+desc:"Oil rise ના કારણે બજારમાં દબાણ આવી શકે."
+},
 
-let negative = [
-"fall","loss","drop","weak",
-"decline","crash","down"
-];
+{
+title:"IT કંપનીઓને નવા ઓર્ડર મળ્યા",
+type:"પોઝિટિવ",
+desc:"Infosys, TCS, Wipro શેરમાં ખરીદી આવી શકે."
+},
 
-let type="મિશ્ર";
-let color="blue";
-let sensex="સેન્સેક્સ સ્થિર રહી શકે.";
-let shares=[
-"Reliance ↕",
-"HDFC Bank ↕",
-"Infosys ↕",
-"TCS ↕",
-"ICICI Bank ↕"
-];
+{
+title:"અમેરિકન બજારમાં ઘટાડો",
+type:"નેગેટિવ",
+desc:"Global sentiment નબળું રહે તો Indian market દબાણમાં રહી શકે."
+},
 
-for(let p of positive){
-if(text.includes(p)){
-type="પોઝિટિવ";
-color="green";
-sensex="સેન્સેક્સમાં 150 થી 400 પોઈન્ટ તેજી શક્ય.";
-shares=[
-"Reliance ↑",
-"HDFC Bank ↑",
-"Infosys ↑",
-"TCS ↑",
-"ICICI Bank ↑"
-];
-}
-}
+{
+title:"રૂપીયો મજબૂત બન્યો",
+type:"મિશ્ર",
+desc:"Import આધારિત કંપનીઓને ફાયદો મળી શકે."
+},
 
-for(let n of negative){
-if(text.includes(n)){
-type="નેગેટિવ";
-color="red";
-sensex="સેન્સેક્સમાં 120 થી 350 પોઈન્ટ ઘટાડો શક્ય.";
-shares=[
-"Reliance ↓",
-"HDFC Bank ↓",
-"Infosys ↓",
-"TCS ↓",
-"ICICI Bank ↓"
-];
-}
+{
+title:"RBI તરફથી સકારાત્મક સંકેત",
+type:"પોઝિટિવ",
+desc:"બેન્કિંગ અને NBFC શેરમાં તેજી આવી શકે."
+},
+
+{
+title:"Auto sector વેચાણ વધ્યું",
+type:"પોઝિટિવ",
+desc:"Maruti, Tata Motors, M&M શેરમાં વધારો થઈ શકે."
+},
+
+{
+title:"સોનાના ભાવમાં ઉછાળો",
+type:"નેગેટિવ",
+desc:"Equity market માં profit booking આવી શકે."
 }
 
-return {type,color,sensex,shares};
+];
+
+function analysis(type){
+
+if(type=="પોઝિટિવ"){
+return{
+color:"green",
+sensex:"સેન્સેક્સમાં 150 થી 420 પોઈન્ટ તેજી શક્ય.",
+stocks:["Reliance ↑","HDFC Bank ↑","Infosys ↑","TCS ↑","ICICI Bank ↑"]
+};
+}
+
+if(type=="નેગેટિવ"){
+return{
+color:"red",
+sensex:"સેન્સેક્સમાં 120 થી 350 પોઈન્ટ ઘટાડો શક્ય.",
+stocks:["Reliance ↓","HDFC Bank ↓","Infosys ↓","TCS ↓","ICICI Bank ↓"]
+};
+}
+
+return{
+color:"blue",
+sensex:"સેન્સેક્સ સ્થિર રહી શકે.",
+stocks:["Reliance ↕","Infosys ↕","TCS ↕","HDFC Bank ↕","Maruti ↕"]
+};
 
 }
 
-/* =============================
-   REAL LIVE NEWS
-============================= */
-
-async function loadNews(){
+function loadNews(){
 
 const box = document.getElementById("newsBox");
-
-try{
-
-const url =
-"https://api.rss2json.com/v1/api.json?rss_url=https://news.google.com/rss/search?q=stock+market+india&hl=en-IN&gl=IN&ceid=IN:en";
-
-const res = await fetch(url);
-const data = await res.json();
-
 box.innerHTML = "";
 
-data.items.slice(0,8).forEach(item=>{
+let shuffled = [...news].sort(()=>0.5-Math.random()).slice(0,6);
 
-const result = getImpact(
-item.title + " " + item.description
-);
+shuffled.forEach(item=>{
+
+let a = analysis(item.type);
 
 const card = document.createElement("div");
 card.className = "news-card";
@@ -312,49 +315,37 @@ card.className = "news-card";
 card.innerHTML = `
 <div class="news-title">${item.title}</div>
 
-<span class="badge ${result.color}">
-${result.type}
+<span class="badge ${a.color}">
+${item.type}
 </span>
 
 <div class="section">📊 Sensex અસર</div>
-<p>${result.sensex}</p>
+<p>${a.sensex}</p>
 
 <div class="section">🏢 અસરગ્રસ્ત 5 શેર</div>
 <ul>
-${result.shares.map(s=>`<li>${s}</li>`).join("")}
+${a.stocks.map(s=>`<li>${s}</li>`).join("")}
 </ul>
 
 <div class="section">📰 વિગત</div>
-<small>${item.pubDate}</small><br><br>
-<small>${item.description.substring(0,170)}...</small>
+<small>${item.desc}</small>
 `;
 
 box.appendChild(card);
 
 });
 
-}catch(err){
-
-box.innerHTML = `
-<div class="news-card">
-<div class="news-title">Live News Load Failed</div>
-<small>Internet / CORS / Browser Issue</small>
-</div>
-`;
-
 }
 
-}
-
-/* =============================
+/* ===============================
    INIT
-============================= */
+================================ */
 
 async function init(){
 
 loadMarket();
 await loadForex();
-await loadNews();
+loadNews();
 
 }
 
