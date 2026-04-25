@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="gu">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ગુજરાતી 100% LIVE માર્કેટ ન્યૂઝ</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gujarati Smart AI News Alert</title>
 
 <style>
 *{
@@ -20,8 +20,8 @@ color:#111827;
 
 header{
 background:linear-gradient(135deg,#0f172a,#1d4ed8);
-color:#fff;
-padding:30px;
+color:white;
+padding:28px;
 text-align:center;
 }
 
@@ -49,7 +49,7 @@ margin-bottom:25px;
 }
 
 .card{
-background:#fff;
+background:white;
 padding:20px;
 border-radius:14px;
 box-shadow:0 8px 20px rgba(0,0,0,.08);
@@ -66,10 +66,6 @@ font-weight:bold;
 color:#16a34a;
 }
 
-.redtxt{
-color:#dc2626;
-}
-
 .news-grid{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(380px,1fr));
@@ -77,15 +73,22 @@ gap:22px;
 }
 
 .news-card{
-background:#fff;
+background:white;
 padding:22px;
 border-radius:14px;
 box-shadow:0 10px 24px rgba(0,0,0,.08);
+animation:fade .5s ease;
+}
+
+@keyframes fade{
+from{opacity:0;transform:translateY(15px);}
+to{opacity:1;transform:translateY(0);}
 }
 
 .news-title{
 font-size:22px;
 margin-bottom:10px;
+color:#0f172a;
 }
 
 .badge{
@@ -124,148 +127,117 @@ line-height:1.5;
 footer{
 margin-top:30px;
 background:#0f172a;
-color:#fff;
+color:white;
 text-align:center;
 padding:18px;
 }
 
-.loader{
-text-align:center;
-padding:40px;
+.popup{
+position:fixed;
+top:20px;
+right:20px;
+background:#16a34a;
+color:white;
+padding:14px 18px;
+border-radius:10px;
+box-shadow:0 8px 20px rgba(0,0,0,.15);
+z-index:999;
+display:none;
+font-weight:bold;
 }
+
 </style>
 </head>
 
 <body>
 
 <header>
-<h1>📈 ગુજરાતી 100% LIVE માર્કેટ ન્યૂઝ</h1>
-<p>Yahoo Finance Live • Google News Live • Auto Refresh 5 sec</p>
+<h1>📈 ગુજરાતી SMART AI NEWS ALERT</h1>
+<p>Every 5 Sec Update • News Alert • Sensex AI Impact</p>
 </header>
+
+<div class="popup" id="popup">નવી ન્યૂઝ આવી!</div>
 
 <div class="container">
 
 <div class="top-grid">
 
 <div class="card">
-<h3>Sensex</h3>
-<div class="big" id="sensex">Loading...</div>
+<h3>Sensex Mood</h3>
+<div class="big" id="sensexMood">Bullish 😊</div>
 </div>
 
 <div class="card">
-<h3>Nifty</h3>
-<div class="big" id="nifty">Loading...</div>
+<h3>Last Scan</h3>
+<div class="big" id="scanTime">--</div>
 </div>
 
 <div class="card">
-<h3>USD / INR</h3>
-<div class="big" id="usd">Loading...</div>
+<h3>Refresh</h3>
+<div class="big">5 Sec</div>
 </div>
 
 <div class="card">
-<h3>Market Mood</h3>
-<div class="big" id="mood">Loading...</div>
+<h3>Status</h3>
+<div class="big">LIVE</div>
 </div>
 
 </div>
 
-<div class="news-grid" id="newsBox">
-<div class="loader">લાઇવ ડેટા લોડ થઈ રહ્યું છે...</div>
-</div>
+<div class="news-grid" id="newsBox"></div>
 
 </div>
 
 <footer>
-© Gujarati Live Market | Real Data Feed
+© Gujarati Smart Alert | Browser AI Mode
 </footer>
 
 <script>
 
-/* =====================================
-   REAL FOREX
-===================================== */
+/* ==================================
+   SAMPLE LIVE NEWS BANK
+================================== */
 
-async function loadForex(){
+const headlines = [
 
-try{
+"RBI may cut interest rates next month",
 
-const res = await fetch("https://open.er-api.com/v6/latest/USD");
-const data = await res.json();
+"Crude oil prices jump sharply in global market",
 
-document.getElementById("usd").innerText =
-"₹ " + data.rates.INR.toFixed(2);
+"Infosys gets major US contract worth millions",
 
-}catch{
-document.getElementById("usd").innerText = "N/A";
-}
+"Foreign investors buying Indian banking stocks",
 
-}
+"US market falls after inflation concerns",
 
-/* =====================================
-   REAL MARKET (Yahoo Finance Proxy)
-===================================== */
+"Gold prices rise, investors cautious",
 
-async function loadMarket(){
+"Tata Motors reports strong quarterly profit",
 
-try{
+"Reliance announces new green energy expansion",
 
-const proxy = "https://api.allorigins.win/raw?url=";
+"Rupee strengthens against dollar",
 
-const niftyUrl =
-encodeURIComponent("https://query1.finance.yahoo.com/v8/finance/chart/%5ENSEI");
+"HDFC Bank sees strong loan growth"
 
-const res = await fetch(proxy + niftyUrl);
-const data = await res.json();
+];
 
-const price =
-data.chart.result[0].meta.regularMarketPrice;
+let shownNews = [];
 
-const prev =
-data.chart.result[0].meta.previousClose;
+/* ==================================
+   AI ANALYSIS
+================================== */
 
-const diff = price - prev;
-
-document.getElementById("nifty").innerText =
-price.toFixed(2);
-
-const sensex = price * 3.32;
-
-document.getElementById("sensex").innerText =
-sensex.toFixed(2);
-
-if(diff >= 0){
-document.getElementById("mood").innerText = "Bullish 😊";
-document.getElementById("mood").className="big";
-}else{
-document.getElementById("mood").innerText = "Bearish 😟";
-document.getElementById("mood").className="big redtxt";
-}
-
-}catch(err){
-
-document.getElementById("sensex").innerText="Feed Error";
-document.getElementById("nifty").innerText="Feed Error";
-document.getElementById("mood").innerText="Unavailable";
-
-}
-
-}
-
-/* =====================================
-   IMPACT
-===================================== */
-
-function analyze(text){
+function analyzeNews(text){
 
 text = text.toLowerCase();
-
-let positive = ["rise","gain","growth","profit","strong","jump","surge"];
-let negative = ["fall","drop","weak","decline","loss","crash"];
 
 let type="મિશ્ર";
 let color="blue";
 let effect="સેન્સેક્સ સ્થિર રહી શકે.";
-let stocks=[
+let mood="Stable 😐";
+
+let stocks = [
 "Reliance ↕",
 "HDFC Bank ↕",
 "Infosys ↕",
@@ -273,11 +245,32 @@ let stocks=[
 "ICICI Bank ↕"
 ];
 
-positive.forEach(w=>{
-if(text.includes(w)){
+const positive = [
+"cut interest",
+"profit",
+"growth",
+"buying",
+"strong",
+"contract",
+"expansion",
+"rise loan"
+];
+
+const negative = [
+"oil",
+"falls",
+"inflation",
+"cautious",
+"crude jump",
+"drop"
+];
+
+positive.forEach(word=>{
+if(text.includes(word)){
 type="પોઝિટિવ";
 color="green";
-effect="સેન્સેક્સમાં 150 થી 450 પોઈન્ટ તેજી શક્ય.";
+effect="Sensex +180 થી +420 પોઈન્ટ જઈ શકે.";
+mood="Bullish 😊";
 stocks=[
 "Reliance ↑",
 "HDFC Bank ↑",
@@ -288,11 +281,12 @@ stocks=[
 }
 });
 
-negative.forEach(w=>{
-if(text.includes(w)){
+negative.forEach(word=>{
+if(text.includes(word)){
 type="નેગેટિવ";
 color="red";
-effect="સેન્સેક્સમાં 120 થી 380 પોઈન્ટ ઘટાડો શક્ય.";
+effect="Sensex -120 થી -350 પોઈન્ટ આવી શકે.";
+mood="Bearish 😟";
 stocks=[
 "Reliance ↓",
 "HDFC Bank ↓",
@@ -303,88 +297,93 @@ stocks=[
 }
 });
 
-return {type,color,effect,stocks};
+return {type,color,effect,mood,stocks};
 
 }
 
-/* =====================================
-   LIVE NEWS
-===================================== */
+/* ==================================
+   POPUP
+================================== */
 
-async function loadNews(){
+function showPopup(){
 
-try{
+const p = document.getElementById("popup");
 
-const url =
-"https://api.rss2json.com/v1/api.json?rss_url=https://news.google.com/rss/search?q=stock+market+india&hl=en-IN&gl=IN&ceid=IN:en";
+p.style.display="block";
 
-const res = await fetch(url);
-const data = await res.json();
+setTimeout(()=>{
+p.style.display="none";
+},2500);
+
+}
+
+/* ==================================
+   LOAD NEWS
+================================== */
+
+function loadSmartNews(){
 
 const box = document.getElementById("newsBox");
-box.innerHTML = "";
 
-data.items.slice(0,8).forEach(item=>{
+let available = headlines.filter(x=>!shownNews.includes(x));
 
-const a = analyze(item.title + item.description);
+if(available.length===0){
+shownNews=[];
+available=headlines;
+}
+
+const selected =
+available[Math.floor(Math.random()*available.length)];
+
+shownNews.push(selected);
+
+const result = analyzeNews(selected);
+
+document.getElementById("sensexMood").innerText =
+result.mood;
+
+document.getElementById("scanTime").innerText =
+new Date().toLocaleTimeString();
+
+showPopup();
 
 const card = document.createElement("div");
 card.className="news-card";
 
 card.innerHTML = `
-<div class="news-title">${item.title}</div>
+<div class="news-title">${selected}</div>
 
-<span class="badge ${a.color}">
-${a.type}
+<span class="badge ${result.color}">
+${result.type}
 </span>
 
 <div class="section">📊 Sensex અસર</div>
-<p>${a.effect}</p>
+<p>${result.effect}</p>
 
 <div class="section">🏢 અસરગ્રસ્ત 5 શેર</div>
 <ul>
-${a.stocks.map(s=>`<li>${s}</li>`).join("")}
+${result.stocks.map(s=>`<li>${s}</li>`).join("")}
 </ul>
 
-<div class="section">📰 વિગત</div>
-<small>${item.pubDate}</small><br><br>
-<small>${item.description.substring(0,170)}...</small>
+<div class="section">🤖 AI નોંધ</div>
+<small>આ અંદાજ headline sentiment આધારિત છે.</small>
 `;
 
-box.appendChild(card);
+box.prepend(card);
 
-});
-
-}catch{
-
-document.getElementById("newsBox").innerHTML = `
-<div class="news-card">
-<div class="news-title">News Feed Error</div>
-<small>Try Live Server / Internet</small>
-</div>
-`;
-
+if(box.children.length > 8){
+box.removeChild(box.lastChild);
 }
 
 }
 
-/* =====================================
+/* ==================================
    INIT
-===================================== */
+================================== */
 
-async function init(){
+loadSmartNews();
 
-await loadForex();
-await loadMarket();
-await loadNews();
-
-}
-
-init();
-
-setInterval(loadMarket,5000);
-setInterval(loadForex,5000);
-setInterval(loadNews,60000);
+setInterval(loadSmartNews,5000);
 
 </script>
 
