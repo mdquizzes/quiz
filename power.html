@@ -1,161 +1,72 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Square Count Game</title>
+  <title>Nested Square Pattern Game</title>
   <style>
     body {
-      font-family: Arial;
-      text-align: center;
-      background: #eef2f7;
-    }
-
-    #gameArea {
-      margin: 20px auto;
-      width: 320px;
-      height: 320px;
-      position: relative;
-    }
-
-    .layer {
-      position: absolute;
-      display: grid;
+      background: #2e8b57;
+      display: flex;
       justify-content: center;
-      align-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
     }
 
-    .smallBox {
-      width: 20px;
-      height: 20px;
+    .container {
+      width: 500px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 20px;
     }
 
-    button {
-      padding: 10px;
-      margin: 6px;
-      font-size: 16px;
-      cursor: pointer;
+    .bigSquare {
+      width: 80px;
+      height: 80px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 2px;
+      transform: rotate(45deg);
     }
 
-    input {
-      padding: 8px;
-      font-size: 16px;
+    .smallSquare {
+      width: 100%;
+      height: 100%;
+      background: white;
     }
   </style>
 </head>
 
 <body>
 
-<h1>🟦 Square Counting Game</h1>
-
-<div id="startScreen">
-  <input type="text" id="playerName" placeholder="Enter your name">
-  <br><br>
-  <button onclick="startGame()">Start Game</button>
-</div>
-
-<div id="gameScreen" style="display:none;">
-  <h3 id="playerDisplay"></h3>
-  <h2>Count total SMALL squares</h2>
-
-  <div id="gameArea"></div>
-
-  <div id="options"></div>
-
-  <h3 id="score">Score: 0</h3>
-</div>
+<div class="container" id="pattern"></div>
 
 <script>
-let score = 0;
-let correctAnswer = 0;
+const colors = [
+  "#1b4332", "#081c15", "#2d6a4f",
+  "#344e41", "#3a5a40"
+];
 
-const colors = ["#ff6b6b", "#4ecdc4", "#ffe66d", "#5f27cd", "#1dd1a1"];
+function createPattern() {
+  const container = document.getElementById("pattern");
 
-function startGame() {
-  let name = document.getElementById("playerName").value;
-  if(name === "") {
-    alert("Enter name first!");
-    return;
-  }
+  for (let i = 0; i < 15; i++) { // number of big squares
+    let big = document.createElement("div");
+    big.className = "bigSquare";
 
-  document.getElementById("startScreen").style.display = "none";
-  document.getElementById("gameScreen").style.display = "block";
-  document.getElementById("playerDisplay").innerText = "Player: " + name;
+    let color = colors[Math.floor(Math.random() * colors.length)];
+    big.style.background = color;
 
-  nextQuestion();
-}
-
-function nextQuestion() {
-  let gameArea = document.getElementById("gameArea");
-  gameArea.innerHTML = "";
-
-  let layers = Math.floor(Math.random()*2) + 2; // 2-3 layers
-  let gridSize = Math.floor(Math.random()*2) + 2; // 2x2 or 3x3
-
-  correctAnswer = layers * (gridSize * gridSize);
-
-  for(let i=0; i<layers; i++) {
-    let layer = document.createElement("div");
-    layer.className = "layer";
-
-    let size = 300 - (i * 60);
-
-    layer.style.width = size + "px";
-    layer.style.height = size + "px";
-    layer.style.top = (i*30) + "px";
-    layer.style.left = (i*30) + "px";
-
-    layer.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
-    layer.style.gap = "4px";
-
-    let color = colors[i % colors.length];
-
-    for(let j=0; j<gridSize * gridSize; j++) {
-      let box = document.createElement("div");
-      box.className = "smallBox";
-      box.style.background = color;
-      layer.appendChild(box);
+    for (let j = 0; j < 25; j++) { // 5x5 grid inside
+      let small = document.createElement("div");
+      small.className = "smallSquare";
+      big.appendChild(small);
     }
 
-    gameArea.appendChild(layer);
+    container.appendChild(big);
   }
-
-  generateOptions();
 }
 
-function generateOptions() {
-  let optionsDiv = document.getElementById("options");
-  optionsDiv.innerHTML = "";
-
-  let answers = [correctAnswer];
-
-  while(answers.length < 4) {
-    let wrong = correctAnswer + Math.floor(Math.random()*8) - 4;
-    if(wrong > 0 && !answers.includes(wrong)) {
-      answers.push(wrong);
-    }
-  }
-
-  answers.sort(() => Math.random() - 0.5);
-
-  answers.forEach(ans => {
-    let btn = document.createElement("button");
-    btn.innerText = ans;
-    btn.onclick = () => checkAnswer(ans);
-    optionsDiv.appendChild(btn);
-  });
-}
-
-function checkAnswer(ans) {
-  if(ans === correctAnswer) {
-    score++;
-    alert("✅ Correct!");
-  } else {
-    alert("❌ Wrong! Correct: " + correctAnswer);
-  }
-
-  document.getElementById("score").innerText = "Score: " + score;
-
-  nextQuestion();
-}
+createPattern();
 </script>
 
 </body>
