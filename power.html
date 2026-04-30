@@ -1,19 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Nested Square Pattern Game</title>
+  <title>Square Count Game</title>
   <style>
     body {
+      font-family: Arial;
       background: #2e8b57;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      text-align: center;
       margin: 0;
+      color: white;
     }
 
-    .container {
-      width: 500px;
+    #startScreen {
+      margin-top: 100px;
+    }
+
+    input {
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px 15px;
+      margin: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #gameArea {
+      width: 520px;
+      margin: 20px auto;
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 20px;
@@ -23,7 +39,6 @@
       width: 80px;
       height: 80px;
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
       gap: 2px;
       transform: rotate(45deg);
     }
@@ -38,35 +53,121 @@
 
 <body>
 
-<div class="container" id="pattern"></div>
+<h1>🔷 Square Counting Game</h1>
+
+<div id="startScreen">
+  <input type="text" id="playerName" placeholder="Enter your name">
+  <br><br>
+  <button onclick="startGame()">Start Game</button>
+</div>
+
+<div id="gameScreen" style="display:none;">
+  <h3 id="playerDisplay"></h3>
+  <h2>Count TOTAL small squares</h2>
+
+  <div id="gameArea"></div>
+
+  <div id="options"></div>
+
+  <h3 id="score">Score: 0</h3>
+</div>
 
 <script>
+let score = 0;
+let correctAnswer = 0;
+
 const colors = [
-  "#1b4332", "#081c15", "#2d6a4f",
-  "#344e41", "#3a5a40"
+  "#081c15","#1b4332","#2d6a4f","#344e41","#3a5a40"
 ];
 
-function createPattern() {
-  const container = document.getElementById("pattern");
+function startGame() {
+  let name = document.getElementById("playerName").value;
+  if(name === "") {
+    alert("Enter name first!");
+    return;
+  }
 
-  for (let i = 0; i < 15; i++) { // number of big squares
+  document.getElementById("startScreen").style.display = "none";
+  document.getElementById("gameScreen").style.display = "block";
+  document.getElementById("playerDisplay").innerText = "Player: " + name;
+
+  nextQuestion();
+}
+
+function nextQuestion() {
+  let gameArea = document.getElementById("gameArea");
+  gameArea.innerHTML = "";
+
+  correctAnswer = 0;
+
+  let totalBigSquares = Math.floor(Math.random()*5) + 8; // 8–12 squares
+
+  for(let i=0; i<totalBigSquares; i++) {
+
+    let gridSize = Math.floor(Math.random()*2) + 3; // 3x3 or 4x4
+    let smallCount = gridSize * gridSize;
+
+    correctAnswer += smallCount;
+
     let big = document.createElement("div");
     big.className = "bigSquare";
 
-    let color = colors[Math.floor(Math.random() * colors.length)];
+    let size = 80;
+    big.style.width = size + "px";
+    big.style.height = size + "px";
+
+    big.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+
+    let color = colors[Math.floor(Math.random()*colors.length)];
     big.style.background = color;
 
-    for (let j = 0; j < 25; j++) { // 5x5 grid inside
+    for(let j=0; j<smallCount; j++) {
       let small = document.createElement("div");
       small.className = "smallSquare";
       big.appendChild(small);
     }
 
-    container.appendChild(big);
+    gameArea.appendChild(big);
   }
+
+  generateOptions();
 }
 
-createPattern();
+function generateOptions() {
+  let optionsDiv = document.getElementById("options");
+  optionsDiv.innerHTML = "";
+
+  let answers = [correctAnswer];
+
+  while(answers.length < 4) {
+    let wrong = correctAnswer + Math.floor(Math.random()*20) - 10;
+    if(wrong > 0 && !answers.includes(wrong)) {
+      answers.push(wrong);
+    }
+  }
+
+  answers.sort(() => Math.random() - 0.5);
+
+  answers.forEach(ans => {
+    let btn = document.createElement("button");
+    btn.innerText = ans;
+    btn.onclick = () => checkAnswer(ans);
+    optionsDiv.appendChild(btn);
+  });
+}
+
+function checkAnswer(ans) {
+  if(ans === correctAnswer) {
+    score++;
+    alert("✅ Correct!");
+  } else {
+    alert("❌ Wrong! Correct: " + correctAnswer);
+  }
+
+  document.getElementById("score").innerText = "Score: " + score;
+
+  nextQuestion();
+}
 </script>
 
 </body>
