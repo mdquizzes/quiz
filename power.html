@@ -1,177 +1,211 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Prime Factor Challenge</title>
+  <title>Prime Factor Drag Game</title>
+
   <style>
     body {
       font-family: Arial;
       text-align: center;
-      background: #1e293b;
+      background: #0f172a;
       color: white;
     }
 
     h1 { margin-top: 20px; }
 
-    .card {
-      background: #334155;
-      padding: 20px;
-      border-radius: 10px;
-      width: 320px;
-      margin: 20px auto;
+    .box {
+      border: 2px dashed #ccc;
+      width: 60px;
+      height: 40px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      margin: 5px;
+      font-size: 18px;
+      background: #1e293b;
     }
 
-    input {
-      width: 40px;
-      padding: 5px;
+    .draggable {
+      padding: 8px 12px;
+      background: #38bdf8;
       margin: 5px;
-      text-align: center;
-      font-size: 16px;
+      display: inline-block;
+      cursor: grab;
+      border-radius: 5px;
+    }
+
+    .area {
+      margin: 20px;
     }
 
     button {
-      padding: 10px 15px;
+      padding: 10px;
       margin: 10px;
       cursor: pointer;
-      font-size: 16px;
-    }
-
-    #score {
-      margin-top: 10px;
     }
   </style>
 </head>
 
 <body>
 
-<h1>🔥 Prime Factor Challenge</h1>
+<h1>🔥 Prime Factor Drag Game</h1>
 
 <div id="startScreen">
-  <input type="text" id="playerName" placeholder="Enter Name">
+  <input id="playerName" placeholder="Enter name">
   <br><br>
-  <button onclick="startGame()">Start Game</button>
+  <button onclick="startGame()">Start</button>
 </div>
 
 <div id="gameScreen" style="display:none;">
-  <h3 id="playerDisplay"></h3>
+  <h3 id="player"></h3>
+  <h2 id="targetNumber"></h2>
 
-  <div class="card">
-    <h2 id="number"></h2>
-    <div id="factorArea"></div>
+  <div id="dropArea"></div>
+
+  <h3 id="liveResult"></h3>
+
+  <div class="area">
+    <h3>Drag Bases</h3>
+    <div id="bases"></div>
+
+    <h3>Drag Powers</h3>
+    <div id="powers"></div>
   </div>
-
-  <button onclick="checkAnswer()">Submit</button>
-
-  <h3 id="level"></h3>
-  <h3 id="score">Score: 0</h3>
 </div>
 
 <script>
-let score = 0;
-let level = 1;
-let currentFactors = [];
+let target = 0;
 
 function startGame() {
   let name = document.getElementById("playerName").value;
-  if(name === "") return alert("Enter name!");
+  if(!name) return alert("Enter name");
 
   document.getElementById("startScreen").style.display = "none";
   document.getElementById("gameScreen").style.display = "block";
+  document.getElementById("player").innerText = "Player: " + name;
 
-  document.getElementById("playerDisplay").innerText = "Player: " + name;
-
-  nextQuestion();
+  newQuestion();
 }
 
-function getPrimeFactors(num) {
-  let factors = {};
+function getFactors(num) {
+  let factors = [];
   let d = 2;
 
-  while (num > 1) {
-    while (num % d === 0) {
-      factors[d] = (factors[d] || 0) + 1;
+  while(num > 1) {
+    let count = 0;
+    while(num % d === 0) {
       num /= d;
+      count++;
     }
+    if(count > 0) factors.push([d, count]);
     d++;
   }
-
   return factors;
 }
 
-function generateNumber() {
-  return Math.floor(Math.random() * 9000) + 1000;
+function newQuestion() {
+  target = Math.floor(Math.random()*900) + 100;
+  document.getElementById("targetNumber").innerText = "Target: " + target;
+
+  let factors = getFactors(target);
+
+  createDropBoxes(factors.length);
+  createDraggables(factors);
 }
 
-function nextQuestion() {
-  let num = generateNumber();
-  let factors = getPrimeFactors(num);
-
-  currentFactors = Object.entries(factors);
-
-  document.getElementById("number").innerText = num;
-  document.getElementById("level").innerText = "Level: " + level;
-
-  let area = document.getElementById("factorArea");
+function createDropBoxes(n) {
+  let area = document.getElementById("dropArea");
   area.innerHTML = "";
 
-  currentFactors.forEach(([base, power], i) => {
+  for(let i=0;i<n;i++) {
     let div = document.createElement("div");
-
-    if(level === 1) {
-      // base given
-      div.innerHTML = base + "<sup><input id='p"+i+"'></sup>";
-    }
-    else if(level === 2) {
-      // power given
-      div.innerHTML = "<input id='b"+i+"'>^" + power;
-    }
-    else {
-      // both empty
-      div.innerHTML = "<input id='b"+i+"'>^<input id='p"+i+"'>";
-    }
-
+    div.innerHTML = `
+      <div class="box" ondrop="drop(event)" ondragover="allowDrop(event)" data-type="base"></div>
+      ^
+      <div class="box" ondrop="drop(event)" ondragover="allowDrop(event)" data-type="power"></div>
+    `;
     area.appendChild(div);
+  }
+}
+
+function createDraggables(factors) {
+  let basesDiv = document.getElementById("bases");
+  let powersDiv = document.getElementById("powers");
+
+  basesDiv.innerHTML = "";
+  powersDiv.innerHTML = "";
+
+  factors.forEach(([b,p]) => {
+    let base = document.createElement("div");
+    base.className = "draggable";
+    base.innerText = b;
+    base.draggable = true;
+    base.dataset.type = "base";
+    base.dataset.value = b;
+    base.ondragstart = drag;
+    basesDiv.appendChild(base);
+
+    let power = document.createElement("div");
+    power.className = "draggable";
+    power.innerText = p;
+    power.draggable = true;
+    power.dataset.type = "power";
+    power.dataset.value = p;
+    power.ondragstart = drag;
+    powersDiv.appendChild(power);
   });
 }
 
-function checkAnswer() {
-  let correct = true;
+function allowDrop(ev) {
+  ev.preventDefault();
+}
 
-  currentFactors.forEach(([base, power], i) => {
+function drag(ev) {
+  ev.dataTransfer.setData("type", ev.target.dataset.type);
+  ev.dataTransfer.setData("value", ev.target.dataset.value);
+}
 
-    if(level === 1) {
-      let p = document.getElementById("p"+i).value;
-      if(Number(p) !== Number(power)) correct = false;
-    }
+function drop(ev) {
+  ev.preventDefault();
 
-    else if(level === 2) {
-      let b = document.getElementById("b"+i).value;
-      if(Number(b) !== Number(base)) correct = false;
-    }
+  let type = ev.dataTransfer.getData("type");
+  let value = ev.dataTransfer.getData("value");
 
-    else {
-      let b = document.getElementById("b"+i).value;
-      let p = document.getElementById("p"+i).value;
+  if(ev.target.dataset.type === type) {
+    ev.target.innerText = value;
+    ev.target.dataset.value = value;
+  }
 
-      if(Number(b) !== Number(base) || Number(p) !== Number(power)) {
-        correct = false;
-      }
+  updateResult();
+}
+
+function updateResult() {
+  let boxes = document.querySelectorAll("#dropArea > div");
+
+  let result = 1;
+  let expression = "";
+
+  boxes.forEach(box => {
+    let b = box.children[0].dataset.value;
+    let p = box.children[1].dataset.value;
+
+    if(b && p) {
+      result *= Math.pow(b, p);
+      expression += `${b}^${p} × `;
     }
   });
 
-  if(correct) {
-    score++;
-    alert("✅ Correct!");
-  } else {
-    alert("❌ Wrong!");
+  expression = expression.slice(0,-2);
+
+  document.getElementById("liveResult").innerText =
+    expression + " = " + result;
+
+  if(result === target) {
+    setTimeout(() => {
+      alert("🎉 Correct! Next Player!");
+      newQuestion();
+    }, 500);
   }
-
-  document.getElementById("score").innerText = "Score: " + score;
-
-  // level progression
-  if(score === 3) level = 2;
-  if(score === 6) level = 3;
-
-  nextQuestion();
 }
 </script>
 
