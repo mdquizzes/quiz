@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Exponent Counting Game</title>
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      background: #f4f4f4;
+    }
+    #gameArea {
+      margin: 20px auto;
+      width: 300px;
+      height: 300px;
+      position: relative;
+    }
+    .box {
+      border: 2px solid #333;
+      position: absolute;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .small {
+      width: 10px;
+      height: 10px;
+      background: red;
+      margin: 2px;
+      display: inline-block;
+    }
+    button {
+      padding: 10px;
+      margin: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>Exponent Counting Game</h1>
+
+<div id="startScreen">
+  <input type="text" id="playerName" placeholder="Enter your name">
+  <br><br>
+  <button onclick="startGame()">Start Game</button>
+</div>
+
+<div id="gameScreen" style="display:none;">
+  <h3 id="playerDisplay"></h3>
+  <h2>Count total small objects</h2>
+
+  <div id="gameArea"></div>
+
+  <div id="options"></div>
+
+  <h3 id="score">Score: 0</h3>
+</div>
+
+<script>
+let score = 0;
+let correctAnswer = 0;
+
+function startGame() {
+  let name = document.getElementById("playerName").value;
+  if(name === "") {
+    alert("Enter name first!");
+    return;
+  }
+  document.getElementById("startScreen").style.display = "none";
+  document.getElementById("gameScreen").style.display = "block";
+  document.getElementById("playerDisplay").innerText = "Player: " + name;
+
+  nextQuestion();
+}
+
+function nextQuestion() {
+  let gameArea = document.getElementById("gameArea");
+  gameArea.innerHTML = "";
+
+  let layers = Math.floor(Math.random()*2) + 2; // 2–3 layers
+  let countPerLayer = Math.floor(Math.random()*3) + 2; // 2–4
+
+  correctAnswer = Math.pow(countPerLayer, layers);
+
+  createBoxes(gameArea, layers, countPerLayer, 0);
+
+  generateOptions();
+}
+
+function createBoxes(parent, layers, count, level) {
+  if(level >= layers) return;
+
+  let size = 300 - (level * 60);
+
+  for(let i=0; i<count; i++) {
+    let box = document.createElement("div");
+    box.className = "box";
+    box.style.width = size + "px";
+    box.style.height = size + "px";
+    box.style.top = (level*30) + "px";
+    box.style.left = (level*30) + "px";
+
+    parent.appendChild(box);
+
+    if(level === layers-1) {
+      // Add small objects
+      for(let j=0; j<count; j++) {
+        let small = document.createElement("div");
+        small.className = "small";
+        box.appendChild(small);
+      }
+    } else {
+      createBoxes(box, layers, count, level+1);
+    }
+  }
+}
+
+function generateOptions() {
+  let optionsDiv = document.getElementById("options");
+  optionsDiv.innerHTML = "";
+
+  let answers = [correctAnswer];
+
+  while(answers.length < 4) {
+    let wrong = correctAnswer + Math.floor(Math.random()*10) - 5;
+    if(wrong > 0 && !answers.includes(wrong)) {
+      answers.push(wrong);
+    }
+  }
+
+  answers.sort(() => Math.random() - 0.5);
+
+  answers.forEach(ans => {
+    let btn = document.createElement("button");
+    btn.innerText = ans;
+    btn.onclick = () => checkAnswer(ans);
+    optionsDiv.appendChild(btn);
+  });
+}
+
+function checkAnswer(ans) {
+  if(ans === correctAnswer) {
+    score++;
+    alert("Correct!");
+  } else {
+    alert("Wrong! Correct answer: " + correctAnswer);
+  }
+
+  document.getElementById("score").innerText = "Score: " + score;
+
+  nextQuestion();
+}
+</script>
+
+</body>
+</html>
