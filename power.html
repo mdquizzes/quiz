@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Prime Factor Challenge</title>
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      background: #1e293b;
+      color: white;
+    }
+
+    h1 { margin-top: 20px; }
+
+    .card {
+      background: #334155;
+      padding: 20px;
+      border-radius: 10px;
+      width: 320px;
+      margin: 20px auto;
+    }
+
+    input {
+      width: 40px;
+      padding: 5px;
+      margin: 5px;
+      text-align: center;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px 15px;
+      margin: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    #score {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>🔥 Prime Factor Challenge</h1>
+
+<div id="startScreen">
+  <input type="text" id="playerName" placeholder="Enter Name">
+  <br><br>
+  <button onclick="startGame()">Start Game</button>
+</div>
+
+<div id="gameScreen" style="display:none;">
+  <h3 id="playerDisplay"></h3>
+
+  <div class="card">
+    <h2 id="number"></h2>
+    <div id="factorArea"></div>
+  </div>
+
+  <button onclick="checkAnswer()">Submit</button>
+
+  <h3 id="level"></h3>
+  <h3 id="score">Score: 0</h3>
+</div>
+
+<script>
+let score = 0;
+let level = 1;
+let currentFactors = [];
+
+function startGame() {
+  let name = document.getElementById("playerName").value;
+  if(name === "") return alert("Enter name!");
+
+  document.getElementById("startScreen").style.display = "none";
+  document.getElementById("gameScreen").style.display = "block";
+
+  document.getElementById("playerDisplay").innerText = "Player: " + name;
+
+  nextQuestion();
+}
+
+function getPrimeFactors(num) {
+  let factors = {};
+  let d = 2;
+
+  while (num > 1) {
+    while (num % d === 0) {
+      factors[d] = (factors[d] || 0) + 1;
+      num /= d;
+    }
+    d++;
+  }
+
+  return factors;
+}
+
+function generateNumber() {
+  return Math.floor(Math.random() * 9000) + 1000;
+}
+
+function nextQuestion() {
+  let num = generateNumber();
+  let factors = getPrimeFactors(num);
+
+  currentFactors = Object.entries(factors);
+
+  document.getElementById("number").innerText = num;
+  document.getElementById("level").innerText = "Level: " + level;
+
+  let area = document.getElementById("factorArea");
+  area.innerHTML = "";
+
+  currentFactors.forEach(([base, power], i) => {
+    let div = document.createElement("div");
+
+    if(level === 1) {
+      // base given
+      div.innerHTML = base + "<sup><input id='p"+i+"'></sup>";
+    }
+    else if(level === 2) {
+      // power given
+      div.innerHTML = "<input id='b"+i+"'>^" + power;
+    }
+    else {
+      // both empty
+      div.innerHTML = "<input id='b"+i+"'>^<input id='p"+i+"'>";
+    }
+
+    area.appendChild(div);
+  });
+}
+
+function checkAnswer() {
+  let correct = true;
+
+  currentFactors.forEach(([base, power], i) => {
+
+    if(level === 1) {
+      let p = document.getElementById("p"+i).value;
+      if(Number(p) !== Number(power)) correct = false;
+    }
+
+    else if(level === 2) {
+      let b = document.getElementById("b"+i).value;
+      if(Number(b) !== Number(base)) correct = false;
+    }
+
+    else {
+      let b = document.getElementById("b"+i).value;
+      let p = document.getElementById("p"+i).value;
+
+      if(Number(b) !== Number(base) || Number(p) !== Number(power)) {
+        correct = false;
+      }
+    }
+  });
+
+  if(correct) {
+    score++;
+    alert("✅ Correct!");
+  } else {
+    alert("❌ Wrong!");
+  }
+
+  document.getElementById("score").innerText = "Score: " + score;
+
+  // level progression
+  if(score === 3) level = 2;
+  if(score === 6) level = 3;
+
+  nextQuestion();
+}
+</script>
+
+</body>
+</html>
