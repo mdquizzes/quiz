@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Prime Factor Drag Game</title>
+  <title>Prime Factor Drag Game PRO</title>
 
   <style>
     body {
@@ -13,16 +13,35 @@
 
     h1 { margin-top: 20px; }
 
-    .box {
-      border: 2px dashed #ccc;
+    .pair {
+      display: inline-flex;
+      align-items: flex-start;
+      margin: 10px;
+      font-size: 20px;
+    }
+
+    .baseBox {
       width: 60px;
       height: 40px;
-      display: inline-flex;
+      border: 2px dashed #ccc;
+      display: flex;
       justify-content: center;
       align-items: center;
-      margin: 5px;
-      font-size: 18px;
       background: #1e293b;
+      margin-right: 2px;
+    }
+
+    .powerBox {
+      width: 30px;
+      height: 25px;
+      border: 2px dashed #ccc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #1e293b;
+      font-size: 14px;
+      position: relative;
+      top: -10px;
     }
 
     .draggable {
@@ -48,7 +67,7 @@
 
 <body>
 
-<h1>🔥 Prime Factor Drag Game</h1>
+<h1>🔥 Prime Factor Drag Game PRO</h1>
 
 <div id="startScreen">
   <input id="playerName" placeholder="Enter name">
@@ -87,27 +106,39 @@ function startGame() {
   newQuestion();
 }
 
-function getFactors(num) {
-  let factors = [];
-  let d = 2;
+// Generate number with at least 3 primes and different powers
+function generateSmartNumber() {
+  const primes = [2,3,5,7,11];
+  let chosen = [];
 
-  while(num > 1) {
-    let count = 0;
-    while(num % d === 0) {
-      num /= d;
-      count++;
-    }
-    if(count > 0) factors.push([d, count]);
-    d++;
+  // pick 3 different primes
+  while(chosen.length < 3) {
+    let p = primes[Math.floor(Math.random()*primes.length)];
+    if(!chosen.includes(p)) chosen.push(p);
   }
-  return factors;
+
+  // assign different powers
+  let powers = [];
+  while(powers.length < 3) {
+    let pow = Math.floor(Math.random()*3) + 1; // 1–3
+    if(!powers.includes(pow)) powers.push(pow);
+  }
+
+  let num = 1;
+  for(let i=0;i<3;i++) {
+    num *= Math.pow(chosen[i], powers[i]);
+  }
+
+  return {num, factors: chosen.map((p,i)=>[p,powers[i]])};
 }
 
 function newQuestion() {
-  target = Math.floor(Math.random()*900) + 100;
-  document.getElementById("targetNumber").innerText = "Target: " + target;
+  let data = generateSmartNumber();
 
-  let factors = getFactors(target);
+  target = data.num;
+  let factors = data.factors;
+
+  document.getElementById("targetNumber").innerText = "Target: " + target;
 
   createDropBoxes(factors.length);
   createDraggables(factors);
@@ -119,11 +150,13 @@ function createDropBoxes(n) {
 
   for(let i=0;i<n;i++) {
     let div = document.createElement("div");
+    div.className = "pair";
+
     div.innerHTML = `
-      <div class="box" ondrop="drop(event)" ondragover="allowDrop(event)" data-type="base"></div>
-      ^
-      <div class="box" ondrop="drop(event)" ondragover="allowDrop(event)" data-type="power"></div>
+      <div class="baseBox" ondrop="drop(event)" ondragover="allowDrop(event)" data-type="base"></div>
+      <div class="powerBox" ondrop="drop(event)" ondragover="allowDrop(event)" data-type="power"></div>
     `;
+
     area.appendChild(div);
   }
 }
@@ -136,6 +169,7 @@ function createDraggables(factors) {
   powersDiv.innerHTML = "";
 
   factors.forEach(([b,p]) => {
+
     let base = document.createElement("div");
     base.className = "draggable";
     base.innerText = b;
@@ -153,6 +187,7 @@ function createDraggables(factors) {
     power.dataset.value = p;
     power.ondragstart = drag;
     powersDiv.appendChild(power);
+
   });
 }
 
@@ -180,14 +215,14 @@ function drop(ev) {
 }
 
 function updateResult() {
-  let boxes = document.querySelectorAll("#dropArea > div");
+  let pairs = document.querySelectorAll(".pair");
 
   let result = 1;
   let expression = "";
 
-  boxes.forEach(box => {
-    let b = box.children[0].dataset.value;
-    let p = box.children[1].dataset.value;
+  pairs.forEach(pair => {
+    let b = pair.children[0].dataset.value;
+    let p = pair.children[1].dataset.value;
 
     if(b && p) {
       result *= Math.pow(b, p);
@@ -202,7 +237,7 @@ function updateResult() {
 
   if(result === target) {
     setTimeout(() => {
-      alert("🎉 Correct! Next Player!");
+      alert("🎉 Perfect Match! Next Player!");
       newQuestion();
     }, 500);
   }
