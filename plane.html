@@ -1,330 +1,205 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Air Traffic Control</title>
-
-<style>
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-body{
-    overflow:hidden;
-    background:#7dbb52;
-    font-family:Arial;
-}
-
-canvas{
-    display:block;
-    background:#7dbb52;
-}
-
-#ui{
-    position:absolute;
-    top:10px;
-    left:10px;
-    color:white;
-    font-size:22px;
-    z-index:10;
-    text-shadow:2px 2px 4px black;
-}
-
-#gameOver{
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    color:white;
-    font-size:60px;
-    text-align:center;
-    display:none;
-    z-index:20;
-}
-
-button{
-    margin-top:20px;
-    padding:12px 24px;
-    font-size:24px;
-    border:none;
-    border-radius:10px;
-    cursor:pointer;
-}
-
-</style>
-</head>
-<body>
-
-<div id="ui">
-    Score: <span id="score">0</span>
-</div>
-
-<div id="gameOver">
-    GAME OVER
-    <br>
-    <button onclick="location.reload()">Restart</button>
-</div>
-
-<canvas id="game"></canvas>
+<!-- =========================
+REPLACE ONLY THESE PARTS
+========================= -->
 
 <script>
 
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
-
-canvas.width = innerWidth;
-canvas.height = innerHeight;
-
-const scoreEl = document.getElementById("score");
-const gameOverEl = document.getElementById("gameOver");
-
-let score = 0;
-let running = true;
+// =========================
+// NEW RUNWAY SYSTEM
+// =========================
 
 const runway = {
 
-    x: canvas.width/2 - 140,
-    y: canvas.height/2 - 70,
-    width:280,
-    height:140
+    x: canvas.width/2 - 55,
+    y: canvas.height/2 - 170,
+    width:110,
+    height:340
 };
 
-const helipad = {
+// TOP ENTRY
+const runwayEntryTop = {
 
-    x: canvas.width - 180,
-    y: 120,
-    r:40
+    x: canvas.width/2,
+    y: runway.y - 120
 };
 
-class Aircraft{
+// BOTTOM ENTRY
+const runwayEntryBottom = {
 
-    constructor(type){
+    x: canvas.width/2,
+    y: runway.y + runway.height + 120
+};
 
-        this.type = type;
+// =========================
+// NEW SHELTER PARKING
+// =========================
 
-        this.speed = type==="plane" ? 1.2 : 0.9;
+const shelter = {
 
-        this.path = [];
-        this.pathIndex = 0;
+    x: runway.x + 180,
+    y: runway.y + 40,
+    width:180,
+    height:220
+};
 
-        this.assigned = false;
+// =========================
+// UPDATE CONSTRUCTOR
+// =========================
 
-        this.angle = 0;
+this.entrySide =
+Math.random() > 0.5
+? "top"
+: "bottom";
 
-        const side = Math.floor(Math.random()*4);
+// =========================
+// REPLACE FLOAT MOVEMENT
+// =========================
 
-        if(side===0){
+if(this.path.length===0){
 
-            this.x = Math.random()*canvas.width;
-            this.y = -40;
-        }
+    this.angle += 0.01;
 
-        else if(side===1){
+    this.x += Math.cos(this.angle)*0.4;
 
-            this.x = canvas.width+40;
-            this.y = Math.random()*canvas.height;
-        }
+    this.y += Math.sin(this.angle)*0.4;
 
-        else if(side===2){
+    // KEEP INSIDE SCREEN
 
-            this.x = Math.random()*canvas.width;
-            this.y = canvas.height+40;
-        }
+    this.x = Math.max(20,
+    Math.min(canvas.width-20,this.x));
 
-        else{
+    this.y = Math.max(20,
+    Math.min(canvas.height-20,this.y));
 
-            this.x = -40;
-            this.y = Math.random()*canvas.height;
-        }
+    return;
+}
 
-        this.color =
-        type==="plane"
-        ? "#ffffff"
-        : "#222222";
+// =========================
+// LINE DISAPPEAR EFFECT
+// =========================
+
+if(dist < 10){
+
+    this.path.shift();
+
+    this.pathIndex = 0;
+
+    return;
+}
+
+// =========================
+// LANDING TARGETS
+// =========================
+
+if(this.path.length===0){
+
+    if(this.type==="plane"){
+
+        // STRAIGHT LANDING
+
+        this.path = [
+
+            {
+
+                x: this.entrySide==="top"
+                ? runwayEntryTop.x
+                : runwayEntryBottom.x,
+
+                y: this.entrySide==="top"
+                ? runwayEntryTop.y
+                : runwayEntryBottom.y
+            },
+
+            {
+
+                x: canvas.width/2,
+
+                y: this.entrySide==="top"
+                ? runway.y + runway.height
+                : runway.y
+            }
+        ];
     }
 
-    update(){
+    else{
 
-        if(this.path.length===0){
+        this.path = [
 
-            // FLOAT IN SKY
+            {
 
-            this.angle += 0.01;
+                x: helipad.x,
 
-            this.x += Math.cos(this.angle)*0.6;
-            this.y += Math.sin(this.angle)*0.6;
-
-            return;
-        }
-
-        const target = this.path[this.pathIndex];
-
-        if(!target) return;
-
-        const dx = target.x - this.x;
-        const dy = target.y - this.y;
-
-        const dist = Math.sqrt(dx*dx + dy*dy);
-
-        this.angle = Math.atan2(dy,dx);
-
-        if(dist < 6){
-
-            this.pathIndex++;
-
-            if(this.pathIndex >= this.path.length){
-
-                score++;
-
-                scoreEl.innerText = score;
-
-                this.completed = true;
+                y: helipad.y
             }
-        }
-
-        else{
-
-            this.x += Math.cos(this.angle)*this.speed;
-            this.y += Math.sin(this.angle)*this.speed;
-        }
-    }
-
-    draw(){
-
-        // PATH
-
-        if(this.path.length>0){
-
-            ctx.beginPath();
-
-            ctx.moveTo(this.x,this.y);
-
-            for(let p of this.path){
-
-                ctx.lineTo(p.x,p.y);
-            }
-
-            ctx.strokeStyle =
-            this.type==="plane"
-            ? "#ffffff"
-            : "#000000";
-
-            ctx.lineWidth = 2;
-
-            ctx.setLineDash([8,8]);
-
-            ctx.stroke();
-
-            ctx.setLineDash([]);
-        }
-
-        ctx.save();
-
-        ctx.translate(this.x,this.y);
-
-        ctx.rotate(this.angle);
-
-        if(this.type==="plane"){
-
-            ctx.fillStyle="white";
-
-            // BODY
-
-            ctx.beginPath();
-
-            ctx.moveTo(18,0);
-            ctx.lineTo(-12,-5);
-            ctx.lineTo(-18,0);
-            ctx.lineTo(-12,5);
-
-            ctx.closePath();
-
-            ctx.fill();
-
-            // WINGS
-
-            ctx.beginPath();
-
-            ctx.moveTo(-2,0);
-            ctx.lineTo(-12,-14);
-            ctx.lineTo(-6,-14);
-            ctx.lineTo(5,0);
-
-            ctx.closePath();
-
-            ctx.fill();
-
-            ctx.beginPath();
-
-            ctx.moveTo(-2,0);
-            ctx.lineTo(-12,14);
-            ctx.lineTo(-6,14);
-            ctx.lineTo(5,0);
-
-            ctx.closePath();
-
-            ctx.fill();
-        }
-
-        else{
-
-            // HELICOPTER
-
-            ctx.fillStyle="#222";
-
-            ctx.fillRect(-12,-6,24,12);
-
-            ctx.fillRect(-18,-2,8,4);
-
-            // ROTOR
-
-            ctx.strokeStyle="white";
-
-            ctx.beginPath();
-
-            ctx.moveTo(-20,0);
-            ctx.lineTo(20,0);
-
-            ctx.stroke();
-
-            ctx.beginPath();
-
-            ctx.moveTo(0,-20);
-            ctx.lineTo(0,20);
-
-            ctx.stroke();
-        }
-
-        ctx.restore();
+        ];
     }
 }
 
-const aircrafts = [];
+// =========================
+// AFTER LANDING
+// =========================
 
-function spawnAircraft(){
+if(this.type==="plane" && !this.parked){
 
-    if(!running) return;
+    // INSIDE RUNWAY
 
-    const type =
-    Math.random() > 0.7
-    ? "helicopter"
-    : "plane";
+    if(this.x > runway.x &&
+       this.x < runway.x + runway.width &&
+       this.y > runway.y &&
+       this.y < runway.y + runway.height){
 
-    aircrafts.push(new Aircraft(type));
+        this.landed = true;
+
+        // TAXI TO SHELTER
+
+        this.path = [
+
+            {
+
+                x: shelter.x + 20,
+
+                y: shelter.y + shelter.height/2
+            }
+        ];
+    }
 }
 
-setInterval(spawnAircraft,2500);
+// =========================
+// HIDE INSIDE SHELTER
+// =========================
+
+if(this.landed){
+
+    if(this.x > shelter.x &&
+       this.x < shelter.x + shelter.width &&
+       this.y > shelter.y &&
+       this.y < shelter.y + shelter.height){
+
+        this.parked = true;
+
+        this.hidden = true;
+
+        score++;
+
+        scoreEl.innerText = score;
+    }
+}
+
+// =========================
+// DO NOT DRAW HIDDEN PLANES
+// =========================
+
+if(this.hidden) return;
+
+// =========================
+// IMPROVED DRAW AIRPORT
+// =========================
 
 function drawAirport(){
 
     // RUNWAY
 
-    ctx.fillStyle="#777";
+    ctx.fillStyle="#666";
 
     ctx.fillRect(
         runway.x,
@@ -333,29 +208,73 @@ function drawAirport(){
         runway.height
     );
 
+    // RUNWAY EDGE
+
     ctx.strokeStyle="white";
 
-    ctx.lineWidth=4;
+    ctx.lineWidth=2;
+
+    ctx.strokeRect(
+        runway.x,
+        runway.y,
+        runway.width,
+        runway.height
+    );
+
+    // CENTER LINE
+
+    ctx.lineWidth=3;
+
+    for(let i=0;i<12;i++){
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            canvas.width/2,
+            runway.y + i*28
+        );
+
+        ctx.lineTo(
+            canvas.width/2,
+            runway.y + i*28 + 16
+        );
+
+        ctx.stroke();
+    }
+
+    // ENTRY LIGHTS
+
+    ctx.fillStyle="yellow";
 
     ctx.beginPath();
 
-    ctx.moveTo(
-        runway.x + runway.width/2,
-        runway.y
+    ctx.arc(
+        runwayEntryTop.x,
+        runwayEntryTop.y,
+        8,
+        0,
+        Math.PI*2
     );
 
-    ctx.lineTo(
-        runway.x + runway.width/2,
-        runway.y + runway.height
+    ctx.fill();
+
+    ctx.beginPath();
+
+    ctx.arc(
+        runwayEntryBottom.x,
+        runwayEntryBottom.y,
+        8,
+        0,
+        Math.PI*2
     );
 
-    ctx.stroke();
+    ctx.fill();
 
     // HELIPAD
 
     ctx.beginPath();
 
-    ctx.fillStyle="#bbbbbb";
+    ctx.fillStyle="#cfcfcf";
 
     ctx.arc(
         helipad.x,
@@ -376,148 +295,77 @@ function drawAirport(){
         helipad.x-14,
         helipad.y+14
     );
+
+    // =====================
+    // AIRCRAFT SHELTER
+    // =====================
+
+    ctx.fillStyle="#505050";
+
+    ctx.fillRect(
+        shelter.x,
+        shelter.y,
+        shelter.width,
+        shelter.height
+    );
+
+    // ROOF
+
+    ctx.beginPath();
+
+    ctx.moveTo(shelter.x - 20,shelter.y);
+
+    ctx.lineTo(shelter.x + 20,shelter.y - 30);
+
+    ctx.lineTo(
+        shelter.x + shelter.width - 20,
+        shelter.y - 30
+    );
+
+    ctx.lineTo(
+        shelter.x + shelter.width + 20,
+        shelter.y
+    );
+
+    ctx.closePath();
+
+    ctx.fillStyle="#333";
+
+    ctx.fill();
+
+    // ENTRY
+
+    ctx.fillStyle="#222";
+
+    ctx.fillRect(
+        shelter.x,
+        shelter.y + 60,
+        20,
+        90
+    );
+
+    // LABEL
+
+    ctx.fillStyle="white";
+
+    ctx.font="20px Arial";
+
+    ctx.fillText(
+        "AIRCRAFT SHELTER",
+        shelter.x + 10,
+        shelter.y + shelter.height + 30
+    );
 }
 
-function detectCollision(){
+// =========================
+// BETTER COLLISION
+// =========================
 
-    for(let i=0;i<aircrafts.length;i++){
+if(dist < 34){
 
-        for(let j=i+1;j<aircrafts.length;j++){
+    running = false;
 
-            const a = aircrafts[i];
-            const b = aircrafts[j];
-
-            if(a.completed || b.completed)
-            continue;
-
-            const dx = a.x - b.x;
-            const dy = a.y - b.y;
-
-            const dist =
-            Math.sqrt(dx*dx + dy*dy);
-
-            if(dist < 26){
-
-                running = false;
-
-                gameOverEl.style.display="block";
-            }
-        }
-    }
+    gameOverEl.style.display="block";
 }
-
-let drawing = false;
-let selected = null;
-
-function getPos(e){
-
-    const rect = canvas.getBoundingClientRect();
-
-    return{
-
-        x:(e.clientX || e.touches[0].clientX)-rect.left,
-
-        y:(e.clientY || e.touches[0].clientY)-rect.top
-    };
-}
-
-canvas.addEventListener("mousedown",startDraw);
-canvas.addEventListener("touchstart",startDraw);
-
-function startDraw(e){
-
-    const pos = getPos(e);
-
-    for(let a of aircrafts){
-
-        const dx = pos.x - a.x;
-        const dy = pos.y - a.y;
-
-        const dist = Math.sqrt(dx*dx + dy*dy);
-
-        if(dist < 30){
-
-            drawing = true;
-
-            selected = a;
-
-            a.path = [];
-
-            a.pathIndex = 0;
-
-            break;
-        }
-    }
-}
-
-canvas.addEventListener("mousemove",drawPath);
-canvas.addEventListener("touchmove",drawPath);
-
-function drawPath(e){
-
-    if(!drawing || !selected) return;
-
-    const pos = getPos(e);
-
-    selected.path.push({
-        x:pos.x,
-        y:pos.y
-    });
-}
-
-canvas.addEventListener("mouseup",endDraw);
-canvas.addEventListener("touchend",endDraw);
-
-function endDraw(){
-
-    if(selected){
-
-        if(selected.type==="plane"){
-
-            selected.path.push({
-
-                x: runway.x + runway.width/2,
-
-                y: runway.y + runway.height/2
-            });
-        }
-
-        else{
-
-            selected.path.push({
-
-                x: helipad.x,
-
-                y: helipad.y
-            });
-        }
-    }
-
-    drawing = false;
-
-    selected = null;
-}
-
-function animate(){
-
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-
-    drawAirport();
-
-    aircrafts.forEach(a=>{
-
-        a.update();
-
-        a.draw();
-    });
-
-    detectCollision();
-
-    requestAnimationFrame(animate);
-}
-
-animate();
 
 </script>
-</body>
-</html>
