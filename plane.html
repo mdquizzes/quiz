@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Air Traffic Control</title>
+<title>Air Traffic Control Ultimate</title>
 
 <style>
 
@@ -16,25 +16,37 @@
 body{
     overflow:hidden;
     font-family:Arial;
-    background:#74b34a;
+    background:#78b84d;
 }
 
 canvas{
     display:block;
     background:
     radial-gradient(circle at center,
-    #95d268 0%,
-    #74b34a 100%);
+    #98d86b 0%,
+    #78b84d 100%);
 }
 
 #ui{
 
     position:absolute;
-    top:12px;
-    left:12px;
+    top:10px;
+    left:10px;
     color:white;
     font-size:24px;
     z-index:10;
+    text-shadow:2px 2px 5px black;
+}
+
+#warning{
+
+    position:absolute;
+    top:60px;
+    left:10px;
+    color:#ffeb3b;
+    font-size:20px;
+    z-index:10;
+    display:none;
     text-shadow:2px 2px 5px black;
 }
 
@@ -45,36 +57,25 @@ canvas{
     left:50%;
     transform:translate(-50%,-50%);
     color:white;
-    font-size:72px;
     text-align:center;
     display:none;
     z-index:50;
+}
+
+#gameOver h1{
+
+    font-size:80px;
     text-shadow:4px 4px 10px black;
 }
 
 button{
 
     margin-top:20px;
-    padding:12px 28px;
+    padding:14px 30px;
+    font-size:24px;
     border:none;
     border-radius:10px;
-    font-size:24px;
     cursor:pointer;
-}
-
-#warning{
-
-    position:absolute;
-    bottom:20px;
-    left:50%;
-    transform:translateX(-50%);
-    background:red;
-    color:white;
-    padding:10px 20px;
-    border-radius:10px;
-    display:none;
-    font-size:22px;
-    z-index:40;
 }
 
 </style>
@@ -91,9 +92,7 @@ button{
 
 <div id="gameOver">
 
-    GAME OVER
-
-    <br>
+    <h1>GAME OVER</h1>
 
     <button onclick="location.reload()">
         Restart
@@ -117,11 +116,11 @@ canvas.height = innerHeight;
 const scoreEl =
 document.getElementById("score");
 
-const gameOverEl =
-document.getElementById("gameOver");
-
 const warningEl =
 document.getElementById("warning");
+
+const gameOverEl =
+document.getElementById("gameOver");
 
 let running = true;
 let score = 0;
@@ -138,11 +137,9 @@ const runway = {
     height:90
 };
 
-// ENTRY POINT
-
 const runwayEntry = {
 
-    x: runway.x - 120,
+    x: runway.x - 110,
     y: runway.y + runway.height/2
 };
 
@@ -190,7 +187,7 @@ class Explosion{
 
         this.radius += 5;
 
-        this.alpha -= 0.025;
+        this.alpha -= 0.03;
     }
 
     draw(){
@@ -198,8 +195,6 @@ class Explosion{
         ctx.save();
 
         ctx.globalAlpha = this.alpha;
-
-        // FIRE
 
         ctx.beginPath();
 
@@ -264,96 +259,106 @@ class Aircraft{
 
         this.path = [];
 
-        this.angle = 0;
+        this.angle =
+        Math.random()*Math.PI*2;
 
         this.hidden = false;
 
-        // SAFE SPAWN
+        // SPAWN ANYWHERE
 
-        const side =
-        Math.floor(Math.random()*4);
+        this.x =
+        Math.random()*
+        (canvas.width-200)+100;
 
-        if(side===0){
+        this.y =
+        Math.random()*
+        (canvas.height-200)+100;
 
-            this.x =
-            Math.random()*
-            (canvas.width-100)+50;
+        // RANDOM FLY DIRECTION
 
-            this.y = 40;
-        }
+        this.vx =
+        Math.cos(this.angle)*0.7;
 
-        else if(side===1){
-
-            this.x =
-            canvas.width - 40;
-
-            this.y =
-            Math.random()*
-            (canvas.height-100)+50;
-        }
-
-        else if(side===2){
-
-            this.x =
-            Math.random()*
-            (canvas.width-100)+50;
-
-            this.y =
-            canvas.height - 40;
-        }
-
-        else{
-
-            this.x = 40;
-
-            this.y =
-            Math.random()*
-            (canvas.height-100)+50;
-        }
+        this.vy =
+        Math.sin(this.angle)*0.7;
     }
 
     update(){
 
         if(this.hidden) return;
 
-        // ===================
-        // FLOATING
-        // ===================
+        // =================================
+        // FREE SKY MOVEMENT
+        // =================================
 
         if(this.path.length===0){
 
-            this.angle += 0.01;
+            this.x += this.vx;
 
-            this.x +=
-            Math.cos(this.angle)*0.4;
+            this.y += this.vy;
 
-            this.y +=
-            Math.sin(this.angle)*0.4;
+            // RANDOM AIR DRIFT
 
-            // KEEP INSIDE SCREEN
+            this.vx +=
+            (Math.random()-0.5)*0.02;
 
-            this.x =
-            Math.max(
-            30,
-            Math.min(
-            canvas.width-30,
-            this.x));
+            this.vy +=
+            (Math.random()-0.5)*0.02;
 
-            this.y =
-            Math.max(
-            30,
-            Math.min(
-            canvas.height-30,
-            this.y));
+            // LIMIT SPEED
+
+            this.vx =
+            Math.max(-1,
+            Math.min(1,this.vx));
+
+            this.vy =
+            Math.max(-1,
+            Math.min(1,this.vy));
+
+            // SCREEN BOUNCE
+
+            if(this.x < 30){
+
+                this.vx *= -1;
+
+                this.x = 30;
+            }
+
+            if(this.x > canvas.width-30){
+
+                this.vx *= -1;
+
+                this.x =
+                canvas.width-30;
+            }
+
+            if(this.y < 30){
+
+                this.vy *= -1;
+
+                this.y = 30;
+            }
+
+            if(this.y > canvas.height-30){
+
+                this.vy *= -1;
+
+                this.y =
+                canvas.height-30;
+            }
+
+            this.angle =
+            Math.atan2(this.vy,this.vx);
 
             return;
         }
 
-        // ===================
-        // FOLLOW PATH
-        // ===================
+        // =================================
+        // FOLLOW DRAWN PATH
+        // =================================
 
-        const target = this.path[0];
+        const target =
+        this.path[0];
 
         const dx =
         target.x - this.x;
@@ -371,13 +376,9 @@ class Aircraft{
 
             this.path.shift();
 
-            // ===================
             // AUTO LAND
-            // ===================
 
             if(this.path.length===0){
-
-                // PLANE
 
                 if(this.type==="plane"){
 
@@ -401,8 +402,6 @@ class Aircraft{
                     ];
                 }
 
-                // HELICOPTER
-
                 else{
 
                     this.path = [
@@ -419,40 +418,17 @@ class Aircraft{
             return;
         }
 
-        // DRIFT
-
-        const drift =
-        Math.sin(
-        Date.now()*0.001
-        + this.x)*0.12;
+        // SMOOTH MOTION
 
         this.x +=
         Math.cos(this.angle)
-        *this.speed + drift;
+        *this.speed;
 
         this.y +=
         Math.sin(this.angle)
-        *this.speed + drift;
+        *this.speed;
 
-        // KEEP INSIDE SCREEN
-
-        this.x =
-        Math.max(
-        25,
-        Math.min(
-        canvas.width-25,
-        this.x));
-
-        this.y =
-        Math.max(
-        25,
-        Math.min(
-        canvas.height-25,
-        this.y));
-
-        // ===================
-        // ENTER SHELTER
-        // ===================
+        // PLANE INTO SHELTER
 
         if(this.type==="plane"){
 
@@ -471,9 +447,7 @@ class Aircraft{
             }
         }
 
-        // ===================
         // HELICOPTER LAND
-        // ===================
 
         if(this.type==="helicopter"){
 
@@ -486,7 +460,7 @@ class Aircraft{
             const hdist =
             Math.sqrt(hdx*hdx+hdy*hdy);
 
-            if(hdist < 22){
+            if(hdist < 24){
 
                 this.hidden = true;
 
@@ -501,9 +475,7 @@ class Aircraft{
 
         if(this.hidden) return;
 
-        // ===================
         // PATH
-        // ===================
 
         if(this.path.length>0){
 
@@ -536,9 +508,9 @@ class Aircraft{
 
         ctx.rotate(this.angle);
 
-        // ===================
+        // =================================
         // PLANE
-        // ===================
+        // =================================
 
         if(this.type==="plane"){
 
@@ -548,9 +520,9 @@ class Aircraft{
 
             ctx.beginPath();
 
-            ctx.moveTo(20,0);
+            ctx.moveTo(22,0);
             ctx.lineTo(-15,-6);
-            ctx.lineTo(-22,0);
+            ctx.lineTo(-24,0);
             ctx.lineTo(-15,6);
 
             ctx.closePath();
@@ -562,7 +534,7 @@ class Aircraft{
             ctx.beginPath();
 
             ctx.moveTo(-3,0);
-            ctx.lineTo(-15,-18);
+            ctx.lineTo(-16,-18);
             ctx.lineTo(-8,-18);
             ctx.lineTo(5,0);
 
@@ -573,7 +545,7 @@ class Aircraft{
             ctx.beginPath();
 
             ctx.moveTo(-3,0);
-            ctx.lineTo(-15,18);
+            ctx.lineTo(-16,18);
             ctx.lineTo(-8,18);
             ctx.lineTo(5,0);
 
@@ -582,9 +554,9 @@ class Aircraft{
             ctx.fill();
         }
 
-        // ===================
+        // =================================
         // HELICOPTER
-        // ===================
+        // =================================
 
         else{
 
@@ -632,7 +604,7 @@ function spawnAircraft(){
     if(!running) return;
 
     const type =
-    Math.random() > 0.72
+    Math.random() > 0.7
     ? "helicopter"
     : "plane";
 
@@ -653,7 +625,7 @@ function updateScore(){
 }
 
 // =====================================
-// AIRPORT
+// DRAW AIRPORT
 // =====================================
 
 function drawAirport(){
@@ -779,7 +751,7 @@ function drawAirport(){
 
     ctx.fillText(
         "AIRCRAFT SHELTER",
-        shelter.x + 8,
+        shelter.x + 10,
         shelter.y +
         shelter.height + 28
     );
@@ -829,8 +801,11 @@ function detectCollision(){
             if(a.hidden || b.hidden)
             continue;
 
-            const dx = a.x - b.x;
-            const dy = a.y - b.y;
+            const dx =
+            a.x - b.x;
+
+            const dy =
+            a.y - b.y;
 
             const dist =
             Math.sqrt(dx*dx + dy*dy);
@@ -855,14 +830,10 @@ function detectCollision(){
                 const ey =
                 (a.y+b.y)/2;
 
-                // SAFE EXPLOSION
-
                 explosions.push(
+                new Explosion(ex,ey));
 
-                    new Explosion(ex,ey)
-                );
-
-                // VIBRATION
+                // DEVICE SHAKE
 
                 if(navigator.vibrate){
 
@@ -872,16 +843,16 @@ function detectCollision(){
 
                 // SCREEN SHAKE
 
-                let shakes = 12;
+                let shakes = 14;
 
                 const shake =
                 setInterval(()=>{
 
                     const x =
-                    Math.random()*12-6;
+                    Math.random()*14-7;
 
                     const y =
-                    Math.random()*12-6;
+                    Math.random()*14-7;
 
                     document.body.style.transform =
                     `translate(${x}px,${y}px)`;
@@ -910,7 +881,7 @@ function detectCollision(){
 }
 
 // =====================================
-// DRAWING
+// DRAW PATH
 // =====================================
 
 let drawing = false;
@@ -960,13 +931,13 @@ function startDraw(e){
         const dist =
         Math.sqrt(dx*dx + dy*dy);
 
-        if(dist < 30){
+        if(dist < 35){
 
             drawing = true;
 
             selected = a;
 
-            a.path = [];
+            selected.path = [];
 
             break;
         }
