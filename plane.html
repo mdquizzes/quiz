@@ -1,0 +1,392 @@
+# Air Traffic Control Line-Draw Game (HTML + CSS + JavaScript)
+
+Ye game aap apne blog me embed kar sakte ho. Player ko planes ke liye line draw karni hoti hai jisse plane safely runway tak pahunch sake bina takraye.
+
+## Features
+
+* Planes random side se aate hain
+* Mouse / finger se path draw kar sakte ho
+* Plane drawn line ko follow karega
+* Runway par safely land karega
+* Landing ke baad parking area me automatically chala jayega
+* Plane collision detection
+* Score system
+* Game over on collision
+* Mobile friendly canvas game
+
+---
+
+# Full Code
+
+Is pure code ko ek HTML file me save karo:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Air Traffic Control Game</title>
+
+<style>
+    *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+    }
+
+    body{
+        background:#06131f;
+        overflow:hidden;
+        font-family:Arial, sans-serif;
+    }
+
+    canvas{
+        background:linear-gradient(#0b2740,#06131f);
+        display:block;
+    }
+
+    #ui{
+        position:absolute;
+        top:10px;
+        left:10px;
+        color:white;
+        z-index:10;
+        font-size:20px;
+    }
+
+    #gameOver{
+        position:absolute;
+        top:50%;
+        left:50%;
+        transform:translate(-50%,-50%);
+        color:white;
+        font-size:50px;
+        display:none;
+        text-align:center;
+    }
+
+    #restartBtn{
+        margin-top:20px;
+        padding:10px 20px;
+        font-size:20px;
+        border:none;
+        border-radius:10px;
+        cursor:pointer;
+    }
+</style>
+</head>
+<body>
+
+<div id="ui">
+    Score: <span id="score">0</span>
+</div>
+
+<div id="gameOver">
+    GAME OVER
+    <br>
+    <button id="restartBtn">Restart</button>
+</div>
+
+<canvas id="gameCanvas"></canvas>
+
+<script>
+
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const scoreEl = document.getElementById('score');
+const gameOverEl = document.getElementById('gameOver');
+const restartBtn = document.getElementById('restartBtn');
+
+let score = 0;
+let gameRunning = true;
+
+const runway = {
+    x: canvas.width/2 - 60,
+    y: canvas.height - 160,
+    width:120,
+    height:140
+};
+
+const parking = {
+    x: canvas.width/2 + 120,
+    y: canvas.height - 140,
+    width:120,
+    height:90
+};
+
+class Plane{
+    constructor(){
+
+        this.size = 12;
+        this.speed = 1.5 + Math.random()*1.5;
+
+        this.path = [];
+        this.pathIndex = 0;
+        this.selected = false;
+        this.landed = false;
+        this.parking = false;
+
+        const side = Math.floor(Math.random()*4);
+
+        if(side === 0){
+            this.x = Math.random()*canvas.width;
+            this.y = -20;
+        }
+        else if(side === 1){
+            this.x = canvas.width + 20;
+            this.y = Math.random()*canvas.height;
+        }
+        else if(side === 2){
+            this.x = Math.random()*canvas.width;
+            this.y = canvas.height + 20;
+        }
+        else{
+            this.x = -20;
+            this.y = Math.random()*canvas.height;
+        }
+
+        this.color = `hsl(${Math.random()*360},80%,60%)`;
+    }
+
+    draw(){
+
+        ctx.save();
+        ctx.translate(this.x,this.y);
+
+        ctx.fillStyle = this.color;
+
+        ctx.beginPath();
+        ctx.moveTo(15,0);
+        ctx.lineTo(-10,-7);
+        ctx.lineTo(-5,0);
+        ctx.lineTo(-10,7);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.restore();
+
+        if(this.path.length > 0){
+            ctx.strokeStyle = this.color;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(this.path[0].x,this.path[0].y);
+
+            for(let p of this.path){
+                ctx.lineTo(p.x,p.y);
+            }
+
+            ctx.stroke();
+        }
+    }
+
+    update(){
+
+        if(this.path.length > 0 && this.pathIndex < this.path.length){
+
+            const target = this.path[this.pathIndex];
+
+            const dx = target.x - this.x;
+            const dy = target.y - this.y;
+
+            const dist = Math.sqrt(dx*dx + dy*dy);
+
+            if(dist < 5){
+                this.pathIndex++;
+            }
+            else{
+                this.x += dx/dist * this.speed;
+                this.y += dy/dist * this.speed;
+            }
+        }
+
+        if(!this.landed &&
+           this.x > runway.x &&
+           this.x < runway.x + runway.width &&
+           this.y > runway.y &&
+           this.y < runway.y + runway.height){
+
+            this.landed = true;
+            score++;
+            scoreEl.innerText = score;
+
+            this.path = [
+                {
+                    x: parking.x + parking.width/2,
+                    y: parking.y + parking.height/2
+                }
+            ];
+
+            this.pathIndex = 0;
+        }
+
+        if(this.landed &&
+           this.x > parking.x &&
+           this.x < parking.x + parking.width &&
+           this.y > parking.y &&
+           this.y < parking.y + parking.height){
+
+            this.parking = true;
+        }
+    }
+}
+
+const planes = [];
+
+function spawnPlane(){
+    if(gameRunning){
+        planes.push(new Plane());
+    }
+}
+
+setInterval(spawnPlane,2000);
+
+function drawRunway(){
+
+    ctx.fillStyle = '#444';
+    ctx.fillRect(runway.x,runway.y,runway.width,runway.height);
+
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 3;
+
+    for(let i=0;i<8;i++){
+        ctx.beginPath();
+        ctx.moveTo(runway.x + runway.width/2, runway.y + i*18);
+        ctx.lineTo(runway.x + runway.width/2, runway.y + i*18 + 10);
+        ctx.stroke();
+    }
+
+    ctx.fillStyle = '#1f8f3a';
+    ctx.fillRect(parking.x,parking.y,parking.width,parking.height);
+
+    ctx.fillStyle = 'white';
+    ctx.font = '18px Arial';
+    ctx.fillText('PARKING', parking.x + 10, parking.y + 45);
+}
+
+function detectCollision(){
+
+    for(let i=0;i<planes.length;i++){
+
+        for(let j=i+1;j<planes.length;j++){
+
+            const a = planes[i];
+            const b = planes[j];
+
+            if(a.parking || b.parking) continue;
+
+            const dx = a.x - b.x;
+            const dy = a.y - b.y;
+
+            const dist = Math.sqrt(dx*dx + dy*dy);
+
+            if(dist < 20){
+                gameOver();
+            }
+        }
+    }
+}
+
+function gameOver(){
+    gameRunning = false;
+    gameOverEl.style.display = 'block';
+}
+
+restartBtn.onclick = ()=>{
+    location.reload();
+}
+
+let drawing = false;
+let currentPlane = null;
+
+function getMousePos(e){
+
+    const rect = canvas.getBoundingClientRect();
+
+    return {
+        x:(e.clientX || e.touches[0].clientX) - rect.left,
+        y:(e.clientY || e.touches[0].clientY) - rect.top
+    }
+}
+
+canvas.addEventListener('mousedown',startDraw);
+canvas.addEventListener('touchstart',startDraw);
+
+function startDraw(e){
+
+    const pos = getMousePos(e);
+
+    for(let plane of planes){
+
+        const dx = pos.x - plane.x;
+        const dy = pos.y - plane.y;
+
+        const dist = Math.sqrt(dx*dx + dy*dy);
+
+        if(dist < 30){
+
+            drawing = true;
+            currentPlane = plane;
+
+            plane.path = [];
+            plane.pathIndex = 0;
+
+            break;
+        }
+    }
+}
+
+canvas.addEventListener('mousemove',drawPath);
+canvas.addEventListener('touchmove',drawPath);
+
+function drawPath(e){
+
+    if(!drawing || !currentPlane) return;
+
+    const pos = getMousePos(e);
+
+    currentPlane.path.push({
+        x:pos.x,
+        y:pos.y
+    });
+}
+
+canvas.addEventListener('mouseup',endDraw);
+canvas.addEventListener('touchend',endDraw);
+
+function endDraw(){
+    drawing = false;
+    currentPlane = null;
+}
+
+function animate(){
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    drawRunway();
+
+    for(let plane of planes){
+        plane.update();
+        plane.draw();
+    }
+
+    detectCollision();
+
+    requestAnimationFrame(animate);
+}
+
+animate();
+
+window.addEventListener('resize',()=>{
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
+
+</script>
+</body>
+</html>
+
