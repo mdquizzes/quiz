@@ -1,35 +1,3 @@
-# Air Traffic Control Line-Draw Game (HTML + CSS + JavaScript)
-
-Ye game aap apne blog me embed kar sakte ho. Player ko planes ke liye line draw karni hoti hai jisse plane safely runway tak pahunch sake bina takraye.
-
-## Features
-
-* Planes random side se aate hain
-* Mouse / finger se path draw kar sakte ho
-* Plane drawn line ko follow karega
-* Runway par safely land karega
-* Landing ke baad parking area me automatically chala jayega
-* Plane collision detection
-* Score system
-* Game over on collision
-* Mobile friendly canvas game
-
----
-
-# Full Code
-
-Is updated version me:
-
-* Runway center me hai
-* Planes automatically runway direction me fly karte hain
-* Viewer plane ko custom line draw karke redirect kar sakta hai
-* Smooth airplane rotation
-* Better movement physics
-* Cleaner gameplay
-* Better collision system
-* Real ATC feeling
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -38,6 +6,7 @@ Is updated version me:
 <title>Air Traffic Control Game</title>
 
 <style>
+
 *{
     margin:0;
     padding:0;
@@ -46,22 +15,23 @@ Is updated version me:
 
 body{
     overflow:hidden;
-    background:#06131f;
+    background:#07131f;
     font-family:Arial;
 }
 
 canvas{
     display:block;
-    background:linear-gradient(#0b2740,#06131f);
+    background:
+    radial-gradient(circle at center,#0e2a45 0%,#07131f 70%);
 }
 
 #ui{
     position:absolute;
-    top:10px;
-    left:10px;
+    top:15px;
+    left:15px;
     color:white;
     z-index:10;
-    font-size:22px;
+    font-size:24px;
 }
 
 #gameOver{
@@ -72,20 +42,22 @@ canvas{
     color:white;
     text-align:center;
     display:none;
+    z-index:20;
 }
 
 #gameOver h1{
-    font-size:60px;
+    font-size:70px;
+    margin-bottom:20px;
 }
 
 button{
-    margin-top:20px;
-    padding:12px 24px;
-    font-size:22px;
+    padding:14px 28px;
     border:none;
-    border-radius:12px;
+    border-radius:10px;
+    font-size:24px;
     cursor:pointer;
 }
+
 </style>
 </head>
 <body>
@@ -99,85 +71,92 @@ button{
     <button onclick="location.reload()">Restart</button>
 </div>
 
-<canvas id="canvas"></canvas>
+<canvas id="game"></canvas>
 
 <script>
 
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const scoreEl = document.getElementById('score');
-const gameOverEl = document.getElementById('gameOver');
+const scoreEl = document.getElementById("score");
+const gameOverEl = document.getElementById("gameOver");
 
 let score = 0;
 let running = true;
 
 const runway = {
-    x: canvas.width/2 - 80,
-    y: canvas.height/2 - 150,
-    width:160,
-    height:300
+    x: canvas.width/2 - 70,
+    y: canvas.height/2 - 170,
+    width:140,
+    height:340
 };
 
-const parking = {
-    x: runway.x + 220,
-    y: runway.y + 80,
-    width:140,
-    height:100
+const runwayEntry = {
+    x: canvas.width/2,
+    y: runway.y - 160
 };
+
+const parkingArea = {
+    x: runway.x + 220,
+    y: runway.y + 40
+};
+
+const parkingSlots = [];
+
+for(let i=0;i<6;i++){
+
+    parkingSlots.push({
+        x: parkingArea.x,
+        y: parkingArea.y + i*42,
+        used:false
+    });
+}
 
 class Plane{
 
     constructor(){
 
         this.size = 12;
-        this.speed = 1.7 + Math.random()*1.3;
+
+        this.speed = 0.7 + Math.random()*0.4;
 
         this.path = [];
         this.pathIndex = 0;
 
+        this.angle = 0;
+
+        this.landing = false;
         this.landed = false;
         this.parked = false;
-
-        this.angle = 0;
 
         const side = Math.floor(Math.random()*4);
 
         if(side===0){
             this.x = Math.random()*canvas.width;
-            this.y = -30;
+            this.y = -50;
         }
         else if(side===1){
-            this.x = canvas.width + 30;
+            this.x = canvas.width + 50;
             this.y = Math.random()*canvas.height;
         }
         else if(side===2){
             this.x = Math.random()*canvas.width;
-            this.y = canvas.height + 30;
+            this.y = canvas.height + 50;
         }
         else{
-            this.x = -30;
+            this.x = -50;
             this.y = Math.random()*canvas.height;
         }
 
         this.color = `hsl(${Math.random()*360},80%,60%)`;
 
-        this.defaultPath();
-    }
-
-    defaultPath(){
-
-        this.path = [
-            {
-                x: runway.x + runway.width/2,
-                y: runway.y + runway.height/2
-            }
-        ];
-
-        this.pathIndex = 0;
+        this.path.push({
+            x: runwayEntry.x,
+            y: runwayEntry.y
+        });
     }
 
     update(){
@@ -195,54 +174,81 @@ class Plane{
 
                 this.angle = Math.atan2(dy,dx);
 
-                if(dist < 5){
+                if(dist < 6){
+
                     this.pathIndex++;
 
                     if(this.pathIndex >= this.path.length){
 
-                        if(this.landed){
-                            this.path = [{
-                                x: parking.x + parking.width/2,
-                                y: parking.y + parking.height/2
-                            }];
+                        if(!this.landing && !this.landed){
+
+                            this.landing = true;
+
+                            this.path = [
+                                {
+                                    x: canvas.width/2,
+                                    y: runway.y + runway.height + 30
+                                }
+                            ];
+
                             this.pathIndex = 0;
                         }
-                        else{
-                            this.defaultPath();
+
+                        else if(this.landing && !this.landed){
+
+                            this.landed = true;
+
+                            this.angle = Math.PI/2;
+
+                            score++;
+                            scoreEl.innerText = score;
+
+                            const slot = parkingSlots.find(s => !s.used);
+
+                            if(slot){
+
+                                slot.used = true;
+
+                                this.path = [
+                                    {
+                                        x: runway.x + runway.width + 40,
+                                        y: runway.y + runway.height + 20
+                                    },
+
+                                    {
+                                        x: slot.x,
+                                        y: slot.y
+                                    }
+                                ];
+
+                                this.pathIndex = 0;
+                            }
+                        }
+
+                        else if(this.landed){
+
+                            this.parked = true;
                         }
                     }
                 }
                 else{
-                    this.x += Math.cos(this.angle)*this.speed;
-                    this.y += Math.sin(this.angle)*this.speed;
+
+                    const drift =
+                    Math.sin(Date.now()*0.001 + this.x)*0.15;
+
+                    this.x +=
+                    Math.cos(this.angle)*this.speed + drift;
+
+                    this.y +=
+                    Math.sin(this.angle)*this.speed + drift;
                 }
             }
-        }
-
-        if(!this.landed &&
-            this.x > runway.x &&
-            this.x < runway.x + runway.width &&
-            this.y > runway.y &&
-            this.y < runway.y + runway.height){
-
-            this.landed = true;
-            score++;
-            scoreEl.innerText = score;
-        }
-
-        if(this.landed &&
-            this.x > parking.x &&
-            this.x < parking.x + parking.width &&
-            this.y > parking.y &&
-            this.y < parking.y + parking.height){
-
-            this.parked = true;
         }
     }
 
     draw(){
 
-        if(this.path.length > 0){
+        if(this.path.length > 0 && !this.parked){
 
             ctx.beginPath();
             ctx.moveTo(this.x,this.y);
@@ -252,22 +258,69 @@ class Plane{
             }
 
             ctx.strokeStyle = this.color;
-            ctx.lineWidth = 3;
+            ctx.lineWidth = 2;
+
+            ctx.setLineDash([8,8]);
+
             ctx.stroke();
+
+            ctx.setLineDash([]);
         }
 
         ctx.save();
+
         ctx.translate(this.x,this.y);
+
         ctx.rotate(this.angle);
 
         ctx.fillStyle = this.color;
 
+        // BODY
         ctx.beginPath();
-        ctx.moveTo(16,0);
-        ctx.lineTo(-10,-8);
-        ctx.lineTo(-4,0);
-        ctx.lineTo(-10,8);
+
+        ctx.moveTo(20,0);
+        ctx.lineTo(-16,-6);
+        ctx.lineTo(-22,0);
+        ctx.lineTo(-16,6);
+
         ctx.closePath();
+
+        ctx.fill();
+
+        // LEFT WING
+        ctx.beginPath();
+
+        ctx.moveTo(-2,0);
+        ctx.lineTo(-13,-18);
+        ctx.lineTo(-6,-18);
+        ctx.lineTo(6,0);
+
+        ctx.closePath();
+
+        ctx.fill();
+
+        // RIGHT WING
+        ctx.beginPath();
+
+        ctx.moveTo(-2,0);
+        ctx.lineTo(-13,18);
+        ctx.lineTo(-6,18);
+        ctx.lineTo(6,0);
+
+        ctx.closePath();
+
+        ctx.fill();
+
+        // TAIL
+        ctx.beginPath();
+
+        ctx.moveTo(-16,0);
+        ctx.lineTo(-23,-11);
+        ctx.lineTo(-18,-11);
+        ctx.lineTo(-11,0);
+
+        ctx.closePath();
+
         ctx.fill();
 
         ctx.restore();
@@ -279,34 +332,82 @@ const planes = [];
 function spawnPlane(){
 
     if(running){
+
         planes.push(new Plane());
     }
 }
 
-setInterval(spawnPlane,2200);
+setInterval(spawnPlane,2600);
 
 function drawAirport(){
 
-    ctx.fillStyle = '#555';
-    ctx.fillRect(runway.x,runway.y,runway.width,runway.height);
+    // RUNWAY
 
-    ctx.strokeStyle = 'white';
+    ctx.fillStyle = "#555";
+
+    ctx.fillRect(
+        runway.x,
+        runway.y,
+        runway.width,
+        runway.height
+    );
+
+    // RUNWAY CENTER LINE
+
+    ctx.strokeStyle = "white";
     ctx.lineWidth = 4;
 
-    for(let i=0;i<10;i++){
+    for(let i=0;i<12;i++){
 
         ctx.beginPath();
-        ctx.moveTo(canvas.width/2, runway.y + i*30);
-        ctx.lineTo(canvas.width/2, runway.y + i*30 + 16);
+
+        ctx.moveTo(
+            canvas.width/2,
+            runway.y + i*30
+        );
+
+        ctx.lineTo(
+            canvas.width/2,
+            runway.y + i*30 + 16
+        );
+
         ctx.stroke();
     }
 
-    ctx.fillStyle = '#1e8f45';
-    ctx.fillRect(parking.x,parking.y,parking.width,parking.height);
+    // PARKING AREA
 
-    ctx.fillStyle = 'white';
-    ctx.font = '20px Arial';
-    ctx.fillText('PARKING', parking.x + 20, parking.y + 55);
+    ctx.fillStyle = "#1d8742";
+
+    ctx.fillRect(
+        parkingArea.x - 30,
+        parkingArea.y - 25,
+        150,
+        270
+    );
+
+    ctx.fillStyle = "white";
+
+    ctx.font = "20px Arial";
+
+    ctx.fillText(
+        "PARKING",
+        parkingArea.x - 10,
+        parkingArea.y - 40
+    );
+
+    // SLOT LINES
+
+    ctx.strokeStyle = "white";
+
+    parkingSlots.forEach(slot=>{
+
+        ctx.strokeRect(
+            slot.x - 18,
+            slot.y - 10,
+            36,
+            20
+        );
+    });
 }
 
 function detectCollision(){
@@ -323,37 +424,44 @@ function detectCollision(){
             const dx = a.x - b.x;
             const dy = a.y - b.y;
 
-            const dist = Math.sqrt(dx*dx + dy*dy);
+            const dist =
+            Math.sqrt(dx*dx + dy*dy);
 
-            if(dist < 18){
+            if(dist < 28){
+
                 running = false;
-                gameOverEl.style.display = 'block';
+
+                gameOverEl.style.display = "block";
             }
         }
     }
 }
 
 let drawing = false;
-let currentPlane = null;
+let selectedPlane = null;
 
 function getPos(e){
 
     const rect = canvas.getBoundingClientRect();
 
     return {
+
         x:(e.clientX || e.touches[0].clientX) - rect.left,
+
         y:(e.clientY || e.touches[0].clientY) - rect.top
-    }
+    };
 }
 
-canvas.addEventListener('mousedown',startDraw);
-canvas.addEventListener('touchstart',startDraw);
+canvas.addEventListener("mousedown",startDraw);
+canvas.addEventListener("touchstart",startDraw);
 
 function startDraw(e){
 
     const pos = getPos(e);
 
     for(let plane of planes){
+
+        if(plane.landed || plane.parked) continue;
 
         const dx = pos.x - plane.x;
         const dy = pos.y - plane.y;
@@ -363,9 +471,11 @@ function startDraw(e){
         if(dist < 30){
 
             drawing = true;
-            currentPlane = plane;
+
+            selectedPlane = plane;
 
             plane.path = [];
+
             plane.pathIndex = 0;
 
             break;
@@ -373,36 +483,37 @@ function startDraw(e){
     }
 }
 
-canvas.addEventListener('mousemove',drawLine);
-canvas.addEventListener('touchmove',drawLine);
+canvas.addEventListener("mousemove",drawPath);
+canvas.addEventListener("touchmove",drawPath);
 
-function drawLine(e){
+function drawPath(e){
 
-    if(!drawing || !currentPlane) return;
+    if(!drawing || !selectedPlane) return;
 
     const pos = getPos(e);
 
-    currentPlane.path.push({
+    selectedPlane.path.push({
         x:pos.x,
         y:pos.y
     });
 }
 
-canvas.addEventListener('mouseup',stopDraw);
-canvas.addEventListener('touchend',stopDraw);
+canvas.addEventListener("mouseup",endDraw);
+canvas.addEventListener("touchend",endDraw);
 
-function stopDraw(){
+function endDraw(){
 
-    if(currentPlane){
+    if(selectedPlane){
 
-        currentPlane.path.push({
-            x: runway.x + runway.width/2,
-            y: runway.y + runway.height/2
+        selectedPlane.path.push({
+            x: runwayEntry.x,
+            y: runwayEntry.y
         });
     }
 
     drawing = false;
-    currentPlane = null;
+
+    selectedPlane = null;
 }
 
 function animate(){
@@ -411,10 +522,12 @@ function animate(){
 
     drawAirport();
 
-    for(let plane of planes){
+    planes.forEach(plane=>{
+
         plane.update();
+
         plane.draw();
-    }
+    });
 
     detectCollision();
 
@@ -423,7 +536,8 @@ function animate(){
 
 animate();
 
-window.addEventListener('resize',()=>{
+window.addEventListener("resize",()=>{
+
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 });
