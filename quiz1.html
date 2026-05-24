@@ -379,6 +379,60 @@ analysisHTML+=
 document.getElementById("questionAnalysis").innerHTML=analysisHTML;
 
 }
+/* 🔥 SAVE SCORE */
+
+async function saveUserScore(){
+
+const user = auth.currentUser;
+
+if(!user) return;
+
+const ref = doc(db,"users",user.uid);
+
+const snap = await getDoc(ref);
+
+let prev = 0;
+
+if(snap.exists()){
+prev = snap.data().totalScore || 0;
+}
+
+await setDoc(ref,{
+totalScore: prev + practiceScore
+},{merge:true});
+
+}
+
+/* RESULT */
+
+function finishQuiz(){
+
+document.getElementById("quizArea").style.display="none";
+
+let percent=Math.round((correctCount/totalQuestions)*100);
+let accuracy=Math.round((correctCount/(correctCount+wrongCount))*100);
+
+let grade="C";
+
+if(percent>=90) grade="A+";
+else if(percent>=75) grade="A";
+else if(percent>=60) grade="B";
+else if(percent>=40) grade="C";
+else grade="D";
+
+document.getElementById("result").classList.remove("hide");
+
+document.getElementById("rScore").innerText="Score : "+practiceScore;
+document.getElementById("rPercent").innerText="Percentage : "+percent+"%";
+document.getElementById("rAccuracy").innerText="Accuracy : "+accuracy+"%";
+document.getElementById("rGrade").innerText="Grade : "+grade;
+
+/* ✅ SAVE TO LEADERBOARD */
+saveUserScore();
+
+}
+
+updateQuestionOptions();
 
 </script>
 
