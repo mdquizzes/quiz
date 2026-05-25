@@ -215,7 +215,8 @@ Open Full Quiz
 </div>
 
 
-<!-- MAIN WRAP -->
+
+<!-- MAIN -->
 
 <div class="quiz-wrap">
 
@@ -224,6 +225,7 @@ Open Full Quiz
 <h1>🎯 MD QUIZZES</h1>
 
 </div>
+
 
 
 <!-- SETTINGS -->
@@ -415,7 +417,7 @@ OFF
 
 
 
-<!-- QUIZ SECTION -->
+<!-- QUIZ -->
 
 <div id="quiz" class="hide">
 
@@ -477,9 +479,17 @@ Next
 </div>
 
 
-<!-- FIREBASE AUTH -->
 
-<script type="module" src="js/auth.js"></script>
+<!-- LOAD AUTH FIRST -->
+
+<script type="module">
+
+import "./js/auth.js";
+
+window.authReady=true;
+
+</script>
+
 
 
 <!-- LOAD QUIZ DATA -->
@@ -522,6 +532,12 @@ script.onload = function(){
 
 console.log("Quiz Data Loaded");
 
+if(window.startQuizEngine){
+
+window.startQuizEngine();
+
+}
+
 };
 
 document.body.appendChild(script);
@@ -531,30 +547,35 @@ document.body.appendChild(script);
 </script>
 
 
-<!-- QUIZ ENGINE -->
 
-<script src="js/uniquiz-engine.js"></script>
-
-
-<!-- START BUTTON FIX -->
+<!-- LOAD ENGINE AFTER AUTH -->
 
 <script>
 
-const originalStart =
-document.getElementById("startBtn").onclick;
+window.addEventListener("DOMContentLoaded",()=>{
+
+const engine=document.createElement("script");
+
+engine.src="js/uniquiz-engine.js";
+
+document.body.appendChild(engine);
+
+});
+
+</script>
+
+
+
+<!-- START BUTTON -->
+
+<script>
 
 document.getElementById("startBtn")
-.onclick = async()=>{
+.addEventListener("click",async()=>{
 
 await loadQuizData();
 
-setTimeout(()=>{
-
-originalStart();
-
-},500);
-
-};
+});
 
 </script>
 
