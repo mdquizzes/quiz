@@ -528,19 +528,65 @@ script.src = path;
 
 script.id = "quizDataScript";
 
-script.onload = function(){
+script.onload=function(){
 
-console.log("Quiz Data Loaded");
+console.log("Quiz File Loaded");
 
-if(window.startQuizEngine){
+setTimeout(()=>{
 
-window.startQuizEngine();
+if(!window.QUIZ_DATA){
+
+alert("Quiz data not ready");
+
+return;
 
 }
 
+const ALL=window.QUIZ_DATA;
+
+const n=+qCountEl.value;
+
+POS=+posMarksEl.value;
+
+NEG=+negMarksEl.value;
+
+timerOn=timerModeEl.value==='on';
+
+quizQs=shuffle([...ALL]).slice(0,n);
+
+settings.classList.add('hide');
+
+quiz.classList.remove('hide');
+
+idx=0;
+
+practiceScore=0;
+officialScore=0;
+
+attempted=0;
+correctCount=0;
+
+userAnswers=[];
+
+if(timerOn){
+
+totalTime=quizQs.length*60;
+
+startTimer();
+
+}else{
+
+timerEl.classList.add('hide');
+
+}
+
+renderQ();
+
+},300);
+
 };
 
-document.body.appendChild(script);
+  document.body.appendChild(script);
 
 };
 
