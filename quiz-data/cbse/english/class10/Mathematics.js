@@ -1,5 +1,6 @@
 window.QUIZ_DATA = [
-  {
+  
+{
   question: "Find HCF of 306 and 657 using Euclid’s division algorithm.",
   answers: [
     { text: "3", correct: true },
