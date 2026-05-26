@@ -3,8 +3,8 @@ window.QUIZ_DATA = [
 {
   question: "Find HCF of 306 and 657 using Euclid’s division algorithm.",
   answers: [
-    { text: "3", correct: true },
-    { text: "9", correct: false },
+    { text: "3", correct: false },
+    { text: "9", correct: true },
     { text: "6", correct: false },
     { text: "18", correct: false }
   ],
