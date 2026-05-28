@@ -827,57 +827,142 @@ function toggleQ(key, i) {
    AUTO PAPER
 ========================= */
 function generateRandomPaper() {
+
   if (!ALL.length) {
-    alert("Please load data first.");
+
+    alert("Question bank not loaded.");
+
     return;
   }
 
   selectedMap.clear();
 
+
+
   const counts = {
+
     A: parseInt(document.getElementById("countA").value || 0),
+
     B: parseInt(document.getElementById("countB").value || 0),
+
     C: parseInt(document.getElementById("countC").value || 0),
+
     D: parseInt(document.getElementById("countD").value || 0),
+
     E: parseInt(document.getElementById("countE").value || 0)
+
   };
 
+
+
   Object.keys(counts).forEach(sec => {
+
     let pool = ALL.filter(q => q.section === sec);
 
-    const diff = document.getElementById("difficultySelect").value.trim().toLowerCase();
-    if (diff) pool = pool.filter(q => q.difficulty.toLowerCase() === diff);
 
-    if(sec === "A"){
-      const secAType = document.getElementById("sectionASubType") ? document.getElementById("sectionASubType").value.trim().toLowerCase() : "";
-      if(secAType){
-  pool = pool.filter(q =>
-    String(q.subType || q.type || "mcq")
-      .toLowerCase()
-      .trim() === secAType
-  );
-}
+
+    // DIFFICULTY FILTER
+
+    const diff = document.getElementById("difficultySelect")
+      .value
+      .trim()
+      .toLowerCase();
+
+    if (diff) {
+
+      pool = pool.filter(q =>
+
+        String(q.difficulty)
+          .toLowerCase()
+          .trim() === diff
+
+      );
+
     }
 
-    const source = document.getElementById("sourceSelect") ? document.getElementById("sourceSelect").value.trim().toUpperCase() : "";
-    if(source) pool = pool.filter(q => String(q.source).toUpperCase() === source);
+
+
+    // SECTION A TYPE
+
+    if (sec === "A") {
+
+      const typeSelect =
+        document.getElementById("sectionASubType");
+
+      if (typeSelect) {
+
+        const selectedType =
+          typeSelect.value
+            .trim()
+            .toLowerCase();
+
+        pool = pool.filter(q => {
+
+          const type = String(
+            q.subType || q.type || "mcq"
+          ).toLowerCase().trim();
+
+          return type === selectedType;
+
+        });
+
+      }
+
+    }
+
+
+
+    // SOURCE FILTER
+
+    const source = document.getElementById("sourceSelect")
+      ? document.getElementById("sourceSelect")
+          .value
+          .trim()
+          .toUpperCase()
+      : "";
+
+    if (source) {
+
+      pool = pool.filter(q =>
+
+        String(q.source || "")
+          .toUpperCase()
+          .trim() === source
+
+      );
+
+    }
+
+
+
+    // RANDOMIZE
 
     shuffle(pool);
-    pool.slice(0, counts[sec]).forEach((q, idx) => {
-      selectedMap.set(`${sec}_AUTO_${idx}_${hashString(q.question)}`, q);
+
+
+
+    // PICK QUESTIONS
+
+    const selected = pool.slice(0, counts[sec]);
+
+
+
+    selected.forEach((q, idx) => {
+
+      const key =
+        `${sec}_AUTO_${idx}_${hashString(q.question)}`;
+
+      selectedMap.set(key, q);
+
     });
+
   });
 
+
+
   renderPaper();
-}
 
-function shuffle(arr){
-  for(let i = arr.length - 1; i > 0; i--){
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
 }
-
 /* =========================
    CLEAR PAPER
 ========================= */
