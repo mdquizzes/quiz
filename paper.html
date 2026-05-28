@@ -222,6 +222,7 @@ hr{
   <div class="row">
     <select id="classSelect" onchange="reloadAllData()">
       <option value="10">Class 10</option>
+      <option value="8">Class 9</option>
       <option value="8">Class 8</option>
     </select>
 
@@ -623,7 +624,7 @@ function refreshQuestionArea() {
     (
       currentSection !== "A" ||
       !secAType ||
-      q.subType.toLowerCase() === secAType
+      (q.subType || "mcq").toLowerCase() === secAType
     )
   );
 
