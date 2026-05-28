@@ -25,6 +25,7 @@ window.SECTION_A = [
 question: "A reaction in which heat is released is called:",
 chapter: "Chemical Reactions and Equations",
 difficulty: "easy",
+subType: "mcq",
 answers: [
 { text: "Exothermic reaction", correct: true },
 { text: "Endothermic reaction", correct: false },
@@ -38,6 +39,7 @@ solution: "Exothermic reactions release heat."
 question: "Rusting of iron is an example of:",
 chapter: "Chemical Reactions and Equations",
 difficulty: "easy",
+subType: "mcq",
 answers: [
 { text: "Oxidation", correct: true },
 { text: "Reduction", correct: false },
@@ -51,6 +53,7 @@ solution: "Rusting involves oxidation of iron."
 question: "The reaction 2Mg + O₂ → 2MgO is:",
 chapter: "Chemical Reactions and Equations",
 difficulty: "medium",
+subType: "mcq",
 answers: [
 { text: "Combination reaction", correct: true },
 { text: "Decomposition reaction", correct: false },
@@ -64,6 +67,7 @@ solution: "Two substances combine to form one product."
 question: "The balanced form of H₂ + O₂ → H₂O is:",
 chapter: "Chemical Reactions and Equations",
 difficulty: "medium",
+subType: "mcq",
 answers: [
 { text: "2H₂ + O₂ → 2H₂O", correct: true },
 { text: "H₂ + O₂ → H₂O", correct: false },
@@ -77,6 +81,7 @@ solution: "Balanced equation is 2H₂ + O₂ → 2H₂O."
 question: "A substance that gets reduced causes another substance to get:",
 chapter: "Chemical Reactions and Equations",
 difficulty: "hard",
+subType: "mcq",
 answers: [
 { text: "Oxidized", correct: true },
 { text: "Neutralized", correct: false },
@@ -94,6 +99,7 @@ solution: "Reduction and oxidation occur together in redox reactions."
 question: "Acids turn blue litmus paper:",
 chapter: "Acids, Bases and Salts",
 difficulty: "easy",
+subType: "mcq",
 answers: [
 { text: "Red", correct: true },
 { text: "Green", correct: false },
@@ -107,6 +113,7 @@ solution: "Acids turn blue litmus red."
 question: "pH value of a neutral solution is:",
 chapter: "Acids, Bases and Salts",
 difficulty: "easy",
+subType: "mcq",
 answers: [
 { text: "7", correct: true },
 { text: "0", correct: false },
@@ -120,6 +127,7 @@ solution: "Neutral solutions have pH 7."
 question: "Which of the following is a base?",
 chapter: "Acids, Bases and Salts",
 difficulty: "easy",
+subType: "mcq",
 answers: [
 { text: "NaOH", correct: true },
 { text: "HCl", correct: false },
@@ -133,6 +141,7 @@ solution: "NaOH is sodium hydroxide, a strong base."
 question: "Common salt is chemically known as:",
 chapter: "Acids, Bases and Salts",
 difficulty: "medium",
+subType: "mcq",
 answers: [
 { text: "Sodium chloride", correct: true },
 { text: "Sodium carbonate", correct: false },
@@ -146,6 +155,7 @@ solution: "Common salt is NaCl."
 question: "Tooth decay starts when mouth pH falls below:",
 chapter: "Acids, Bases and Salts",
 difficulty: "hard",
+subType: "mcq",
 answers: [
 { text: "5.5", correct: true },
 { text: "7.0", correct: false },
@@ -163,6 +173,7 @@ solution: "Enamel begins to corrode below pH 5.5."
 question: "Which metal is liquid at room temperature?",
 chapter: "Metals and Non-Metals",
 difficulty: "easy",
+subType: "mcq",
 answers: [
 { text: "Mercury", correct: true },
 { text: "Iron", correct: false },
@@ -176,6 +187,7 @@ solution: "Mercury is liquid at room temperature."
 question: "Metals are generally:",
 chapter: "Metals and Non-Metals",
 difficulty: "easy",
+subType: "mcq",
 answers: [
 { text: "Good conductors of electricity", correct: true },
 { text: "Poor conductors of heat", correct: false },
@@ -189,6 +201,7 @@ solution: "Most metals conduct heat and electricity well."
 question: "The property by which metals can be beaten into sheets is called:",
 chapter: "Metals and Non-Metals",
 difficulty: "medium",
+subType: "mcq",
 answers: [
 { text: "Malleability", correct: true },
 { text: "Ductility", correct: false },
@@ -202,6 +215,7 @@ solution: "Malleability means forming thin sheets."
 question: "Which gas is generally evolved when metals react with acids?",
 chapter: "Metals and Non-Metals",
 difficulty: "medium",
+subType: "mcq",
 answers: [
 { text: "Hydrogen", correct: true },
 { text: "Oxygen", correct: false },
@@ -215,6 +229,7 @@ solution: "Metal + Acid → Salt + Hydrogen gas."
 question: "Aluminium is protected from corrosion due to:",
 chapter: "Metals and Non-Metals",
 difficulty: "hard",
+subType: "mcq",
 answers: [
 { text: "Formation of oxide layer", correct: true },
 { text: "Low density", correct: false },
@@ -232,6 +247,7 @@ solution: "Aluminium forms a protective oxide layer."
 question: "Carbon has valency:",
 chapter: "Carbon and Its Compounds",
 difficulty: "easy",
+subType: "mcq",
 answers: [
 { text: "4", correct: true },
 { text: "2", correct: false },
@@ -245,6 +261,7 @@ solution: "Carbon is tetravalent."
 question: "Compounds with same molecular formula but different structures are called:",
 chapter: "Carbon and Its Compounds",
 difficulty: "medium",
+subType: "mcq",
 answers: [
 { text: "Isomers", correct: true },
 { text: "Homologues", correct: false },
@@ -258,6 +275,7 @@ solution: "Such compounds are called isomers."
 question: "Functional group of alcohol is:",
 chapter: "Carbon and Its Compounds",
 difficulty: "easy",
+subType: "mcq",
 answers: [
 { text: "-OH", correct: true },
 { text: "-CHO", correct: false },
@@ -271,6 +289,7 @@ solution: "Alcohol contains hydroxyl group."
 question: "Soap molecules have:",
 chapter: "Carbon and Its Compounds",
 difficulty: "medium",
+subType: "mcq",
 answers: [
 { text: "Hydrophilic head and hydrophobic tail", correct: true },
 { text: "Only hydrophilic part", correct: false },
@@ -284,6 +303,7 @@ solution: "Soap has dual nature for cleaning."
 question: "Ethanoic acid is commonly called:",
 chapter: "Carbon and Its Compounds",
 difficulty: "hard",
+subType: "mcq",
 answers: [
 { text: "Acetic acid", correct: true },
 { text: "Formic acid", correct: false },
@@ -301,6 +321,7 @@ solution: "Ethanoic acid is acetic acid."
 question: "The process by which green plants prepare food is:",
 chapter: "Life Processes",
 difficulty: "easy",
+subType: "mcq",
 answers: [
 { text: "Photosynthesis", correct: true },
 { text: "Respiration", correct: false },
@@ -314,6 +335,7 @@ solution: "Plants prepare food by photosynthesis."
 question: "The functional unit of kidney is:",
 chapter: "Life Processes",
 difficulty: "easy",
+subType: "mcq",
 answers: [
 { text: "Nephron", correct: true },
 { text: "Neuron", correct: false },
@@ -327,7 +349,8 @@ solution: "Nephron is the structural and functional unit of kidney."
 question: "Transport of water in plants takes place through:",
 chapter: "Life Processes",
 difficulty: "medium",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Xylem", correct: true },
 { text: "Phloem", correct: false },
 { text: "Stomata", correct: false },
@@ -340,7 +363,8 @@ solution: "Xylem carries water and minerals."
 question: "The breakdown of glucose to release energy is called:",
 chapter: "Life Processes",
 difficulty: "medium",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Respiration", correct: true },
 { text: "Photosynthesis", correct: false },
 { text: "Excretion", correct: false },
@@ -353,7 +377,8 @@ solution: "Respiration releases energy from food."
 question: "Bile is produced by:",
 chapter: "Life Processes",
 difficulty: "hard",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Liver", correct: true },
 { text: "Pancreas", correct: false },
 { text: "Stomach", correct: false },
@@ -370,7 +395,8 @@ solution: "Liver produces bile."
 question: "The basic unit of nervous system is:",
 chapter: "Control and Coordination",
 difficulty: "easy",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Neuron", correct: true },
 { text: "Nephron", correct: false },
 { text: "Hormone", correct: false },
@@ -383,7 +409,8 @@ solution: "Neuron is the functional unit of the nervous system."
 question: "Plant movement in response to touch is called:",
 chapter: "Control and Coordination",
 difficulty: "medium",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Thigmotropism", correct: true },
 { text: "Phototropism", correct: false },
 { text: "Geotropism", correct: false },
@@ -396,7 +423,8 @@ solution: "Thigmotropism is movement due to touch."
 question: "Insulin is secreted by:",
 chapter: "Control and Coordination",
 difficulty: "medium",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Pancreas", correct: true },
 { text: "Liver", correct: false },
 { text: "Kidney", correct: false },
@@ -409,7 +437,8 @@ solution: "Insulin is secreted by pancreas."
 question: "Reflex action is controlled by:",
 chapter: "Control and Coordination",
 difficulty: "hard",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Spinal cord", correct: true },
 { text: "Cerebrum", correct: false },
 { text: "Cerebellum", correct: false },
@@ -426,7 +455,8 @@ solution: "Reflex actions are mainly controlled by spinal cord."
 question: "Binary fission occurs in:",
 chapter: "How Do Organisms Reproduce?",
 difficulty: "easy",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Amoeba", correct: true },
 { text: "Hydra", correct: false },
 { text: "Yeast", correct: false },
@@ -439,7 +469,8 @@ solution: "Amoeba reproduces by binary fission."
 question: "The reproductive part of a flower is:",
 chapter: "How Do Organisms Reproduce?",
 difficulty: "easy",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Flower", correct: true },
 { text: "Root", correct: false },
 { text: "Leaf", correct: false },
@@ -452,7 +483,8 @@ solution: "Flower is the reproductive organ in flowering plants."
 question: "Fusion of male and female gametes is called:",
 chapter: "How Do Organisms Reproduce?",
 difficulty: "medium",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Fertilization", correct: true },
 { text: "Budding", correct: false },
 { text: "Fragmentation", correct: false },
@@ -465,7 +497,8 @@ solution: "Fertilization is fusion of gametes."
 question: "Condom is a method of:",
 chapter: "How Do Organisms Reproduce?",
 difficulty: "hard",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Contraception", correct: true },
 { text: "Fertilization", correct: false },
 { text: "Pollination", correct: false },
@@ -482,7 +515,8 @@ solution: "Condom is a contraceptive method."
 question: "The science of heredity is called:",
 chapter: "Heredity and Evolution",
 difficulty: "easy",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Genetics", correct: true },
 { text: "Ecology", correct: false },
 { text: "Evolution", correct: false },
@@ -495,7 +529,8 @@ solution: "Genetics is the study of heredity."
 question: "The trait that expresses itself in F1 generation is:",
 chapter: "Heredity and Evolution",
 difficulty: "medium",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Dominant trait", correct: true },
 { text: "Recessive trait", correct: false },
 { text: "Hybrid trait", correct: false },
@@ -508,7 +543,8 @@ solution: "Dominant traits express in F1 generation."
 question: "Mendel worked on:",
 chapter: "Heredity and Evolution",
 difficulty: "easy",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Pea plants", correct: true },
 { text: "Mango plants", correct: false },
 { text: "Rats", correct: false },
@@ -521,7 +557,8 @@ solution: "Mendel used pea plants in his experiments."
 question: "Sex of a child in humans is determined by:",
 chapter: "Heredity and Evolution",
 difficulty: "hard",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Father", correct: true },
 { text: "Mother", correct: false },
 { text: "Both equally by XX only", correct: false },
@@ -538,7 +575,8 @@ solution: "Father contributes either X or Y chromosome."
 question: "The angle of incidence is equal to angle of reflection.",
 chapter: "Light",
 difficulty: "easy",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "True", correct: true },
 { text: "False", correct: false },
 { text: "Sometimes true", correct: false },
@@ -551,7 +589,8 @@ solution: "Law of reflection states i = r."
 question: "Speed of light in vacuum is:",
 chapter: "Light",
 difficulty: "easy",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "3 × 10^8 m/s", correct: true },
 { text: "3 × 10^6 m/s", correct: false },
 { text: "1.5 × 10^8 m/s", correct: false },
@@ -564,7 +603,8 @@ solution: "Standard speed of light."
 question: "Plane mirror forms image which is:",
 chapter: "Light",
 difficulty: "easy",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Virtual and erect", correct: true },
 { text: "Real and inverted", correct: false },
 { text: "Magnified", correct: false },
@@ -577,7 +617,8 @@ solution: "Plane mirror forms virtual, erect image."
 question: "Mirror formula is:",
 chapter: "Light",
 difficulty: "medium",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "1/f = 1/v + 1/u", correct: true },
 { text: "v = u + f", correct: false },
 { text: "f = uv", correct: false },
@@ -590,7 +631,8 @@ solution: "Standard mirror formula."
 question: "Power of lens formula:",
 chapter: "Light",
 difficulty: "medium",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "P = 1/f", correct: true },
 { text: "P = f", correct: false },
 { text: "P = uv", correct: false },
@@ -603,7 +645,8 @@ solution: "Power is inverse of focal length."
 question: "Magnification produced by plane mirror is:",
 chapter: "Light",
 difficulty: "hard",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "+1", correct: true },
 { text: "-1", correct: false },
 { text: "0", correct: false },
@@ -620,7 +663,8 @@ solution: "Plane mirror forms virtual upright image."
 question: "The least distance of distinct vision for a normal human eye is:",
 chapter: "Human Eye and Colourful World",
 difficulty: "easy",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "25 cm", correct: true },
 { text: "2.5 cm", correct: false },
 { text: "50 cm", correct: false },
@@ -633,7 +677,8 @@ solution: "Normal least distance of distinct vision is 25 cm."
 question: "The splitting of white light into seven colours is called:",
 chapter: "Human Eye and Colourful World",
 difficulty: "easy",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Dispersion", correct: true },
 { text: "Reflection", correct: false },
 { text: "Refraction", correct: false },
@@ -646,7 +691,8 @@ solution: "Dispersion is splitting of white light."
 question: "Myopia can be corrected using:",
 chapter: "Human Eye and Colourful World",
 difficulty: "medium",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Concave lens", correct: true },
 { text: "Convex lens", correct: false },
 { text: "Bifocal lens", correct: false },
@@ -659,7 +705,8 @@ solution: "Myopia is corrected by concave lens."
 question: "Hypermetropia is corrected by:",
 chapter: "Human Eye and Colourful World",
 difficulty: "medium",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Convex lens", correct: true },
 { text: "Concave lens", correct: false },
 { text: "Cylindrical lens", correct: false },
@@ -672,7 +719,8 @@ solution: "Hypermetropia is corrected using convex lens."
 question: "The colour of sky appears blue due to:",
 chapter: "Human Eye and Colourful World",
 difficulty: "hard",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Scattering of light", correct: true },
 { text: "Reflection of light", correct: false },
 { text: "Refraction of light", correct: false },
@@ -689,7 +737,8 @@ solution: "Blue light scatters more, so sky appears blue."
 question: "SI unit of electric current is:",
 chapter: "Electricity",
 difficulty: "easy",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Ampere", correct: true },
 { text: "Volt", correct: false },
 { text: "Ohm", correct: false },
@@ -702,7 +751,8 @@ solution: "SI unit of current is Ampere."
 question: "Potential difference unit is:",
 chapter: "Electricity",
 difficulty: "easy",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Volt", correct: true },
 { text: "Ampere", correct: false },
 { text: "Ohm", correct: false },
@@ -715,7 +765,8 @@ solution: "Unit of potential difference is volt."
 question: "Ohm’s law states:",
 chapter: "Electricity",
 difficulty: "easy",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "V = IR", correct: true },
 { text: "V = I/R", correct: false },
 { text: "R = VI", correct: false },
@@ -728,7 +779,8 @@ solution: "Ohm's law relation."
 question: "Power formula is:",
 chapter: "Electricity",
 difficulty: "medium",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "P = VI", correct: true },
 { text: "P = IR", correct: false },
 { text: "P = V/R", correct: false },
@@ -741,7 +793,8 @@ solution: "Power relation."
 question: "Heating effect formula:",
 chapter: "Electricity",
 difficulty: "medium",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "H = I²Rt", correct: true },
 { text: "H = IR", correct: false },
 { text: "H = VIt", correct: false },
@@ -754,7 +807,8 @@ solution: "Joule’s law."
 question: "If V = 10V, I = 2A, power is:",
 chapter: "Electricity",
 difficulty: "hard",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "20W", correct: true },
 { text: "5W", correct: false },
 { text: "10W", correct: false },
@@ -771,7 +825,8 @@ solution: "P = VI"
 question: "Magnetic field lines around a straight conductor are:",
 chapter: "Magnetic Effects of Electric Current",
 difficulty: "easy",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Circular", correct: true },
 { text: "Straight", correct: false },
 { text: "Elliptical", correct: false },
@@ -784,7 +839,8 @@ solution: "Magnetic field lines around a straight conductor are circular."
 question: "The device used to detect current is:",
 chapter: "Magnetic Effects of Electric Current",
 difficulty: "easy",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Galvanometer", correct: true },
 { text: "Voltmeter", correct: false },
 { text: "Ammeter", correct: false },
@@ -797,7 +853,8 @@ solution: "Galvanometer detects electric current."
 question: "Fleming’s left-hand rule is used for:",
 chapter: "Magnetic Effects of Electric Current",
 difficulty: "medium",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Direction of force on conductor", correct: true },
 { text: "Direction of induced current", correct: false },
 { text: "Resistance measurement", correct: false },
@@ -810,7 +867,8 @@ solution: "Left-hand rule gives direction of force."
 question: "An electric motor converts:",
 chapter: "Magnetic Effects of Electric Current",
 difficulty: "medium",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Electrical energy into mechanical energy", correct: true },
 { text: "Mechanical energy into electrical energy", correct: false },
 { text: "Heat energy into electrical energy", correct: false },
@@ -823,7 +881,8 @@ solution: "Motor converts electrical energy to mechanical energy."
 question: "Domestic electric fuse works on:",
 chapter: "Magnetic Effects of Electric Current",
 difficulty: "hard",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Heating effect of current", correct: true },
 { text: "Chemical effect of current", correct: false },
 { text: "Magnetic effect of current", correct: false },
@@ -840,7 +899,8 @@ solution: "Fuse wire melts due to heating effect."
 question: "The organisms which break down dead matter are called:",
 chapter: "Our Environment",
 difficulty: "easy",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Decomposers", correct: true },
 { text: "Producers", correct: false },
 { text: "Consumers", correct: false },
@@ -853,7 +913,8 @@ solution: "Decomposers break down dead organic matter."
 question: "Green plants are:",
 chapter: "Our Environment",
 difficulty: "easy",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Producers", correct: true },
 { text: "Consumers", correct: false },
 { text: "Decomposers", correct: false },
@@ -866,7 +927,8 @@ solution: "Plants produce their own food."
 question: "Ozone layer protects us from:",
 chapter: "Our Environment",
 difficulty: "medium",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Ultraviolet rays", correct: true },
 { text: "Infrared rays", correct: false },
 { text: "X-rays", correct: false },
@@ -879,7 +941,8 @@ solution: "Ozone absorbs harmful UV rays."
 question: "A food chain begins with:",
 chapter: "Our Environment",
 difficulty: "medium",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Producer", correct: true },
 { text: "Herbivore", correct: false },
 { text: "Carnivore", correct: false },
@@ -892,7 +955,8 @@ solution: "Every food chain begins with a producer."
 question: "Biodegradable waste can be broken down by:",
 chapter: "Our Environment",
 difficulty: "hard",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Microorganisms", correct: true },
 { text: "Only sunlight", correct: false },
 { text: "Only machines", correct: false },
@@ -909,7 +973,8 @@ solution: "Microorganisms decompose biodegradable waste."
 question: "The use of resources in a way that meets present needs without harming future generations is called:",
 chapter: "Sustainable Management of Natural Resources",
 difficulty: "easy",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Sustainable development", correct: true },
 { text: "Industrialization", correct: false },
 { text: "Deforestation", correct: false },
@@ -922,7 +987,8 @@ solution: "This is the definition of sustainable development."
 question: "Chipko movement was related to:",
 chapter: "Sustainable Management of Natural Resources",
 difficulty: "easy",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Conservation of forests", correct: true },
 { text: "Saving rivers", correct: false },
 { text: "Saving animals", correct: false },
@@ -935,7 +1001,8 @@ solution: "Chipko movement aimed to protect forests."
 question: "Rainwater harvesting helps in:",
 chapter: "Sustainable Management of Natural Resources",
 difficulty: "medium",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Groundwater recharge", correct: true },
 { text: "Deforestation", correct: false },
 { text: "Acid rain", correct: false },
@@ -948,7 +1015,8 @@ solution: "Rainwater harvesting increases groundwater level."
 question: "Three R’s stand for:",
 chapter: "Sustainable Management of Natural Resources",
 difficulty: "medium",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Reduce, Reuse, Recycle", correct: true },
 { text: "Read, Revise, Repeat", correct: false },
 { text: "Run, Rest, Recover", correct: false },
@@ -961,7 +1029,8 @@ solution: "The 3 R's help conserve resources."
 question: "Coal and petroleum are:",
 chapter: "Sustainable Management of Natural Resources",
 difficulty: "hard",
-answers: [
+subType: "mcq",
+   answers: [
 { text: "Non-renewable resources", correct: true },
 { text: "Renewable resources", correct: false },
 { text: "Biodegradable resources", correct: false },
