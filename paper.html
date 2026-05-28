@@ -461,17 +461,17 @@ async function reloadAllData() {
   console.log("Expected Section B Path:", getSectionPath("B"));
   console.log("SECTION_B loaded data:", window.SECTION_B);
 
-  ALL_RAW = ALL_RAW.map(q => ({
-    class: q.class ?? cls,
-    subject: q.subject ?? capitalize(subject),
-    difficulty: q.difficulty ?? "medium",
-    answers: Array.isArray(q.answers) ? q.answers : [],
-    subType: q.subType ?? "normal",
-    source: q.source ?? "OTHERS",
-    ...q
-  }));
+ALL_RAW = ALL_RAW.map(q => ({
+  class: q.class ?? cls,
+  subject: q.subject ?? capitalize(subject),
+  difficulty: q.difficulty ?? "medium",
+  answers: Array.isArray(q.answers) ? q.answers : [],
+  subType: (q.subType ?? "mcq").toLowerCase(),
+  source: q.source ?? "OTHERS",
+  ...q
+}));
 
-  filterData();
+ filterData();
 
   // Build load status
   let failed = results.filter(r => !r.success);
