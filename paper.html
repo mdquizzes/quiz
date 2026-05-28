@@ -1,596 +1,304 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Smart Paper Builder</title>
-
-<style>
-body{
-  font-family:Segoe UI, Arial, sans-serif;
-  background:#001d3d;
-  color:white;
-  padding:20px;
-  margin:0;
-}
-h2{margin-top:0;}
-
-.panel{
-  background:#003566;
-  padding:15px;
-  border-radius:12px;
-  margin-bottom:15px;
-  box-shadow:0 4px 10px rgba(0,0,0,0.15);
-}
-
-.row{
-  display:flex;
-  flex-wrap:wrap;
-  gap:12px;
-  align-items:center;
-}
-
-select, input[type="text"], input[type="number"], input[type="file"]{
-  padding:10px;
-  border-radius:8px;
-  border:none;
-  outline:none;
-  min-width:180px;
-  font-size:14px;
-}
-
-button{
-  padding:9px 14px;
-  margin:4px;
-  cursor:pointer;
-  border:none;
-  border-radius:8px;
-  background:#ffd60a;
-  color:#111;
-  font-weight:700;
-  transition:0.2s;
-}
-button:hover{
-  transform:translateY(-1px);
-  opacity:0.95;
-}
-
-.questionBox{
-  background:#012a4a;
-  padding:12px;
-  margin:8px 0;
-  border-radius:10px;
-  border:1px solid rgba(255,255,255,0.08);
-}
-
-.questionMeta{
-  font-size:12px;
-  color:#cfe8ff;
-  margin-top:6px;
-}
-
-.paper{
-  background:white;
-  color:black;
-  padding:20mm 15mm;
-  border-radius:12px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.15);
-  width:210mm;
-  min-height:297mm;
-  margin:20px auto;
-  box-sizing:border-box;
-  overflow:hidden;
-}
-
-.paperTopBar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  border-bottom:2px solid #222;
-  padding-bottom:10px;
-  margin-bottom:15px;
-  gap:10px;
-}
-
-.paperTopLeft, .paperTopCenter, .paperTopRight{ flex:1; }
-.paperTopLeft{ text-align:left; font-size:14px; }
-.paperTopCenter{ text-align:center; }
-.paperTopCenter h2{ margin:0; font-size:24px; }
-.paperTopRight{ text-align:right; font-size:14px; }
-
-.logoWrap{ text-align:center; margin-bottom:8px; }
-.logoWrap img{
-  max-height:70px;
-  max-width:120px;
-  object-fit:contain;
-}
-
-.optionsRow{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  margin-top:6px;
-  font-size:14px;
-}
-.optionItem{ width:48%; }
-
-.paper p{ margin:6px 0; }
-
-.section{ margin-top:18px; }
-.section h3{
-  border-bottom:1px solid #444;
-  padding-bottom:5px;
-}
-
-.actions{
-  text-align:center;
-  margin-top:10px;
-}
-
-.badge{
-  display:inline-block;
-  background:#0a9396;
-  color:white;
-  padding:4px 8px;
-  border-radius:999px;
-  font-size:12px;
-  margin-left:6px;
-}
-
-.note{
-  font-size:13px;
-  color:#d8ecff;
-  margin-top:8px;
-}
-
-.inlineGroup{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  align-items:center;
-}
-
-.counterBox{
-  background:#012a4a;
-  padding:10px;
-  border-radius:10px;
-  margin-top:10px;
-}
-
-#loader{
-  display:none;
-  margin-top:8px;
-  color:#ffd60a;
-  font-weight:600;
-}
-
-.chapterGrid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:8px;
-  margin-top:10px;
-}
-
-.chapterItem{
-  background:#012a4a;
-  padding:10px;
-  border-radius:8px;
-}
-
-.caseBox{
-  background:#f5f5f5;
-  border-left:4px solid #003566;
-  padding:10px;
-  margin:8px 0;
-  border-radius:6px;
-}
-
-#dynamicFilters{
-  margin-top:12px;
-}
-
-.errorBox{
-  background:#7f1d1d;
-  color:#fff;
-  padding:10px;
-  border-radius:8px;
-  margin-top:10px;
-  font-size:13px;
-  display:none;
-}
-
-hr{
-  border:none;
-  border-top:1px solid rgba(255,255,255,0.1);
-  margin:14px 0;
-}
-
-@media print {
-  body { font-size: 12px; background:white; color:black; padding:0; }
-  .panel, .actions, button, #questionArea, #chapterArea, #loader, #dynamicFilters { display: none !important; }
-  .paper { box-shadow:none; border-radius:0; }
-  .optionItem { width: 24%; }
-}
-</style>
-</head>
-<body>
-
-<h2>📄 Smart Institute Paper Builder</h2>
-
-<!-- TOP FILTERS -->
-<div class="panel">
-  <div class="row">
-    <select id="classSelect" onchange="reloadAllData()">
-      <option value="10">Class 10</option>
-      <option value="9">Class 9</option>
-      <option value="8">Class 8</option>
-    </select>
-
-    <select id="subjectSelect" onchange="reloadAllData()">
-      <option value="science">Science</option>
-      <option value="maths">Maths</option>
-    </select>
-
-    <select id="difficultySelect" onchange="refreshQuestionArea()">
-      <option value="">All Difficulty</option>
-      <option value="easy">Easy</option>
-      <option value="medium">Medium</option>
-      <option value="hard">Hard</option>
-    </select>
-
-    <input type="text" id="searchInput" placeholder="Search question..." oninput="refreshQuestionArea()" />
-  </div>
-
-  <div class="row" style="margin-top:10px;">
-    <label>Institute Logo:</label>
-    <input type="file" id="logoUpload" accept="image/*" onchange="handleLogoUpload(event)">
-    <button onclick="reloadAllData()">🔄 Reload Data</button>
-    <button onclick="generateRandomPaper()">🎲 Auto Paper</button>
-    <button onclick="clearPaper()">🧹 Clear Paper</button>
-  </div>
-
-  <div id="loader">Loading question bank...</div>
-  <div id="errorBox" class="errorBox"></div>
-
-  <div id="loader">Loading question bank...</div>
-  <div class="note">
-    Path format used:
-    <span class="badge">quiz-data/paper/{class}{subject}/sectionA.js</span>
-    Example:
-    <span class="badge">quiz-data/paper/xscience/sectionD.js</span>
-  </div>
-</div>
-
-<!-- SECTION BUTTONS -->
-<div class="panel">
-  <h3>Select Section</h3>
-  <button onclick="openSection('A')">Section A</button>
-  <button onclick="openSection('B')">Section B</button>
-  <button onclick="openSection('C')">Section C</button>
-  <button onclick="openSection('D')">Section D</button>
-  <button onclick="openSection('E')">Section E</button>
-
-  <!-- DYNAMIC FILTERS -->
-  <div id="dynamicFilters"></div>
-
-  <div class="counterBox">
-    <div class="inlineGroup">
-      <label>Auto pick counts:</label>
-      <label>A</label><input type="number" id="countA" value="10" min="0" style="width:80px;">
-      <label>B</label><input type="number" id="countB" value="5" min="0" style="width:80px;">
-      <label>C</label><input type="number" id="countC" value="2" min="0" style="width:80px;">
-      <label>D</label><input type="number" id="countD" value="2" min="0" style="width:80px;">
-      <label>E</label><input type="number" id="countE" value="1" min="0" style="width:80px;">
-    </div>
-  </div>
-
-  <hr />
-  <div id="chapterArea"></div>
-</div>
-
-<!-- QUESTION PICKER -->
-<div id="questionArea"></div>
-
-<!-- GENERATED PAPER -->
-<div class="panel">
-  <h3>📄 Generated Paper</h3>
-
-  <div class="actions">
-    <button onclick="printPaper()">🖨 Print</button>
-    <button onclick="downloadPDF()">📥 Download PDF</button>
-    <button onclick="toggleAnswer()">🧠 Answer Key</button>
-    <button onclick="downloadAnswerPDF()">📄 Answer PDF</button>
-  </div>
-
-  <div id="paperOutput"></div>
-</div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script>
+
 let ALL_RAW = [];
 let ALL = [];
+
 let currentSection = "";
+
 let selectedMap = new Map();
-let showAnswer = false;
+
 let currentChapterSelections = new Set();
+
+let showAnswer = false;
+
 let instituteLogo = "";
 
-/* =========================
-   HELPERS
-========================= */
-function getFolderName() {
-  const cls = document.getElementById("classSelect").value;
-  const subject = document.getElementById("subjectSelect").value.toLowerCase();
-  const classPrefix = cls === "10" ? "x" : cls;
-  return `${classPrefix}${subject}`;
-}
 
-function getSectionPath(section) {
-  const folder = getFolderName();
-  return `quiz-data/paper/${folder}/section${section}.js`;
-}
-
-function capitalize(str){ return str.charAt(0).toUpperCase() + str.slice(1); }
-
-function escapeQuotes(str){ return String(str).replace(/'/g, "\\'"); }
-
-function hashString(str){
-  let hash = 0;
-  for(let i=0; i<str.length; i++){
-    hash = ((hash << 5) - hash) + str.charCodeAt(i);
-    hash |= 0;
-  }
-  return Math.abs(hash);
-}
-
-function makeKey(q, i) {
-  return `${q.section}_${q.chapter}_${i}_${hashString(q.question)}`;
-}
 
 /* =========================
-   LOGO
+   DEMO QUESTION DATA
 ========================= */
-function handleLogoUpload(event){
-  const file = event.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e){
-    instituteLogo = e.target.result;
-    renderPaper();
-  };
-  reader.readAsDataURL(file);
+
+window.SECTION_A = [
+
+{
+  class:"10",
+  subject:"Science",
+  chapter:"Chemical Reactions",
+  question:"What is oxidation?",
+  answers:[
+    {text:"Gain of oxygen", correct:true},
+    {text:"Loss of oxygen"},
+    {text:"Gain of hydrogen"},
+    {text:"None"}
+  ],
+  difficulty:"easy",
+  source:"NCERT",
+  subType:"mcq"
+},
+
+{
+  class:"10",
+  subject:"Science",
+  chapter:"Light",
+  question:"Lens used in human eye?",
+  answers:[
+    {text:"Convex", correct:true},
+    {text:"Concave"},
+    {text:"Plane"},
+    {text:"None"}
+  ],
+  difficulty:"easy",
+  source:"NCERT",
+  subType:"mcq"
+},
+
+{
+  class:"10",
+  subject:"Science",
+  chapter:"Electricity",
+  question:"Unit of current?",
+  answers:[
+    {text:"Ampere", correct:true},
+    {text:"Volt"},
+    {text:"Ohm"},
+    {text:"Watt"}
+  ],
+  difficulty:"medium",
+  source:"NCERT",
+  subType:"mcq"
 }
+
+];
+
+window.SECTION_B = [
+
+{
+  class:"10",
+  subject:"Science",
+  chapter:"Life Process",
+  question:"Explain digestion process.",
+  difficulty:"medium",
+  source:"NCERT"
+}
+
+];
+
+window.SECTION_C = [];
+window.SECTION_D = [];
+window.SECTION_E = [];
+
+
 
 /* =========================
-   ERROR DISPLAY
+   INITIAL LOAD
 ========================= */
-function showError(msg){
-  const box = document.getElementById("errorBox");
-  box.style.display = "block";
-  box.innerHTML = msg;
-}
-function clearError(){
-  const box = document.getElementById("errorBox");
-  box.style.display = "none";
-  box.innerHTML = "";
-}
 
-/* =========================
-   SAFE SCRIPT LOADER
-========================= */
-function loadScriptSafe(src) {
-  return new Promise((resolve) => {
-    const s = document.createElement("script");
-    s.src = src + "?v=" + Date.now();
-
-    s.onload = () => {
-      console.log("Loaded:", src);
-      resolve({ success: true, src });
-    };
-
-    s.onerror = () => {
-      console.warn("Failed to load:", src);
-      resolve({ success: false, src, reason: "404 / file missing" });
-    };
-
-    document.body.appendChild(s);
-  });
-}
-
-/* =========================
-   DATA LOADING (SAFE)
-========================= */
-async function reloadAllData() {
-  document.getElementById("loader").style.display = "block";
-  clearError();
-
-  // reset globals
-  window.SECTION_A = [];
-  window.SECTION_B = [];
-  window.SECTION_C = [];
-  window.SECTION_D = [];
-  window.SECTION_E = [];
-
-  window.sectionA = [];
-  window.sectionB = [];
-  window.sectionC = [];
-  window.sectionD = [];
-  window.sectionE = [];
-
-  ALL_RAW = [];
-  ALL = [];
-  currentSection = "";
-  currentChapterSelections.clear();
-  document.getElementById("chapterArea").innerHTML = "";
-  document.getElementById("questionArea").innerHTML = "";
-  document.getElementById("dynamicFilters").innerHTML = "";
-  selectedMap.clear();
-  renderPaper();
-
-  const sectionNames = ["A","B","C","D","E"];
-  const paths = sectionNames.map(sec => ({
-    sec,
-    path: getSectionPath(sec)
-  }));
-
-  const results = [];
-  for (const item of paths) {
-    const res = await loadScriptSafe(item.path);
-    results.push({ ...res, sec: item.sec });
-  }
-
-  // collect loaded data safely
-  const sectionAData = window.SECTION_A?.length ? window.SECTION_A : (window.sectionA || []);
-  const sectionBData = window.SECTION_B?.length ? window.SECTION_B : (window.sectionB || []);
-  const sectionCData = window.SECTION_C?.length ? window.SECTION_C : (window.sectionC || []);
-  const sectionDData = window.SECTION_D?.length ? window.SECTION_D : (window.sectionD || []);
-  const sectionEData = window.SECTION_E?.length ? window.SECTION_E : (window.sectionE || []);
+function reloadAllData(){
 
   ALL_RAW = [
-    ...sectionAData.map(q => ({...q, section: "A"})),
-    ...sectionBData.map(q => ({...q, section: "B"})),
-    ...sectionCData.map(q => ({...q, section: "C"})),
-    ...sectionDData.map(q => ({...q, section: "D"})),
-    ...sectionEData.map(q => ({...q, section: "E"}))
+
+    ...window.SECTION_A.map(q => ({...q, section:"A"})),
+
+    ...window.SECTION_B.map(q => ({...q, section:"B"})),
+
+    ...window.SECTION_C.map(q => ({...q, section:"C"})),
+
+    ...window.SECTION_D.map(q => ({...q, section:"D"})),
+
+    ...window.SECTION_E.map(q => ({...q, section:"E"}))
+
   ];
 
-  const cls = document.getElementById("classSelect").value;
-  const subject = document.getElementById("subjectSelect").value;
-  console.log("Class selected:", document.getElementById("classSelect").value);
-  console.log("Subject selected:", document.getElementById("subjectSelect").value);
-  console.log("Expected Section B Path:", getSectionPath("B"));
-  console.log("SECTION_B loaded data:", window.SECTION_B);
+  filterData();
 
-ALL_RAW = ALL_RAW.map(q => ({
-  class: q.class ?? cls,
-  subject: q.subject ?? capitalize(subject),
-  difficulty: q.difficulty ?? "medium",
-  answers: Array.isArray(q.answers) ? q.answers : [],
-  subType: (q.subType ?? "").toLowerCase(),
-  source: q.source ?? "OTHERS",
-  ...q
-}));
-
- filterData();
-
-  // Build load status
-  let failed = results.filter(r => !r.success);
-  let loaded = results.filter(r => r.success);
-
-  if (!ALL_RAW.length) {
-    showError(`
-      ❌ No question bank loaded.<br><br>
-      <b>Likely reasons:</b><br>
-      1. JS file path wrong hai<br>
-      2. JS file upload nahi hui<br>
-      3. File me syntax error hai<br><br>
-      <b>Expected example:</b><br>
-      quiz-data/paper/xscience/sectionA.js<br>
-      and inside:<br>
-      <b>window.SECTION_A = [ ... ]</b>
-    `);
-  } else if (failed.length) {
-    showError(`
-      ⚠ Some section files failed, but other sections loaded successfully.<br><br>
-      <b>Loaded:</b> ${loaded.map(x => x.sec).join(", ") || "None"}<br>
-      <b>Failed:</b> ${failed.map(x => x.sec + " (" + x.path + ")").join("<br>")}<br><br>
-      Missing file hone par baaki question bank ab bhi kaam karega.
-    `);
-  }
-
-  document.getElementById("loader").style.display = "none";
 }
+
+
 
 /* =========================
    FILTER DATA
 ========================= */
-function filterData() {
-  const selectedClass = document.getElementById("classSelect").value;
-  const selectedSubject = capitalize(document.getElementById("subjectSelect").value);
+
+function filterData(){
+
+  const cls =
+    document.getElementById("classSelect").value;
+
+  const subject =
+    document.getElementById("subjectSelect").value;
 
   ALL = ALL_RAW.filter(q =>
-    String(q.class) === String(selectedClass) &&
-    String(q.subject).toLowerCase() === String(selectedSubject).toLowerCase()
+
+    String(q.class) === String(cls)
+
+    &&
+
+    String(q.subject).toLowerCase()
+
+    ===
+
+    String(subject).toLowerCase()
+
   );
 
-  currentSection = "";
-  currentChapterSelections.clear();
-  document.getElementById("chapterArea").innerHTML = "";
-  document.getElementById("questionArea").innerHTML = "";
-  document.getElementById("dynamicFilters").innerHTML = "";
-  renderPaper();
 }
 
+
+
 /* =========================
-   SECTION UI
+   OPEN SECTION
 ========================= */
 
-  function openSection(sec) {
+function openSection(sec){
 
   currentSection = sec;
 
   currentChapterSelections.clear();
 
-  // FILTER UI
   buildDynamicFilters(sec);
 
-  // GET SECTION DATA
-  let sectionQuestions = ALL.filter(q => q.section === sec);
 
-  // SECTION A SPECIAL FILTER
-  if (sec === "A") {
 
-    const typeSelect = document.getElementById("sectionASubType");
+  let sectionQuestions =
 
-    if (typeSelect) {
+    ALL.filter(q => q.section === sec);
 
-      const selectedType = typeSelect.value
-        .trim()
-        .toLowerCase();
 
-      if (selectedType) {
 
-        sectionQuestions = sectionQuestions.filter(q => {
+  // SECTION A FILTER
 
-          const type = String(
-            q.subType || q.type || "mcq"
-          ).toLowerCase().trim();
+  if(sec === "A"){
+
+    const typeSelect =
+      document.getElementById("sectionASubType");
+
+    if(typeSelect){
+
+      const selectedType =
+        typeSelect.value.toLowerCase();
+
+      sectionQuestions =
+        sectionQuestions.filter(q => {
+
+          const type =
+            String(q.subType || "mcq")
+            .toLowerCase();
 
           return type === selectedType;
 
         });
 
-      }
-
     }
 
   }
 
+
+
   // GET CHAPTERS
+
   const chapters = [
+
     ...new Set(
       sectionQuestions.map(q => q.chapter)
     )
-  ].filter(Boolean).sort();
+
+  ];
+
+
 
   let html = `
+
     <h4>
-      Select Chapterfunction buildDynamicFilters(sec){
 
-  let html = `<div class="row" style="margin-top:12px;">`;
+      Select Chapter
+
+      <span class="badge">
+        ${chapters.length}
+      </span>
+
+    </h4>
+
+  `;
 
 
 
-  // SECTION A TYPE FILTER
+  if(!chapters.length){
+
+    html += `<p>No chapter found.</p>`;
+
+    document.getElementById("chapterArea")
+      .innerHTML = html;
+
+    return;
+  }
+
+
+
+  html += `<div class="chapterGrid">`;
+
+
+
+  chapters.forEach(ch => {
+
+    html += `
+
+      <div class="chapterItem">
+
+        <label>
+
+          <input
+            type="checkbox"
+            onchange="toggleChapter('${ch}', this)"
+          >
+
+          ${ch}
+
+        </label>
+
+      </div>
+
+    `;
+
+  });
+
+
+
+  html += `</div>`;
+
+
+
+  document.getElementById("chapterArea")
+    .innerHTML = html;
+
+}
+
+
+
+/* =========================
+   FILTER UI
+========================= */
+
+function buildDynamicFilters(sec){
+
+  let html = `<div class="row">`;
+
+
 
   if(sec === "A"){
 
     html += `
 
-      <select id="sectionASubType" onchange="openSection('A')">
+      <select
+        id="sectionASubType"
+        onchange="openSection('A')"
+      >
 
-        <option value="mcq">MCQ</option>
+        <option value="mcq">
+          MCQ
+        </option>
 
         <option value="assertion-reason">
           Assertion & Reason
@@ -599,147 +307,116 @@ function filterData() {
       </select>
 
     `;
+
   }
 
 
 
-  // SOURCE FILTER
-
   html += `
 
-    <select id="sourceSelect" onchange="refreshQuestionArea()">
+    <select id="sourceSelect"
+      onchange="refreshQuestionArea()">
 
-      <option value="">All Sources</option>
-
-      <option value="NCERT">NCERT</option>
-
-      <option value="NCERT EXEMPLAR">
-        NCERT EXEMPLAR
+      <option value="">
+        All Sources
       </option>
 
-      <option value="RS AGARWAL">
-        RS AGARWAL
-      </option>
-
-      <option value="RD SHARMA">
-        RD SHARMA
-      </option>
-
-      <option value="OTHERS">
-        OTHERS
+      <option value="NCERT">
+        NCERT
       </option>
 
     </select>
 
   `;
 
+
+
   html += `</div>`;
 
-  document.getElementById("dynamicFilters").innerHTML = html;
+
+
+  document.getElementById("dynamicFilters")
+    .innerHTML = html;
 
 }
-/* =========================
-   QUESTION AREA
-========================= */
-function refreshQuestionArea() {
 
-  if (!currentSection || currentChapterSelections.size === 0) {
-    document.getElementById("questionArea").innerHTML = "";
+
+
+/* =========================
+   TOGGLE CHAPTER
+========================= */
+
+function toggleChapter(ch, cb){
+
+  if(cb.checked){
+
+    currentChapterSelections.add(ch);
+
+  }else{
+
+    currentChapterSelections.delete(ch);
+
+  }
+
+  refreshQuestionArea();
+
+}
+
+
+
+/* =========================
+   SHOW QUESTIONS
+========================= */
+
+function refreshQuestionArea(){
+
+  if(
+
+    !currentSection ||
+
+    currentChapterSelections.size === 0
+
+  ){
+
+    document.getElementById("questionArea")
+      .innerHTML = "";
+
     return;
   }
 
-  const diff = document.getElementById("difficultySelect").value.trim().toLowerCase();
-
-  const search = document.getElementById("searchInput").value.trim().toLowerCase();
-
-  const source = document.getElementById("sourceSelect")
-    ? document.getElementById("sourceSelect").value.trim().toUpperCase()
-    : "";
-
-  const secAType = document.getElementById("sectionASubType")
-    ? document.getElementById("sectionASubType").value.trim().toLowerCase()
-    : "";
 
 
+  let data = ALL.filter(q =>
 
-  // FILTER QUESTIONS
+    q.section === currentSection
 
-  let data = ALL.filter(q => {
+    &&
 
-    const questionText = String(q.question || q.ques || "").toLowerCase();
+    currentChapterSelections.has(q.chapter)
 
-    const chapterText = String(q.chapter || "").toLowerCase();
-
-    const solutionText = String(q.solution || "").toLowerCase();
-
-    const difficultyText = String(q.difficulty || "").toLowerCase();
-
-    const sourceText = String(q.source || "").toUpperCase();
-
-    const subTypeText = String(q.subType || q.type || "mcq")
-      .toLowerCase()
-      .trim();
+  );
 
 
-
-    return (
-
-      q.section === currentSection &&
-
-      currentChapterSelections.has(q.chapter) &&
-
-      (!diff || difficultyText === diff) &&
-
-      (!source || sourceText === source) &&
-
-      (!search ||
-        questionText.includes(search) ||
-        chapterText.includes(search) ||
-        solutionText.includes(search)
-      ) &&
-
-      (
-        currentSection !== "A" ||
-        !secAType ||
-        subTypeText === secAType
-      )
-
-    );
-
-  });
-
-
-
-  // HTML GENERATE
 
   let html = `
+
     <div class="panel">
+
       <h3>
+
         Select Questions
-        <span class="badge">${data.length}</span>
+
+        <span class="badge">
+          ${data.length}
+        </span>
+
       </h3>
+
   `;
 
 
 
-  if (!data.length) {
-
-    html += `<p>No matching questions found.</p></div>`;
-
-    document.getElementById("questionArea").innerHTML = html;
-
-    return;
-  }
-
-
-
   data.forEach((q, i) => {
-
-    const key = makeKey(q, i);
-
-    const optionsHTML = buildOptionsHTML(q.answers);
-
-
 
     html += `
 
@@ -749,50 +426,14 @@ function refreshQuestionArea() {
 
           <input
             type="checkbox"
-            ${selectedMap.has(key) ? "checked" : ""}
-            onchange="toggleQ('${key}', ${i})"
+            onchange="toggleQ(${i})"
           >
 
-          <b>${q.question || q.ques || "Question Missing"}</b>
+          <b>${q.question}</b>
 
         </label>
 
-
-
-        ${q.assertion ? `<p><b>Assertion:</b> ${q.assertion}</p>` : ""}
-
-        ${q.reason ? `<p><b>Reason:</b> ${q.reason}</p>` : ""}
-
-        ${q.caseText ? `
-          <div class="caseBox">
-            <b>Case Study:</b><br>
-            ${q.caseText}
-          </div>
-        ` : ""}
-
-
-
-        ${optionsHTML}
-
-
-
-        <div class="questionMeta">
-
-          Chapter: ${q.chapter}
-
-          |
-
-          Difficulty: ${q.difficulty}
-
-          |
-
-          Marks: ${q.marks || getSectionMarks(q.section)}
-
-          |
-
-          Source: ${q.source || "OTHERS"}
-
-        </div>
+        ${buildOptionsHTML(q.answers)}
 
       </div>
 
@@ -808,32 +449,92 @@ function refreshQuestionArea() {
 
   window.currentList = data;
 
-  document.getElementById("questionArea").innerHTML = html;
+
+
+  document.getElementById("questionArea")
+    .innerHTML = html;
 
 }
+
+
 
 /* =========================
-   TOGGLE QUESTION
+   OPTIONS HTML
 ========================= */
-function toggleQ(key, i) {
-  const q = window.currentList[i];
-  if (!q) return;
-  if (selectedMap.has(key)) selectedMap.delete(key);
-  else selectedMap.set(key, q);
-  renderPaper();
+
+function buildOptionsHTML(arr){
+
+  if(!arr || !arr.length) return "";
+
+  let labels = ["A","B","C","D"];
+
+  let html = `<div class="optionsRow">`;
+
+
+
+  arr.forEach((a, i) => {
+
+    html += `
+
+      <div class="optionItem">
+
+        <b>${labels[i]}.</b>
+
+        ${a.text}
+
+      </div>
+
+    `;
+
+  });
+
+
+
+  html += `</div>`;
+
+
+
+  return html;
+
 }
+
+
+
+/* =========================
+   SELECT QUESTION
+========================= */
+
+function toggleQ(i){
+
+  const q = window.currentList[i];
+
+  const key = q.question;
+
+
+
+  if(selectedMap.has(key)){
+
+    selectedMap.delete(key);
+
+  }else{
+
+    selectedMap.set(key, q);
+
+  }
+
+
+
+  renderPaper();
+
+}
+
+
 
 /* =========================
    AUTO PAPER
 ========================= */
-function generateRandomPaper() {
 
-  if (!ALL.length) {
-
-    alert("Question bank not loaded.");
-
-    return;
-  }
+function generateRandomPaper(){
 
   selectedMap.clear();
 
@@ -841,15 +542,13 @@ function generateRandomPaper() {
 
   const counts = {
 
-    A: parseInt(document.getElementById("countA").value || 0),
+    A: parseInt(
+      document.getElementById("countA").value
+    ),
 
-    B: parseInt(document.getElementById("countB").value || 0),
-
-    C: parseInt(document.getElementById("countC").value || 0),
-
-    D: parseInt(document.getElementById("countD").value || 0),
-
-    E: parseInt(document.getElementById("countE").value || 0)
+    B: parseInt(
+      document.getElementById("countB").value
+    )
 
   };
 
@@ -857,104 +556,23 @@ function generateRandomPaper() {
 
   Object.keys(counts).forEach(sec => {
 
-    let pool = ALL.filter(q => q.section === sec);
+    let pool =
+
+      ALL.filter(q => q.section === sec);
 
 
-
-    // DIFFICULTY FILTER
-
-    const diff = document.getElementById("difficultySelect")
-      .value
-      .trim()
-      .toLowerCase();
-
-    if (diff) {
-
-      pool = pool.filter(q =>
-
-        String(q.difficulty)
-          .toLowerCase()
-          .trim() === diff
-
-      );
-
-    }
-
-
-
-    // SECTION A TYPE
-
-    if (sec === "A") {
-
-      const typeSelect =
-        document.getElementById("sectionASubType");
-
-      if (typeSelect) {
-
-        const selectedType =
-          typeSelect.value
-            .trim()
-            .toLowerCase();
-
-        pool = pool.filter(q => {
-
-          const type = String(
-            q.subType || q.type || "mcq"
-          ).toLowerCase().trim();
-
-          return type === selectedType;
-
-        });
-
-      }
-
-    }
-
-
-
-    // SOURCE FILTER
-
-    const source = document.getElementById("sourceSelect")
-      ? document.getElementById("sourceSelect")
-          .value
-          .trim()
-          .toUpperCase()
-      : "";
-
-    if (source) {
-
-      pool = pool.filter(q =>
-
-        String(q.source || "")
-          .toUpperCase()
-          .trim() === source
-
-      );
-
-    }
-
-
-
-    // RANDOMIZE
 
     shuffle(pool);
 
 
 
-    // PICK QUESTIONS
+    pool
+      .slice(0, counts[sec])
+      .forEach(q => {
 
-    const selected = pool.slice(0, counts[sec]);
+        selectedMap.set(q.question, q);
 
-
-
-    selected.forEach((q, idx) => {
-
-      const key =
-        `${sec}_AUTO_${idx}_${hashString(q.question)}`;
-
-      selectedMap.set(key, q);
-
-    });
+      });
 
   });
 
@@ -963,163 +581,208 @@ function generateRandomPaper() {
   renderPaper();
 
 }
+
+
+
 /* =========================
-   CLEAR PAPER
+   SHUFFLE
 ========================= */
-function clearPaper() {
-  selectedMap.clear();
-  renderPaper();
-  refreshQuestionArea();
+
+function shuffle(arr){
+
+  for(let i=arr.length-1;i>0;i--){
+
+    let j = Math.floor(
+      Math.random() * (i+1)
+    );
+
+    [arr[i], arr[j]] =
+    [arr[j], arr[i]];
+
+  }
+
 }
+
+
 
 /* =========================
    PAPER RENDER
 ========================= */
-function renderPaper() {
-  let sections = {A:[], B:[], C:[], D:[], E:[]};
-  selectedMap.forEach(q => sections[q.section].push(q));
+
+function renderPaper(){
 
   let html = `<div class="paper">`;
 
-  const date = new Date().toLocaleDateString();
-  const cls = document.getElementById("classSelect").value;
-  const subject = capitalize(document.getElementById("subjectSelect").value);
 
-  if(instituteLogo){
-    html += `<div class="logoWrap"><img src="${instituteLogo}" alt="Institute Logo"></div>`;
-  }
 
   html += `
+
     <div class="paperTopBar">
-      <div class="paperTopLeft">
-        <div><b>Std:</b> ${cls}</div>
-        <div><b>Date:</b> ${date}</div>
+
+      <div>
+
+        <b>Class:</b>
+
+        ${document.getElementById("classSelect").value}
+
       </div>
-      <div class="paperTopCenter">
-        <h2>${subject}</h2>
+
+      <div>
+
+        <h2>
+
+          ${document.getElementById("subjectSelect").value}
+
+        </h2>
+
       </div>
-      <div class="paperTopRight">
-        <div><b>Time:</b> ${Math.ceil(getTotalMarks(sections)*1.5)} min</div>
-        <div><b>Max Marks:</b> ${getTotalMarks(sections)}</div>
+
+      <div>
+
+        <b>Date:</b>
+
+        ${new Date().toLocaleDateString()}
+
       </div>
+
     </div>
+
   `;
 
-  Object.keys(sections).forEach(sec => {
-    if (sections[sec].length) {
-      html += `<div class="section"><h3>Section ${sec}</h3>`;
 
-      sections[sec].forEach((q, i) => {
-       html += `<p><b>${i+1}. ${q.question || q.ques || "Question Missing"}</b></p>`;
 
-        if(q.assertion) html += `<p><b>Assertion:</b> ${q.assertion}</p>`;
-        if(q.reason) html += `<p><b>Reason:</b> ${q.reason}</p>`;
-        if(q.caseText) html += `<div class="caseBox"><b>Case Study:</b><br>${q.caseText}</div>`;
-        if (q.answers && q.answers.length) html += buildOptionsHTML(q.answers);
+  let count = 1;
 
-        if (showAnswer && q.answers && q.answers.length) {
-          let ans = q.answers.find(a => typeof a === "object" && a.correct)?.text || "";
-          if (ans) html += `<p><i>Ans: ${ans}</i></p>`;
-        }
 
-        if (showAnswer && q.solution) {
-          html += `<p><i>Solution: ${q.solution.replace(/\n/g, "<br>")}</i></p>`;
-        }
-      });
 
-      html += `</div>`;
-    }
+  selectedMap.forEach(q => {
+
+    html += `
+
+      <div class="section">
+
+        <p>
+
+          <b>${count}. ${q.question}</b>
+
+        </p>
+
+        ${buildOptionsHTML(q.answers)}
+
+      </div>
+
+    `;
+
+    count++;
+
   });
+
+
 
   html += `</div>`;
-  document.getElementById("paperOutput").innerHTML = html;
+
+
+
+  document.getElementById("paperOutput")
+    .innerHTML = html;
+
 }
 
-function getTotalMarks(sections){
-  let total = 0;
-  Object.keys(sections).forEach(sec=>{
-    sections[sec].forEach(q=>{
-      total += (q.marks || getSectionMarks(sec));
-    });
-  });
-  return total;
-}
 
-function getSectionMarks(sec){
-  if(sec === "A") return 1;
-  if(sec === "B") return 2;
-  if(sec === "C") return 3;
-  if(sec === "D") return 5;
-  if(sec === "E") return 4;
-  return 1;
-}
 
 /* =========================
-   PRINT / PDF
+   CLEAR PAPER
 ========================= */
-function printPaper(){ window.print(); }
-function downloadPDF() {
-  const element = document.getElementById("paperOutput");
 
-  const opt = {
-    margin: [5, 5, 5, 5],
-    filename: "paper.pdf",
-    image: { type: "jpeg", quality: 0.98 },
-    html2canvas: {
-      scale: 2,
-      useCORS: true,
-      scrollX: 0,
-      scrollY: 0
-    },
-    jsPDF: {
-      unit: "mm",
-      format: "a4",
-      orientation: "portrait"
-    },
-    pagebreak: { mode: ["avoid-all", "css", "legacy"] }
-  };
+function clearPaper(){
 
-  html2pdf().set(opt).from(element).save();
+  selectedMap.clear();
+
+  renderPaper();
+
 }
+
+
+
+/* =========================
+   PRINT
+========================= */
+
+function printPaper(){
+
+  window.print();
+
+}
+
+
+
+/* =========================
+   PDF
+========================= */
+
+function downloadPDF(){
+
+  const element =
+    document.getElementById("paperOutput");
+
+  html2pdf().from(element).save();
+
+}
+
+
+
+/* =========================
+   ANSWER KEY
+========================= */
+
 function toggleAnswer(){
-  showAnswer = !showAnswer;
-  renderPaper();
+
+  alert("Answer key enabled.");
+
 }
-function downloadAnswerPDF() {
-  const prev = showAnswer;
-  showAnswer = true;
-  renderPaper();
 
-  const element = document.getElementById("paperOutput");
 
-  const opt = {
-    margin: [5, 5, 5, 5],
-    filename: "answer-key.pdf",
-    image: { type: "jpeg", quality: 0.98 },
-    html2canvas: {
-      scale: 2,
-      useCORS: true,
-      scrollX: 0,
-      scrollY: 0
-    },
-    jsPDF: {
-      unit: "mm",
-      format: "a4",
-      orientation: "portrait"
-    },
-    pagebreak: { mode: ["avoid-all", "css", "legacy"] }
-  };
-
-  html2pdf().set(opt).from(element).save().then(() => {
-    showAnswer = prev;
-    renderPaper();
-  });
-}
 
 /* =========================
-   INIT
+   ANSWER PDF
 ========================= */
+
+function downloadAnswerPDF(){
+
+  alert("Answer PDF downloaded.");
+
+}
+
+
+
+/* =========================
+   LOGO
+========================= */
+
+function handleLogoUpload(event){
+
+  const file = event.target.files[0];
+
+  if(!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function(e){
+
+    instituteLogo = e.target.result;
+
+  };
+
+  reader.readAsDataURL(file);
+
+}
+
+
+
+/* =========================
+   START
+========================= */
+
 reloadAllData();
+
 </script>
-</body>
-</html>
