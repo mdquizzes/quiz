@@ -611,81 +611,174 @@ function toggleChapter(ch, cb) {
    QUESTION AREA
 ========================= */
 function refreshQuestionArea() {
+
   if (!currentSection || currentChapterSelections.size === 0) {
     document.getElementById("questionArea").innerHTML = "";
     return;
   }
 
   const diff = document.getElementById("difficultySelect").value.trim().toLowerCase();
-  const search = document.getElementById("searchInput").value.trim().toLowerCase();
-  const source = document.getElementById("sourceSelect") ? document.getElementById("sourceSelect").value.trim().toUpperCase() : "";
-  const secAType = document.getElementById("sectionASubType") ? document.getElementById("sectionASubType").value.trim().toLowerCase() : "";
 
-  let data = ALL.filter(q =>
-    q.section === currentSection &&
-    currentChapterSelections.has(q.chapter) &&
-    (!diff || q.difficulty.toLowerCase() === diff) &&
-    (!source || String(q.source).toUpperCase() === source) &&
-    (!search ||
-     String(q.question || q.ques || "").toLowerCase().includes(search) ||
-      q.chapter.toLowerCase().includes(search) ||
-      (q.solution && q.solution.toLowerCase().includes(search))
-    ) &&
-    (
+  const search = document.getElementById("searchInput").value.trim().toLowerCase();
+
+  const source = document.getElementById("sourceSelect")
+    ? document.getElementById("sourceSelect").value.trim().toUpperCase()
+    : "";
+
+  const secAType = document.getElementById("sectionASubType")
+    ? document.getElementById("sectionASubType").value.trim().toLowerCase()
+    : "";
+
+
+
+  // FILTER QUESTIONS
+
+  let data = ALL.filter(q => {
+
+    const questionText = String(q.question || q.ques || "").toLowerCase();
+
+    const chapterText = String(q.chapter || "").toLowerCase();
+
+    const solutionText = String(q.solution || "").toLowerCase();
+
+    const difficultyText = String(q.difficulty || "").toLowerCase();
+
+    const sourceText = String(q.source || "").toUpperCase();
+
+    const subTypeText = String(q.subType || q.type || "mcq")
+      .toLowerCase()
+      .trim();
+
+
+
+    return (
+
+      q.section === currentSection &&
+
+      currentChapterSelections.has(q.chapter) &&
+
+      (!diff || difficultyText === diff) &&
+
+      (!source || sourceText === source) &&
+
+      (!search ||
+        questionText.includes(search) ||
+        chapterText.includes(search) ||
+        solutionText.includes(search)
+      ) &&
+
       (
-  currentSection !== "A" ||
-  !secAType ||
-  String(q.subType || q.type || "mcq").toLowerCase().trim() === secAType
+        currentSection !== "A" ||
+        !secAType ||
+        subTypeText === secAType
+      )
+
     );
 
-  let html = `<div class="panel"><h3>Select Questions <span class="badge">${data.length}</span></h3>`;
+  });
+
+
+
+  // HTML GENERATE
+
+  let html = `
+    <div class="panel">
+      <h3>
+        Select Questions
+        <span class="badge">${data.length}</span>
+      </h3>
+  `;
+
+
 
   if (!data.length) {
+
     html += `<p>No matching questions found.</p></div>`;
+
     document.getElementById("questionArea").innerHTML = html;
+
     return;
   }
 
+
+
   data.forEach((q, i) => {
+
     const key = makeKey(q, i);
+
     const optionsHTML = buildOptionsHTML(q.answers);
 
+
+
     html += `
+
       <div class="questionBox">
+
         <label>
-          <input type="checkbox"
+
+          <input
+            type="checkbox"
             ${selectedMap.has(key) ? "checked" : ""}
-            onchange="toggleQ('${key}', ${i})">
+            onchange="toggleQ('${key}', ${i})"
+          >
+
           <b>${q.question || q.ques || "Question Missing"}</b>
+
         </label>
 
+
+
         ${q.assertion ? `<p><b>Assertion:</b> ${q.assertion}</p>` : ""}
+
         ${q.reason ? `<p><b>Reason:</b> ${q.reason}</p>` : ""}
-        ${q.caseText ? `<div class="caseBox"><b>Case Study:</b><br>${q.caseText}</div>` : ""}
+
+        ${q.caseText ? `
+          <div class="caseBox">
+            <b>Case Study:</b><br>
+            ${q.caseText}
+          </div>
+        ` : ""}
+
+
+
         ${optionsHTML}
 
+
+
         <div class="questionMeta">
-          Chapter: ${q.chapter} | Difficulty: ${q.difficulty} | Marks: ${q.marks || getSectionMarks(q.section)} | Source: ${q.source || "OTHERS"}
+
+          Chapter: ${q.chapter}
+
+          |
+
+          Difficulty: ${q.difficulty}
+
+          |
+
+          Marks: ${q.marks || getSectionMarks(q.section)}
+
+          |
+
+          Source: ${q.source || "OTHERS"}
+
         </div>
+
       </div>
+
     `;
+
   });
 
+
+
   html += `</div>`;
+
+
+
   window.currentList = data;
-  document.getElementById("questionArea").innerHTML = html;
-}
 
-function buildOptionsHTML(answers = []) {
-  if (!answers || !answers.length) return "";
-  const labels = ["(a)", "(b)", "(c)", "(d)"];
-  let html = `<div class="optionsRow">`;
-  answers.forEach((opt, idx) => {
-    const text = typeof opt === "string" ? opt : opt.text;
-    html += `<span class="optionItem"><b>${labels[idx] || ""}</b> ${text || ""}</span>`;
-  });
-  html += `</div>`;
-  return html;
+  document.getElementById("questionArea").innerHTML = html;
+
 }
 
 /* =========================
