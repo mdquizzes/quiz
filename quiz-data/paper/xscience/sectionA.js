@@ -7,6 +7,7 @@ window.SECTION_A = [
      question: "...",
      chapter: "...",
      difficulty: "easy/medium/hard",
+     subType: "mcq",
      answers: [
        { text: "...", correct: true/false },
        { text: "...", correct: true/false },
