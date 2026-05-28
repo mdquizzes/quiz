@@ -222,7 +222,7 @@ hr{
   <div class="row">
     <select id="classSelect" onchange="reloadAllData()">
       <option value="10">Class 10</option>
-      <option value="8">Class 9</option>
+      <option value="9">Class 9</option>
       <option value="8">Class 8</option>
     </select>
 
@@ -525,13 +525,23 @@ function filterData() {
 /* =========================
    SECTION UI
 ========================= */
-function openSection(sec) {
-  currentSection = sec;
-  currentChapterSelections.clear();
-  buildDynamicFilters(sec);
-  buildChapterChoices(sec);
-}
 
+  function openSection(sec) {
+
+  currentSection = sec;
+
+  currentChapterSelections.clear();
+
+  buildDynamicFilters(sec);
+
+  buildChapterChoices(sec);
+
+  console.log("Opening Section:", sec);
+
+  console.log(
+    ALL.filter(q => q.section === sec)
+  );
+}
 function buildDynamicFilters(sec){
   let html = `<div class="row" style="margin-top:12px;">`;
 
@@ -617,16 +627,16 @@ function refreshQuestionArea() {
     (!diff || q.difficulty.toLowerCase() === diff) &&
     (!source || String(q.source).toUpperCase() === source) &&
     (!search ||
-      q.question.toLowerCase().includes(search) ||
+     String(q.question || q.ques || "").toLowerCase().includes(search) ||
       q.chapter.toLowerCase().includes(search) ||
       (q.solution && q.solution.toLowerCase().includes(search))
     ) &&
     (
-      currentSection !== "A" ||
-      !secAType ||
-      (q.subType || "" ).toLowerCase() === secAType
-    )
-  );
+      (
+  currentSection !== "A" ||
+  !secAType ||
+  String(q.subType || q.type || "mcq").toLowerCase().trim() === secAType
+    );
 
   let html = `<div class="panel"><h3>Select Questions <span class="badge">${data.length}</span></h3>`;
 
@@ -646,7 +656,7 @@ function refreshQuestionArea() {
           <input type="checkbox"
             ${selectedMap.has(key) ? "checked" : ""}
             onchange="toggleQ('${key}', ${i})">
-          <b>${q.question}</b>
+          <b>${q.question || q.ques || "Question Missing"}</b>
         </label>
 
         ${q.assertion ? `<p><b>Assertion:</b> ${q.assertion}</p>` : ""}
@@ -716,7 +726,13 @@ function generateRandomPaper() {
 
     if(sec === "A"){
       const secAType = document.getElementById("sectionASubType") ? document.getElementById("sectionASubType").value.trim().toLowerCase() : "";
-      if(secAType) pool = pool.filter(q => q.subType.toLowerCase() === secAType);
+      if(secAType){
+  pool = pool.filter(q =>
+    String(q.subType || q.type || "mcq")
+      .toLowerCase()
+      .trim() === secAType
+  );
+}
     }
 
     const source = document.getElementById("sourceSelect") ? document.getElementById("sourceSelect").value.trim().toUpperCase() : "";
@@ -785,7 +801,7 @@ function renderPaper() {
       html += `<div class="section"><h3>Section ${sec}</h3>`;
 
       sections[sec].forEach((q, i) => {
-        html += `<p><b>${i+1}. ${q.question}</b></p>`;
+       html += `<p><b>${i+1}. ${q.question || q.ques || "Question Missing"}</b></p>`;
 
         if(q.assertion) html += `<p><b>Assertion:</b> ${q.assertion}</p>`;
         if(q.reason) html += `<p><b>Reason:</b> ${q.reason}</p>`;
