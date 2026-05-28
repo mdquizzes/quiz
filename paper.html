@@ -467,7 +467,7 @@ ALL_RAW = ALL_RAW.map(q => ({
   subject: q.subject ?? capitalize(subject),
   difficulty: q.difficulty ?? "medium",
   answers: Array.isArray(q.answers) ? q.answers : [],
-  subType: (q.subType ?? "mcq").toLowerCase(),
+  subType: (q.subType ?? "").toLowerCase(),
   source: q.source ?? "OTHERS",
   ...q
 }));
@@ -624,7 +624,7 @@ function refreshQuestionArea() {
     (
       currentSection !== "A" ||
       !secAType ||
-      (q.subType || ).toLowerCase() === secAType
+      (q.subType || "" ).toLowerCase() === secAType
     )
   );
 
