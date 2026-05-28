@@ -532,81 +532,112 @@ function filterData() {
 
   currentChapterSelections.clear();
 
+  // FILTER UI
   buildDynamicFilters(sec);
 
-  buildChapterChoices(sec);
+  // GET SECTION DATA
+  let sectionQuestions = ALL.filter(q => q.section === sec);
 
-  console.log("Opening Section:", sec);
+  // SECTION A SPECIAL FILTER
+  if (sec === "A") {
 
-  console.log(
-    ALL.filter(q => q.section === sec)
-  );
-}
-function buildDynamicFilters(sec){
+    const typeSelect = document.getElementById("sectionASubType");
+
+    if (typeSelect) {
+
+      const selectedType = typeSelect.value
+        .trim()
+        .toLowerCase();
+
+      if (selectedType) {
+
+        sectionQuestions = sectionQuestions.filter(q => {
+
+          const type = String(
+            q.subType || q.type || "mcq"
+          ).toLowerCase().trim();
+
+          return type === selectedType;
+
+        });
+
+      }
+
+    }
+
+  }
+
+  // GET CHAPTERS
+  const chapters = [
+    ...new Set(
+      sectionQuestions.map(q => q.chapter)
+    )
+  ].filter(Boolean).sort();
+
+  let html = `
+    <h4>
+      Select Chapterfunction buildDynamicFilters(sec){
+
   let html = `<div class="row" style="margin-top:12px;">`;
 
+
+
+  // SECTION A TYPE FILTER
+
   if(sec === "A"){
+
     html += `
-      <select id="sectionASubType" onchange="refreshQuestionArea()">
-        <option value="">Section A Type: All</option>
+
+      <select id="sectionASubType" onchange="openSection('A')">
+
         <option value="mcq">MCQ</option>
-        <option value="assertion-reason">Assertion & Reasoning</option>
+
+        <option value="assertion-reason">
+          Assertion & Reason
+        </option>
+
       </select>
+
     `;
   }
 
+
+
+  // SOURCE FILTER
+
   html += `
+
     <select id="sourceSelect" onchange="refreshQuestionArea()">
+
       <option value="">All Sources</option>
+
       <option value="NCERT">NCERT</option>
-      <option value="NCERT EXEMPLAR">NCERT EXEMPLAR</option>
-      <option value="RS AGARWAL">RS AGARWAL</option>
-      <option value="RD SHARMA">RD SHARMA</option>
-      <option value="OTHERS">OTHERS</option>
+
+      <option value="NCERT EXEMPLAR">
+        NCERT EXEMPLAR
+      </option>
+
+      <option value="RS AGARWAL">
+        RS AGARWAL
+      </option>
+
+      <option value="RD SHARMA">
+        RD SHARMA
+      </option>
+
+      <option value="OTHERS">
+        OTHERS
+      </option>
+
     </select>
+
   `;
 
   html += `</div>`;
+
   document.getElementById("dynamicFilters").innerHTML = html;
+
 }
-
-function buildChapterChoices(sec){
-  let chapters = [...new Set(
-    ALL.filter(q => q.section === sec).map(q => q.chapter)
-  )].sort();
-
-  let html = `<h4>Select Chapter <span class="badge">${chapters.length}</span></h4>`;
-
-  if (!chapters.length) {
-    html += `<p>No data found for this section.</p>`;
-    document.getElementById("chapterArea").innerHTML = html;
-    document.getElementById("questionArea").innerHTML = "";
-    return;
-  }
-
-  html += `<div class="chapterGrid">`;
-  chapters.forEach(ch => {
-    html += `
-      <div class="chapterItem">
-        <label>
-          <input type="checkbox" onchange="toggleChapter('${escapeQuotes(ch)}', this)">
-          ${ch}
-        </label>
-      </div>
-    `;
-  });
-  html += `</div>`;
-
-  document.getElementById("chapterArea").innerHTML = html;
-  document.getElementById("questionArea").innerHTML = "";
-}
-
-function toggleChapter(ch, cb) {
-  if (cb.checked) currentChapterSelections.add(ch);
-  else currentChapterSelections.delete(ch);
-  refreshQuestionArea();
-}
-
 /* =========================
    QUESTION AREA
 ========================= */
