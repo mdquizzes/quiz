@@ -224,7 +224,7 @@ window.QUIZ_DATA = [
     ],
     solution: "20 × 20 × 20 = 8000."
   },
-  [
+  
   {
     ID: 16,
     question: "A locker remains open only if it is toggled an odd number of times. Which locker will remain open?",
@@ -450,8 +450,7 @@ window.QUIZ_DATA = [
     solution: "All prime factors occur in pairs, so the number is a perfect square."
   },
 
-    [
-  {
+    {
     ID: 31,
     question: "Which of the following numbers has exactly 9 as its square root?",
     chapterName: "A Square and A Cube",
