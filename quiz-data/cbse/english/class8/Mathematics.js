@@ -674,7 +674,7 @@ window.QUIZ_DATA = [
     ],
     solution: "64 = 8², so it forms a perfect square array."
   },
-      [
+      
   {
     ID: 46,
     question: "Which prime factorization represents a perfect square?",
@@ -1048,7 +1048,7 @@ window.QUIZ_DATA = [
     ],
     solution: "(aᵐ)ⁿ = aᵐⁿ. Therefore, (3²)⁴ = 3⁸."
   },
-[
+
   {
     ID: "A221",
     question: "A bacterium doubles every hour. If there are 8 bacteria now, how many will there be after 3 hours?",
@@ -1273,7 +1273,7 @@ window.QUIZ_DATA = [
     ],
     solution: "The exponent determines the order of magnitude and overall size."
   },
-  [
+  
   {
     ID: "A221",
     question: "A bacterium doubles every hour. If there are 8 bacteria now, how many will there be after 3 hours?",
@@ -1498,7 +1498,7 @@ window.QUIZ_DATA = [
     ],
     solution: "The exponent determines the order of magnitude and overall size."
   },
-    [
+    
   {
     ID: "A251",
     question: "A social media post is shared with 2 people, and each person shares it with 2 more people. Assuming everyone shares only once, how many people receive it after 5 rounds?",
@@ -1723,7 +1723,7 @@ window.QUIZ_DATA = [
     ],
     solution: "Powers provide a compact way to represent repeated multiplication."
   },
-    [
+    
   {
     ID: "A301",
     question: "Why did early humans develop methods of counting?",
