@@ -1949,4 +1949,3 @@ window.QUIZ_DATA = [
     solution: "The Hindu system uses place value and only ten symbols, making representation and calculations easier."
   },
 ];
-
