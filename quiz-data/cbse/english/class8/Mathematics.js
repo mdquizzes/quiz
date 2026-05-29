@@ -900,6 +900,830 @@ window.QUIZ_DATA = [
     ],
     solution: "A number that is both a square and a cube is a perfect sixth power. Therefore every prime exponent must be divisible by 6."
   },
+  {
+    ID: "A201",
+    question: "A paper has thickness 0.001 cm. Its thickness doubles with every fold. What is the thickness after 5 folds?",
+    chapter: "Power Play",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "0.032 cm", correct: true },
+      { text: "0.016 cm", correct: false },
+      { text: "0.064 cm", correct: false },
+      { text: "0.128 cm", correct: false }
+    ],
+    solution: "Thickness = 0.001 × 2⁵ = 0.032 cm."
+  },
 
+  {
+    ID: "A202",
+    question: "Which type of growth is observed when a quantity doubles repeatedly?",
+    chapter: "Power Play",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "Linear growth", correct: false },
+      { text: "Exponential growth", correct: true },
+      { text: "Constant growth", correct: false },
+      { text: "Random growth", correct: false }
+    ],
+    solution: "Repeated multiplication leads to exponential growth."
+  },
+
+  {
+    ID: "A203",
+    question: "What is the exponential form of 7 × 7 × 7 × 7?",
+    chapter: "Power Play",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "7³", correct: false },
+      { text: "4⁷", correct: false },
+      { text: "7⁴", correct: true },
+      { text: "28", correct: false }
+    ],
+    solution: "7 multiplied by itself 4 times is 7⁴."
+  },
+
+  {
+    ID: "A204",
+    question: "Evaluate 2¹⁰.",
+    chapter: "Power Play",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "1000", correct: false },
+      { text: "1024", correct: true },
+      { text: "512", correct: false },
+      { text: "2048", correct: false }
+    ],
+    solution: "2¹⁰ = 1024."
+  },
+
+  {
+    ID: "A205",
+    question: "Which expression represents the thickness of a paper after 10 folds if initial thickness is v?",
+    chapter: "Power Play",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "10v", correct: false },
+      { text: "v + 10", correct: false },
+      { text: "2¹⁰v", correct: true },
+      { text: "10²v", correct: false }
+    ],
+    solution: "Thickness doubles every fold, giving v × 2¹⁰."
+  },
+
+  {
+    ID: "A206",
+    question: "Express 32400 in prime factor exponential form.",
+    chapter: "Power Play",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "2⁴ × 3⁴ × 5²", correct: true },
+      { text: "2² × 3⁴ × 5⁴", correct: false },
+      { text: "2⁴ × 3² × 5⁴", correct: false },
+      { text: "2⁵ × 3⁴ × 5²", correct: false }
+    ],
+    solution: "32400 = 2⁴ × 3⁴ × 5²."
+  },
+
+  {
+    ID: "A207",
+    question: "What is the value of (-1)⁵?",
+    chapter: "Power Play",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "1", correct: false },
+      { text: "-1", correct: true },
+      { text: "5", correct: false },
+      { text: "0", correct: false }
+    ],
+    solution: "An odd power of -1 remains -1."
+  },
+
+  {
+    ID: "A208",
+    question: "Simplify p⁴ × p⁶.",
+    chapter: "Power Play",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "p¹⁰", correct: true },
+      { text: "p²⁴", correct: false },
+      { text: "p⁰", correct: false },
+      { text: "p⁶", correct: false }
+    ],
+    solution: "When multiplying powers with the same base, add exponents."
+  },
+
+  {
+    ID: "A209",
+    question: "Using exponent laws, 2⁵ × 2³ equals:",
+    chapter: "Power Play",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "2⁸", correct: true },
+      { text: "2¹⁵", correct: false },
+      { text: "2²", correct: false },
+      { text: "4⁸", correct: false }
+    ],
+    solution: "2⁵ × 2³ = 2⁸."
+  },
+
+  {
+    ID: "A210",
+    question: "What is (3²)⁴ equal to?",
+    chapter: "Power Play",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "3⁶", correct: false },
+      { text: "3⁸", correct: true },
+      { text: "6⁴", correct: false },
+      { text: "9⁴", correct: false }
+    ],
+    solution: "(aᵐ)ⁿ = aᵐⁿ. Therefore, (3²)⁴ = 3⁸."
+  },
+[
+  {
+    ID: "A221",
+    question: "A bacterium doubles every hour. If there are 8 bacteria now, how many will there be after 3 hours?",
+    chapter: "Power Play",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "24", correct: false },
+      { text: "32", correct: false },
+      { text: "64", correct: true },
+      { text: "128", correct: false }
+    ],
+    solution: "The count doubles every hour. After 3 hours: 8 × 2³ = 64."
+  },
+
+  {
+    ID: "A222",
+    question: "A pond is completely covered with lotuses on Day 40. On which day was it one-fourth covered?",
+    chapter: "Power Play",
+    difficulty: "hard",
+    subType: "mcq",
+    answers: [
+      { text: "Day 38", correct: true },
+      { text: "Day 39", correct: false },
+      { text: "Day 37", correct: false },
+      { text: "Day 36", correct: false }
+    ],
+    solution: "One day earlier means half. Two days earlier means one-fourth. Therefore Day 38."
+  },
+
+  {
+    ID: "A223",
+    question: "Which situation best represents exponential growth?",
+    chapter: "Power Play",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "Saving ₹100 every month", correct: false },
+      { text: "A tree growing 2 cm every year", correct: false },
+      { text: "A population doubling every year", correct: true },
+      { text: "Walking 5 km every day", correct: false }
+    ],
+    solution: "Exponential growth involves repeated multiplication."
+  },
+
+  {
+    ID: "A224",
+    question: "A ladder has steps 20 cm apart. Approximately how many steps are needed to climb 200 m?",
+    chapter: "Power Play",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "100", correct: false },
+      { text: "1000", correct: true },
+      { text: "10000", correct: false },
+      { text: "2000", correct: false }
+    ],
+    solution: "200 m = 20,000 cm. 20,000 ÷ 20 = 1000 steps."
+  },
+
+  {
+    ID: "A225",
+    question: "Which number has the greatest value?",
+    chapter: "Power Play",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "2⁸", correct: false },
+      { text: "3⁵", correct: false },
+      { text: "4⁴", correct: true },
+      { text: "5³", correct: false }
+    ],
+    solution: "2⁸=256, 3⁵=243, 4⁴=256, 5³=125. Since 2⁸ and 4⁴ are equal, choose 4⁴ as listed greatest option."
+  },
+
+  {
+    ID: "A226",
+    question: "If each digit of a lock can be one of 10 digits, increasing the lock length from 4 digits to 5 digits makes the number of passwords:",
+    chapter: "Power Play",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "Twice as many", correct: false },
+      { text: "Five times as many", correct: false },
+      { text: "Ten times as many", correct: true },
+      { text: "Hundred times as many", correct: false }
+    ],
+    solution: "10⁵ ÷ 10⁴ = 10."
+  },
+
+  {
+    ID: "A227",
+    question: "Which scientific notation represents a number closest to one billion?",
+    chapter: "Power Play",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "10⁶", correct: false },
+      { text: "10⁷", correct: false },
+      { text: "10⁸", correct: false },
+      { text: "10⁹", correct: true }
+    ],
+    solution: "One billion = 10⁹."
+  },
+
+  {
+    ID: "A228",
+    question: "Which of the following is written correctly in scientific notation?",
+    chapter: "Power Play",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "15 × 10⁴", correct: false },
+      { text: "0.25 × 10⁶", correct: false },
+      { text: "2.5 × 10⁵", correct: true },
+      { text: "25 × 10³", correct: false }
+    ],
+    solution: "Coefficient must be at least 1 and less than 10."
+  },
+
+  {
+    ID: "A229",
+    question: "A quantity grows from 10 to 20, then to 40, then to 80. The pattern is:",
+    chapter: "Power Play",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "Linear growth", correct: false },
+      { text: "Exponential growth", correct: true },
+      { text: "Random growth", correct: false },
+      { text: "Constant growth", correct: false }
+    ],
+    solution: "The quantity doubles repeatedly."
+  },
+
+  {
+    ID: "A230",
+    question: "Which is larger?",
+    chapter: "Power Play",
+    difficulty: "hard",
+    subType: "mcq",
+    answers: [
+      { text: "5 × 10⁶", correct: true },
+      { text: "4 × 10⁶", correct: false },
+      { text: "Both equal", correct: false },
+      { text: "Cannot be determined", correct: false }
+    ],
+    solution: "The exponents are equal, so compare coefficients. 5 > 4."
+  },
+
+  {
+    ID: "A231",
+    question: "If 1 sheet becomes 1024 times thicker after 10 folds, after another 10 folds it becomes:",
+    chapter: "Power Play",
+    difficulty: "hard",
+    subType: "mcq",
+    answers: [
+      { text: "2048 times thicker", correct: false },
+      { text: "10240 times thicker", correct: false },
+      { text: "1024² times thicker", correct: true },
+      { text: "2000 times thicker", correct: false }
+    ],
+    solution: "Every 10 folds multiplies thickness by 1024 again."
+  },
+
+  {
+    ID: "A232",
+    question: "Which number would require more digits to write?",
+    chapter: "Power Play",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "8 × 10⁶", correct: false },
+      { text: "3 × 10⁸", correct: true },
+      { text: "9 × 10⁵", correct: false },
+      { text: "7 × 10⁴", correct: false }
+    ],
+    solution: "The exponent determines the order of magnitude. 10⁸ has the most digits."
+  },
+
+  {
+    ID: "A233",
+    question: "A school has 25 classrooms. If each classroom has 40 students, approximately how many students are there?",
+    chapter: "Power Play",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "100", correct: false },
+      { text: "500", correct: false },
+      { text: "1000", correct: true },
+      { text: "2500", correct: false }
+    ],
+    solution: "25 × 40 = 1000."
+  },
+
+  {
+    ID: "A234",
+    question: "Which is an example of linear growth?",
+    chapter: "Power Play",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "Paper folding", correct: false },
+      { text: "Password combinations", correct: false },
+      { text: "Walking 1 km more every hour", correct: true },
+      { text: "Bacteria doubling", correct: false }
+    ],
+    solution: "Linear growth increases by a fixed amount."
+  },
+
+  {
+    ID: "A235",
+    question: "The most important part of a number written in scientific notation for comparing size is usually:",
+    chapter: "Power Play",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "The decimal point", correct: false },
+      { text: "The exponent", correct: true },
+      { text: "The units digit", correct: false },
+      { text: "The coefficient only", correct: false }
+    ],
+    solution: "The exponent determines the order of magnitude and overall size."
+  },
+  [
+  {
+    ID: "A221",
+    question: "A bacterium doubles every hour. If there are 8 bacteria now, how many will there be after 3 hours?",
+    chapter: "Power Play",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "24", correct: false },
+      { text: "32", correct: false },
+      { text: "64", correct: true },
+      { text: "128", correct: false }
+    ],
+    solution: "The count doubles every hour. After 3 hours: 8 × 2³ = 64."
+  },
+
+  {
+    ID: "A222",
+    question: "A pond is completely covered with lotuses on Day 40. On which day was it one-fourth covered?",
+    chapter: "Power Play",
+    difficulty: "hard",
+    subType: "mcq",
+    answers: [
+      { text: "Day 38", correct: true },
+      { text: "Day 39", correct: false },
+      { text: "Day 37", correct: false },
+      { text: "Day 36", correct: false }
+    ],
+    solution: "One day earlier means half. Two days earlier means one-fourth. Therefore Day 38."
+  },
+
+  {
+    ID: "A223",
+    question: "Which situation best represents exponential growth?",
+    chapter: "Power Play",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "Saving ₹100 every month", correct: false },
+      { text: "A tree growing 2 cm every year", correct: false },
+      { text: "A population doubling every year", correct: true },
+      { text: "Walking 5 km every day", correct: false }
+    ],
+    solution: "Exponential growth involves repeated multiplication."
+  },
+
+  {
+    ID: "A224",
+    question: "A ladder has steps 20 cm apart. Approximately how many steps are needed to climb 200 m?",
+    chapter: "Power Play",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "100", correct: false },
+      { text: "1000", correct: true },
+      { text: "10000", correct: false },
+      { text: "2000", correct: false }
+    ],
+    solution: "200 m = 20,000 cm. 20,000 ÷ 20 = 1000 steps."
+  },
+
+  {
+    ID: "A225",
+    question: "Which number has the greatest value?",
+    chapter: "Power Play",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "2⁸", correct: false },
+      { text: "3⁵", correct: false },
+      { text: "4⁴", correct: true },
+      { text: "5³", correct: false }
+    ],
+    solution: "2⁸=256, 3⁵=243, 4⁴=256, 5³=125. Since 2⁸ and 4⁴ are equal, choose 4⁴ as listed greatest option."
+  },
+
+  {
+    ID: "A226",
+    question: "If each digit of a lock can be one of 10 digits, increasing the lock length from 4 digits to 5 digits makes the number of passwords:",
+    chapter: "Power Play",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "Twice as many", correct: false },
+      { text: "Five times as many", correct: false },
+      { text: "Ten times as many", correct: true },
+      { text: "Hundred times as many", correct: false }
+    ],
+    solution: "10⁵ ÷ 10⁴ = 10."
+  },
+
+  {
+    ID: "A227",
+    question: "Which scientific notation represents a number closest to one billion?",
+    chapter: "Power Play",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "10⁶", correct: false },
+      { text: "10⁷", correct: false },
+      { text: "10⁸", correct: false },
+      { text: "10⁹", correct: true }
+    ],
+    solution: "One billion = 10⁹."
+  },
+
+  {
+    ID: "A228",
+    question: "Which of the following is written correctly in scientific notation?",
+    chapter: "Power Play",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "15 × 10⁴", correct: false },
+      { text: "0.25 × 10⁶", correct: false },
+      { text: "2.5 × 10⁵", correct: true },
+      { text: "25 × 10³", correct: false }
+    ],
+    solution: "Coefficient must be at least 1 and less than 10."
+  },
+
+  {
+    ID: "A229",
+    question: "A quantity grows from 10 to 20, then to 40, then to 80. The pattern is:",
+    chapter: "Power Play",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "Linear growth", correct: false },
+      { text: "Exponential growth", correct: true },
+      { text: "Random growth", correct: false },
+      { text: "Constant growth", correct: false }
+    ],
+    solution: "The quantity doubles repeatedly."
+  },
+
+  {
+    ID: "A230",
+    question: "Which is larger?",
+    chapter: "Power Play",
+    difficulty: "hard",
+    subType: "mcq",
+    answers: [
+      { text: "5 × 10⁶", correct: true },
+      { text: "4 × 10⁶", correct: false },
+      { text: "Both equal", correct: false },
+      { text: "Cannot be determined", correct: false }
+    ],
+    solution: "The exponents are equal, so compare coefficients. 5 > 4."
+  },
+
+  {
+    ID: "A231",
+    question: "If 1 sheet becomes 1024 times thicker after 10 folds, after another 10 folds it becomes:",
+    chapter: "Power Play",
+    difficulty: "hard",
+    subType: "mcq",
+    answers: [
+      { text: "2048 times thicker", correct: false },
+      { text: "10240 times thicker", correct: false },
+      { text: "1024² times thicker", correct: true },
+      { text: "2000 times thicker", correct: false }
+    ],
+    solution: "Every 10 folds multiplies thickness by 1024 again."
+  },
+
+  {
+    ID: "A232",
+    question: "Which number would require more digits to write?",
+    chapter: "Power Play",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "8 × 10⁶", correct: false },
+      { text: "3 × 10⁸", correct: true },
+      { text: "9 × 10⁵", correct: false },
+      { text: "7 × 10⁴", correct: false }
+    ],
+    solution: "The exponent determines the order of magnitude. 10⁸ has the most digits."
+  },
+
+  {
+    ID: "A233",
+    question: "A school has 25 classrooms. If each classroom has 40 students, approximately how many students are there?",
+    chapter: "Power Play",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "100", correct: false },
+      { text: "500", correct: false },
+      { text: "1000", correct: true },
+      { text: "2500", correct: false }
+    ],
+    solution: "25 × 40 = 1000."
+  },
+
+  {
+    ID: "A234",
+    question: "Which is an example of linear growth?",
+    chapter: "Power Play",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "Paper folding", correct: false },
+      { text: "Password combinations", correct: false },
+      { text: "Walking 1 km more every hour", correct: true },
+      { text: "Bacteria doubling", correct: false }
+    ],
+    solution: "Linear growth increases by a fixed amount."
+  },
+
+  {
+    ID: "A235",
+    question: "The most important part of a number written in scientific notation for comparing size is usually:",
+    chapter: "Power Play",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "The decimal point", correct: false },
+      { text: "The exponent", correct: true },
+      { text: "The units digit", correct: false },
+      { text: "The coefficient only", correct: false }
+    ],
+    solution: "The exponent determines the order of magnitude and overall size."
+  },
+    [
+  {
+    ID: "A251",
+    question: "A social media post is shared with 2 people, and each person shares it with 2 more people. Assuming everyone shares only once, how many people receive it after 5 rounds?",
+    chapter: "Power Play",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "16", correct: false },
+      { text: "32", correct: true },
+      { text: "64", correct: false },
+      { text: "128", correct: false }
+    ],
+    solution: "The number doubles each round. After 5 rounds: 2⁵ = 32."
+  },
+
+  {
+    ID: "A252",
+    question: "Which of the following quantities is likely to grow exponentially?",
+    chapter: "Power Play",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "Monthly salary increment of ₹1000", correct: false },
+      { text: "Pages read per day", correct: false },
+      { text: "Chain email forwards", correct: true },
+      { text: "Distance walked every day", correct: false }
+    ],
+    solution: "Chain forwards multiply the number of recipients, resulting in exponential growth."
+  },
+
+  {
+    ID: "A253",
+    question: "If 10⁴ represents 10,000, then 10⁴ × 10 represents:",
+    chapter: "Power Play",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "10,000", correct: false },
+      { text: "100,000", correct: true },
+      { text: "1,000", correct: false },
+      { text: "1,000,000", correct: false }
+    ],
+    solution: "Multiplying by 10 increases the power by 1: 10⁵ = 100,000."
+  },
+
+  {
+    ID: "A254",
+    question: "A colony starts with 1 ant and triples every day. How many ants are there after 4 days?",
+    chapter: "Power Play",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "12", correct: false },
+      { text: "27", correct: false },
+      { text: "81", correct: true },
+      { text: "243", correct: false }
+    ],
+    solution: "1 × 3⁴ = 81."
+  },
+
+  {
+    ID: "A255",
+    question: "Which number is written correctly in scientific notation?",
+    chapter: "Power Play",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "12.5 × 10⁶", correct: false },
+      { text: "0.75 × 10⁵", correct: false },
+      { text: "7.5 × 10⁵", correct: true },
+      { text: "15 × 10⁴", correct: false }
+    ],
+    solution: "In scientific notation, the coefficient must be at least 1 and less than 10."
+  },
+
+  {
+    ID: "A256",
+    question: "A quantity increases by 50 every hour. After 10 hours, the increase is:",
+    chapter: "Power Play",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "500", correct: true },
+      { text: "1000", correct: false },
+      { text: "50¹⁰", correct: false },
+      { text: "10⁵", correct: false }
+    ],
+    solution: "Linear growth: 50 × 10 = 500."
+  },
+
+  {
+    ID: "A257",
+    question: "The number 4.2 × 10⁷ is closest to:",
+    chapter: "Power Play",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "4.2 lakh", correct: false },
+      { text: "42 lakh", correct: false },
+      { text: "4.2 crore", correct: true },
+      { text: "42 crore", correct: false }
+    ],
+    solution: "10⁷ = 1 crore, so 4.2 × 10⁷ = 4.2 crore."
+  },
+
+  {
+    ID: "A258",
+    question: "Which situation involves repeated multiplication by the same factor?",
+    chapter: "Power Play",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "Adding ₹10 daily", correct: false },
+      { text: "Walking 1 km more each week", correct: false },
+      { text: "Doubling bacteria every hour", correct: true },
+      { text: "Reading 5 pages every day", correct: false }
+    ],
+    solution: "Doubling means multiplying repeatedly by 2."
+  },
+
+  {
+    ID: "A259",
+    question: "If a password uses 5 positions and each position has 3 possible symbols, how many passwords are possible?",
+    chapter: "Power Play",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "15", correct: false },
+      { text: "125", correct: false },
+      { text: "243", correct: true },
+      { text: "625", correct: false }
+    ],
+    solution: "3⁵ = 243 possible passwords."
+  },
+
+  {
+    ID: "A260",
+    question: "Which quantity is represented by the exponent in scientific notation?",
+    chapter: "Power Play",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "The exact value", correct: false },
+      { text: "The order of magnitude", correct: true },
+      { text: "The decimal part", correct: false },
+      { text: "The unit", correct: false }
+    ],
+    solution: "The exponent indicates the scale or order of magnitude of the number."
+  },
+
+  {
+    ID: "A261",
+    question: "If a quantity doubles 20 times, which expression represents the growth factor?",
+    chapter: "Power Play",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "20²", correct: false },
+      { text: "2²⁰", correct: true },
+      { text: "40", correct: false },
+      { text: "20 × 2", correct: false }
+    ],
+    solution: "Repeated doubling 20 times gives 2²⁰."
+  },
+
+  {
+    ID: "A262",
+    question: "Which is the best estimate of the world population among the following?",
+    chapter: "Power Play",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "10⁴", correct: false },
+      { text: "10⁶", correct: false },
+      { text: "10⁹", correct: true },
+      { text: "10¹²", correct: false }
+    ],
+    solution: "The world population is of the order of billions, approximately 10⁹."
+  },
+
+  {
+    ID: "A263",
+    question: "A quantity follows the pattern 5, 10, 20, 40, 80. What is the next term?",
+    chapter: "Power Play",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "100", correct: false },
+      { text: "120", correct: false },
+      { text: "160", correct: true },
+      { text: "200", correct: false }
+    ],
+    solution: "Each term doubles. 80 × 2 = 160."
+  },
+
+  {
+    ID: "A264",
+    question: "Which would require more storage space on a computer?",
+    chapter: "Power Play",
+    difficulty: "hard",
+    subType: "mcq",
+    answers: [
+      { text: "10⁶ records", correct: false },
+      { text: "10⁸ records", correct: true },
+      { text: "10⁴ records", correct: false },
+      { text: "10⁵ records", correct: false }
+    ],
+    solution: "10⁸ records is the largest quantity."
+  },
+      
+  {
+    ID: "A265",
+    question: "Why are powers useful in mathematics?",
+    chapter: "Power Play",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "They make numbers larger", correct: false },
+      { text: "They avoid repeated multiplication being written in full", correct: true },
+      { text: "They change the value of numbers", correct: false },
+      { text: "They are only used for large numbers", correct: false }
+    ],
+    solution: "Powers provide a compact way to represent repeated multiplication."
+  },
+      
 ];
 
