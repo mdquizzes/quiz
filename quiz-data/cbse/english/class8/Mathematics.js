@@ -1724,6 +1724,231 @@ window.QUIZ_DATA = [
     ],
     solution: "Powers provide a compact way to represent repeated multiplication."
   },
-      
+    [
+  {
+    ID: "A301",
+    question: "Why did early humans develop methods of counting?",
+    chapter: "A Story of Numbers",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "Only for entertainment", correct: false },
+      { text: "To track quantities such as food, animals, and trade goods", correct: true },
+      { text: "Only for writing books", correct: false },
+      { text: "To create calendars only", correct: false }
+    ],
+    solution: "Early humans counted food, livestock, trade goods, rituals, and passing days."
+  },
+
+  {
+    ID: "A302",
+    question: "The digits 0 through 9 used today originated in which country?",
+    chapter: "A Story of Numbers",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "Greece", correct: false },
+      { text: "Egypt", correct: false },
+      { text: "India", correct: true },
+      { text: "Rome", correct: false }
+    ],
+    solution: "The modern numeral system originated and developed in India."
+  },
+
+  {
+    ID: "A303",
+    question: "Who was among the first mathematicians to fully explain and perform computations using the Indian numeral system?",
+    chapter: "A Story of Numbers",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "Fibonacci", correct: false },
+      { text: "Aryabhata", correct: true },
+      { text: "Euclid", correct: false },
+      { text: "Pythagoras", correct: false }
+    ],
+    solution: "Aryabhata (c. 499 CE) used and explained the Indian numeral system extensively."
+  },
+
+  {
+    ID: "A304",
+    question: "What is a one-to-one mapping?",
+    chapter: "A Story of Numbers",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "One symbol representing many objects", correct: false },
+      { text: "Matching each object with exactly one counting object", correct: true },
+      { text: "Grouping objects in tens", correct: false },
+      { text: "Writing numbers using symbols", correct: false }
+    ],
+    solution: "One-to-one mapping associates each object with exactly one corresponding object."
+  },
+
+  {
+    ID: "A305",
+    question: "Which method of counting is most similar to keeping one stick for every cow in a herd?",
+    chapter: "A Story of Numbers",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "Roman numerals", correct: false },
+      { text: "Scientific notation", correct: false },
+      { text: "Tally marks", correct: true },
+      { text: "Place value notation", correct: false }
+    ],
+    solution: "Tally marks represent one mark for each object counted."
+  },
+
+  {
+    ID: "A306",
+    question: "What was a major limitation of using only the letters of the English alphabet as number names?",
+    chapter: "A Story of Numbers",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "Letters are difficult to pronounce", correct: false },
+      { text: "Only 26 unique symbols are available", correct: true },
+      { text: "They cannot represent zero", correct: false },
+      { text: "They require place value", correct: false }
+    ],
+    solution: "The alphabet has only 26 letters, limiting direct representation."
+  },
+
+  {
+    ID: "A307",
+    question: "Which ancient number system used symbols such as I, V, and X?",
+    chapter: "A Story of Numbers",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "Egyptian", correct: false },
+      { text: "Mesopotamian", correct: false },
+      { text: "Roman", correct: true },
+      { text: "Mayan", correct: false }
+    ],
+    solution: "Roman numerals use symbols like I, V, X, L, C, D, and M."
+  },
+
+  {
+    ID: "A308",
+    question: "In Roman numerals, the symbol X represents:",
+    chapter: "A Story of Numbers",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "5", correct: false },
+      { text: "10", correct: true },
+      { text: "50", correct: false },
+      { text: "100", correct: false }
+    ],
+    solution: "X is the Roman numeral for 10."
+  },
+
+  {
+    ID: "A309",
+    question: "Why is the Roman numeral system less convenient for multiplication and division?",
+    chapter: "A Story of Numbers",
+    difficulty: "hard",
+    subType: "mcq",
+    answers: [
+      { text: "It lacks symbols", correct: false },
+      { text: "Its landmark numbers do not follow a consistent base structure", correct: true },
+      { text: "It uses too many zeros", correct: false },
+      { text: "It is written from right to left", correct: false }
+    ],
+    solution: "Roman numerals do not have a consistent base and place value structure."
+  },
+
+  {
+    ID: "A310",
+    question: "What are the symbols occurring in a written number system called?",
+    chapter: "A Story of Numbers",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "Digits", correct: false },
+      { text: "Letters", correct: false },
+      { text: "Numerals", correct: true },
+      { text: "Codes", correct: false }
+    ],
+    solution: "Written symbols used to represent numbers are called numerals."
+  },
+
+  {
+    ID: "A311",
+    question: "The Ishango bone and Lebombo bone are famous because they contain:",
+    chapter: "A Story of Numbers",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "Maps", correct: false },
+      { text: "Astronomical charts", correct: false },
+      { text: "Ancient tally marks", correct: true },
+      { text: "Roman numerals", correct: false }
+    ],
+    solution: "These ancient artifacts contain tally marks used for counting."
+  },
+
+  {
+    ID: "A312",
+    question: "The Gumulgal people formed larger numbers primarily by counting in:",
+    chapter: "A Story of Numbers",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "2s", correct: true },
+      { text: "5s", correct: false },
+      { text: "10s", correct: false },
+      { text: "20s", correct: false }
+    ],
+    solution: "Their number names were based on repeated groups of two."
+  },
+
+  {
+    ID: "A313",
+    question: "Which idea marked an important step in the evolution of number systems?",
+    chapter: "A Story of Numbers",
+    difficulty: "medium",
+    subType: "mcq",
+    answers: [
+      { text: "Counting in groups of a fixed size", correct: true },
+      { text: "Using only tally marks", correct: false },
+      { text: "Avoiding symbols", correct: false },
+      { text: "Using letters only", correct: false }
+    ],
+    solution: "Grouping quantities into fixed sizes made number representation more efficient."
+  },
+
+  {
+    ID: "A314",
+    question: "Which Roman numeral represents 50?",
+    chapter: "A Story of Numbers",
+    difficulty: "easy",
+    subType: "mcq",
+    answers: [
+      { text: "X", correct: false },
+      { text: "L", correct: true },
+      { text: "C", correct: false },
+      { text: "D", correct: false }
+    ],
+    solution: "L is the Roman numeral for 50."
+  },
+
+  {
+    ID: "A315",
+    question: "Why is the Hindu numeral system considered more efficient than the Roman numeral system?",
+    chapter: "A Story of Numbers",
+    difficulty: "hard",
+    subType: "mcq",
+    answers: [
+      { text: "It uses fewer symbols and place value", correct: true },
+      { text: "It uses larger symbols", correct: false },
+      { text: "It avoids arithmetic operations", correct: false },
+      { text: "It has more landmark numbers", correct: false }
+    ],
+    solution: "The Hindu system uses place value and only ten symbols, making representation and calculations easier."
+  },
+
 ];
 
