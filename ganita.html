@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Picture Puzzle Challenge</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
+}
+
+body{
+background:linear-gradient(135deg,#f7e6b5,#fff6df);
+display:flex;
+justify-content:center;
+padding:20px;
+}
+
+.container{
+width:100%;
+max-width:850px;
+text-align:center;
+}
+
+h1{
+color:#8b0000;
+margin-bottom:10px;
+}
+
+.panel{
+background:white;
+padding:20px;
+border-radius:20px;
+box-shadow:0 10px 30px rgba(0,0,0,.15);
+}
+
+input{
+padding:12px;
+width:240px;
+font-size:18px;
+border-radius:10px;
+border:2px solid #ccc;
+}
+
+button{
+padding:12px 20px;
+background:#d35400;
+color:white;
+border:none;
+cursor:pointer;
+border-radius:10px;
+font-size:18px;
+}
+
+button:hover{
+background:#b84300;
+}
+
+.info{
+margin:15px;
+font-size:20px;
+}
+
+#board{
+margin:auto;
+width:400px;
+height:400px;
+
+display:grid;
+grid-template-columns:repeat(4,1fr);
+grid-template-rows:repeat(4,1fr);
+
+gap:2px;
+background:#333;
+padding:2px;
+border-radius:12px;
+}
+
+.tile{
+background-size:400px 400px;
+cursor:pointer;
+transition:.2s;
+}
+
+.tile:hover{
+transform:scale(.97);
+}
+
+.blank{
+background:white;
+}
+
+.leaderboard{
+margin-top:25px;
+}
+
+.entry{
+padding:10px;
+background:#f5f5f5;
+margin:8px;
+border-radius:8px;
+}
+
+.hidden{
+display:none;
+}
+
+.win{
+font-size:30px;
+color:green;
+margin-top:15px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🧩 Build The Picture Challenge</h1>
+
+<div class="panel">
+
+<div id="start">
+
+<input
+id="player"
+placeholder="Enter Student Name">
+
+<button onclick="startGame()">
+Start Game
+</button>
+
+</div>
+
+<div class="info hidden" id="gameInfo">
+
+Player:
+<span id="showName"></span>
+
+|
+
+Moves:
+<span id="moves">0</span>
+
+</div>
+
+<div id="board"></div>
+
+<div id="message" class="win"></div>
+
+<div class="leaderboard">
+
+<h2>🏆 Leaderboard</h2>
+
+<div id="scores"></div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const image =
+"YOUR_IMAGE_URL_HERE";
+
+const size=4;
+
+let tiles=[];
+
+let moves=0;
+
+let player="";
+
+const board=
+document.getElementById("board");
+
+function startGame(){
+
+player=
+document.getElementById("player").value;
+
+if(!player){
+
+alert("Enter name");
+
+return;
+
+}
+
+document
+.getElementById("showName")
+.innerText=player;
+
+document
+.getElementById("gameInfo")
+.classList
+.remove("hidden");
+
+moves=0;
+
+updateMoves();
+
+createPuzzle();
+
+}
+
+function createPuzzle(){
+
+tiles=[];
+
+for(let i=0;i<15;i++)
+tiles.push(i);
+
+tiles.push(null);
+
+shuffle();
+
+draw();
+
+}
+
+function shuffle(){
+
+for(let i=0;i<500;i++){
+
+let blank=
+tiles.indexOf(null);
+
+let possible=[];
+
+let row=
+Math.floor(blank/size);
+
+let col=
+blank%size;
+
+if(row>0)
+possible.push(blank-4);
+
+if(row<3)
+possible.push(blank+4);
+
+if(col>0)
+possible.push(blank-1);
+
+if(col<3)
+possible.push(blank+1);
+
+let move=
+possible[
+Math.floor(
+Math.random()
+*
+possible.length
+)];
+
+[
+tiles[blank],
+tiles[move]
+
+]=
+
+[
+tiles[move],
+tiles[blank]
+
+];
+
+}
+
+}
+
+function draw(){
+
+board.innerHTML="";
+
+tiles.forEach((tile,index)=>{
+
+let div=
+document.createElement("div");
+
+div.className="tile";
+
+if(tile===null){
+
+div.classList
+.add("blank");
+
+}
+
+else{
+
+let x=
+(tile%4)
+*
+100;
+
+let y=
+Math.floor(tile/4)
+*
+100;
+
+div.style.backgroundImage=
+`url(${image})`;
+
+div.style.backgroundPosition=
+`-${x}px -${y}px`;
+
+}
+
+div.onclick=
+()=>move(index);
+
+board.appendChild(div);
+
+});
+
+}
+
+function move(index){
+
+let blank=
+tiles.indexOf(null);
+
+let valid=[
+
+blank-4,
+blank+4,
+
+blank-1,
+blank+1
+
+];
+
+if(
+
+valid.includes(index)
+
+&&
+
+sameRow(
+blank,
+index
+
+)
+
+){
+
+[
+tiles[index],
+tiles[blank]
+
+]
+
+=
+
+[
+tiles[blank],
+tiles[index]
+
+];
+
+moves++;
+
+updateMoves();
+
+draw();
+
+check();
+
+}
+
+}
+
+function sameRow(a,b){
+
+if(
+Math.abs(a-b)==1
+){
+
+return
+
+Math.floor(a/4)
+
+===
+
+Math.floor(b/4);
+
+}
+
+return true;
+
+}
+
+function updateMoves(){
+
+document
+.getElementById("moves")
+.innerText=
+moves;
+
+}
+
+function check(){
+
+for(
+let i=0;
+i<15;
+i++
+
+){
+
+if(
+tiles[i]
+!==i
+)
+
+return;
+
+}
+
+document
+.getElementById("message")
+.innerHTML=
+
+"🎉 Completed!";
+
+saveScore();
+
+}
+
+function saveScore(){
+
+let scores=
+
+JSON.parse(
+
+localStorage
+.getItem(
+"puzzle"
+
+)
+
+||
+
+"[]"
+
+);
+
+scores.push({
+
+name:player,
+
+moves
+
+});
+
+scores.sort(
+
+(a,b)=>
+
+a.moves
+
+-
+
+b.moves
+
+);
+
+scores=
+scores
+.slice(0,10);
+
+localStorage
+.setItem(
+
+"puzzle",
+
+JSON.stringify(scores)
+
+);
+
+showScores();
+
+}
+
+function showScores(){
+
+let scores=
+
+JSON.parse(
+
+localStorage
+.getItem(
+"puzzle"
+
+)
+
+||
+
+"[]"
+
+);
+
+let html="";
+
+scores.forEach(
+
+(s,i)=>
+
+html+=
+
+`
+
+<div class="entry">
+
+${i+1}.
+
+${s.name}
+
+—
+
+${s.moves}
+
+moves
+
+</div>
+
+`
+
+);
+
+document
+.getElementById("scores")
+.innerHTML=
+html;
+
+}
+
+showScores();
+
+</script>
+
+</body>
+
+</html>
