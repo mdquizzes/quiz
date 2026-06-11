@@ -460,17 +460,24 @@ Math.random();
 createBubble(
 roman,
 "roman",
-pairId
+pairId,
+num
 );
 
 createBubble(
 num,
 "number",
-pairId
+pairId,
+num
 );
 
 }
-  function createBubble(text,type,pairId){
+ function createBubble(
+text,
+type,
+pairId,
+value
+){
 
 const bubble =
 document.createElement("div");
@@ -482,6 +489,7 @@ bubble.textContent = text;
 
 bubble.dataset.pair = pairId;
 bubble.dataset.type = type;
+bubble.dataset.value = value;
 
 bubble.style.left =
 Math.random() *
@@ -565,10 +573,11 @@ selected.classList.remove(
 "selected"
 );
 
+showWrongPair();
+
 selected = null;
 
 }
-
 clearInterval(move);
 
 bubble.remove();
@@ -601,8 +610,8 @@ return;
 
 if(
 
-selected.dataset.pair ===
-bubble.dataset.pair
+selected.dataset.value ===
+bubble.dataset.value
 
 &&
 
@@ -622,11 +631,19 @@ selected.classList.remove(
 "selected"
 );
 
+bubble.classList.remove(
+"selected"
+);
+
+showWrongPair();
+
 selected = null;
 
 combo = 0;
 
-}
+document.getElementById(
+"comboCount"
+).textContent = 0;
 
 }
 
@@ -672,6 +689,33 @@ bubble.remove();
 }
 
 function showFloatingPoints(text){
+ function showWrongPair(){
+
+const fp =
+document.getElementById(
+"floatingPoints"
+);
+
+fp.innerHTML =
+"❌ Wrong Pair";
+
+fp.style.color =
+"#ff0000";
+
+fp.style.opacity =
+"1";
+
+setTimeout(()=>{
+
+fp.style.opacity =
+"0";
+
+fp.style.color =
+"yellow";
+
+},700);
+
+}
 
 const fp =
 document.getElementById(
@@ -813,7 +857,29 @@ maxLeft + "px";
 
 }
 );
+ 
+gameArea.addEventListener(
+"click",
+function(e){
 
+if(
+e.target === gameArea
+){
+
+if(selected){
+
+selected.classList.remove(
+"selected"
+);
+
+selected = null;
+
+}
+
+}
+
+}
+);
 </script>
 
 </body>
