@@ -530,6 +530,23 @@ Time:
 🏆 Leaders
 </h3>
 
+ <button
+onclick="resetLeaderboard()"
+style="
+width:100%;
+padding:8px;
+margin-bottom:10px;
+border:none;
+border-radius:8px;
+background:#ff4444;
+color:white;
+cursor:pointer;
+">
+
+Reset Leaderboard
+
+</button>
+ 
 <ul id="leaderList">
 </ul>
 
@@ -771,6 +788,22 @@ gameTime <= 0
 
 endGame();
 
+ function resetLeaderboard(){
+
+const ok =
+confirm(
+"Reset leaderboard permanently?"
+);
+
+if(!ok) return;
+
+localStorage.removeItem(
+LEADERBOARD_KEY
+);
+
+renderLeaderboard();
+
+}
 }
 
 },1000);
