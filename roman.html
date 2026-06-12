@@ -785,22 +785,7 @@ gameTime;
 if(
 gameTime <= 0
 ){
- function resetLeaderboard(){
 
-const ok =
-confirm(
-"Reset leaderboard permanently?"
-);
-
-if(!ok) return;
-
-localStorage.removeItem(
-LEADERBOARD_KEY
-);
-
-renderLeaderboard();
-
-}
 endGame();
 
 }
@@ -1275,7 +1260,33 @@ selected = null;
 }
 
 );
+ 
+function resetLeaderboard(){
 
+const ok = confirm(
+"Reset leaderboard and high score?"
+);
+
+if(!ok){
+return;
+}
+
+localStorage.removeItem(
+LEADERBOARD_KEY
+);
+
+localStorage.removeItem(
+HIGH_SCORE_KEY
+);
+
+document.getElementById(
+"leaderList"
+).innerHTML = "";
+
+location.reload();
+
+}
+ 
 function endGame(){
 
 clearInterval(
