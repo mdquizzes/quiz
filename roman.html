@@ -785,9 +785,6 @@ gameTime;
 if(
 gameTime <= 0
 ){
-
-endGame();
-
  function resetLeaderboard(){
 
 const ok =
@@ -804,6 +801,8 @@ LEADERBOARD_KEY
 renderLeaderboard();
 
 }
+endGame();
+
 }
 
 },1000);
