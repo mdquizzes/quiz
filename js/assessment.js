@@ -1,21 +1,24 @@
 // =========================
 // MD ASSESSMENT SYSTEM
 // assessment.js
+// PART 1
 // =========================
 
-import { db } from "./firebase-config.js";
+import { db }
+from "./firebase-config.js";
 
 import {
+
 collection,
 addDoc,
 getDocs,
 query,
-orderBy,
-limit,
-serverTimestamp,
-where
+serverTimestamp
+
 }
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+from
+"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 
 // =========================
@@ -23,26 +26,23 @@ from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 // =========================
 
 const adminPanel =
-document.getElementById("adminPanel");
-
-const studentPanel =
-document.getElementById("studentPanel");
+document.getElementById(
+"adminPanel"
+);
 
 const modeText =
-document.getElementById("modeText");
-
-const assessmentInfo =
-document.getElementById("assessmentInfo");
-
-const omrSheet =
-document.getElementById("omrSheet");
-
-const leaderboardBody =
-document.getElementById("leaderboardBody");
-
-const submitAssessmentBtn =
 document.getElementById(
-"submitAssessmentBtn"
+"modeText"
+);
+
+const answerKeyBuilder =
+document.getElementById(
+"answerKeyBuilder"
+);
+
+const generateBtn =
+document.getElementById(
+"generateQuestionsBtn"
 );
 
 
@@ -63,13 +63,15 @@ params.get("admin") === "1";
 // GLOBALS
 // =========================
 
+let teacherAnswerKey = [];
+
 let activeAssessment = null;
 
 let studentAnswers = {};
 
 
 // =========================
-// MODE SWITCH
+// ADMIN MODE
 // =========================
 
 if(isAdmin){
@@ -82,14 +84,146 @@ adminPanel.classList.remove(
 );
 
 }
-else{
 
-modeText.innerText =
-"Student Mode";
+
+// =========================
+// GENERATE ANSWER KEY SHEET
+// =========================
+
+if(generateBtn){
+
+generateBtn.addEventListener(
+"click",
+generateAnswerSheet
+);
+
+}
+
+function generateAnswerSheet(){
+
+const totalQuestions =
+parseInt(
+
+document.getElementById(
+"questionCount"
+).value
+
+);
+
+if(
+!totalQuestions ||
+totalQuestions < 1 ||
+totalQuestions > 200
+){
+
+alert(
+"Enter question count between 1 and 200"
+);
+
+return;
+
+}
+
+teacherAnswerKey =
+new Array(
+totalQuestions
+).fill("");
+
+let html = "";
+
+for(
+let i=1;
+i<=totalQuestions;
+i++
+){
+
+html +=
+
+`
+<div class="keyRow">
+
+<div>
+
+<b>
+Q${i}
+</b>
+
+</div>
+
+<div class="keyOptions">
+
+<div
+class="keyBtn"
+onclick="selectTeacherAnswer(${i},'A',this)">
+A
+</div>
+
+<div
+class="keyBtn"
+onclick="selectTeacherAnswer(${i},'B',this)">
+B
+</div>
+
+<div
+class="keyBtn"
+onclick="selectTeacherAnswer(${i},'C',this)">
+C
+</div>
+
+<div
+class="keyBtn"
+onclick="selectTeacherAnswer(${i},'D',this)">
+D
+</div>
+
+</div>
+
+</div>
+`;
+
+}
+
+answerKeyBuilder.innerHTML =
+html;
 
 }
 
 
+// =========================
+// TEACHER ANSWER SELECT
+// =========================
+
+window.selectTeacherAnswer =
+function(
+questionNo,
+answer,
+el
+){
+
+const row =
+el.parentElement;
+
+row
+.querySelectorAll(
+".keyBtn"
+)
+.forEach(btn=>{
+
+btn.classList.remove(
+"active"
+);
+
+});
+
+el.classList.add(
+"active"
+);
+
+teacherAnswerKey[
+questionNo - 1
+] = answer;
+
+};
 // =========================
 // CREATE ASSESSMENT
 // =========================
@@ -103,102 +237,153 @@ if(createBtn){
 
 createBtn.addEventListener(
 "click",
-async ()=>{
+createAssessment
+);
+
+}
+
+async function createAssessment(){
 
 const subject =
+
 document.getElementById(
 "subjectName"
 ).value.trim();
 
 const title =
+
 document.getElementById(
 "assessmentTitle"
 ).value.trim();
 
 const totalQuestions =
+
 parseInt(
+
 document.getElementById(
 "questionCount"
 ).value
-);
 
-const answerKeyRaw =
-document.getElementById(
-"answerKey"
-).value.trim();
+);
 
 if(
 !subject ||
 !title ||
-!totalQuestions ||
-!answerKeyRaw
+!totalQuestions
 ){
+
 alert(
 "Fill all fields"
 );
+
 return;
+
 }
 
-const answerKey =
-answerKeyRaw
-.split(",")
-.map(x=>x.trim().toUpperCase());
+const unanswered =
 
-if(
-answerKey.length !==
-totalQuestions
-){
+teacherAnswerKey.filter(
+x=>!x
+).length;
+
+if(unanswered > 0){
+
 alert(
-"Answer count and question count mismatch"
+
+"Please select answers for all questions"
+
 );
+
 return;
+
 }
+
+try{
 
 await addDoc(
+
 collection(
 db,
 "assessments"
 ),
+
 {
+
 subject,
 title,
+
 totalQuestions,
-answerKey,
+
+answerKey:
+teacherAnswerKey,
+
 active:true,
+
 createdAt:
 serverTimestamp()
+
 }
+
 );
 
 alert(
-"Assessment Created"
+"Assessment Created Successfully"
 );
 
 location.reload();
 
 }
+catch(err){
+
+console.error(err);
+
+alert(
+"Failed to create assessment"
 );
 
 }
+
+}
+
+
+// =========================
+// STUDENT ELEMENTS
+// =========================
+
+const assessmentInfo =
+document.getElementById(
+"assessmentInfo"
+);
+
+const omrSheet =
+document.getElementById(
+"omrSheet"
+);
+
+const submitAssessmentBtn =
+document.getElementById(
+"submitAssessmentBtn"
+);
 
 
 // =========================
 // LOAD ACTIVE ASSESSMENT
 // =========================
 
-async function
-loadAssessment(){
+async function loadAssessment(){
 
-const q =
+const snapshot =
+
+await getDocs(
+
 query(
 collection(
 db,
 "assessments"
 )
-);
+)
 
-const snapshot =
-await getDocs(q);
+);
 
 let latest = null;
 
@@ -210,8 +395,11 @@ doc.data();
 if(data.active){
 
 latest = {
+
 id:doc.id,
+
 ...data
+
 };
 
 }
@@ -221,12 +409,21 @@ id:doc.id,
 if(!latest){
 
 assessmentInfo.innerHTML =
-"No Active Assessment";
+
+`
+<b>
+No Active Assessment
+</b>
+`;
+
+if(submitAssessmentBtn){
 
 submitAssessmentBtn.style.display =
 "none";
+}
 
 return;
+
 }
 
 activeAssessment =
@@ -235,19 +432,23 @@ latest;
 assessmentInfo.innerHTML =
 
 `
+
 <b>Subject:</b>
 ${latest.subject}
-<br>
+
+<br><br>
 
 <b>Assessment:</b>
 ${latest.title}
-<br>
 
-<b>Questions:</b>
+<br><br>
+
+<b>Total Questions:</b>
 ${latest.totalQuestions}
+
 `;
 
-generateOMR(
+generateStudentOMR(
 latest.totalQuestions
 );
 
@@ -255,10 +456,10 @@ latest.totalQuestions
 
 
 // =========================
-// GENERATE OMR
+// GENERATE STUDENT OMR
 // =========================
 
-function generateOMR(
+function generateStudentOMR(
 count
 ){
 
@@ -274,10 +475,13 @@ i++
 html +=
 
 `
+
 <div class="qbox">
 
 <div class="qtitle">
+
 Q${i}
+
 </div>
 
 <div class="options">
@@ -309,6 +513,7 @@ D
 </div>
 
 </div>
+
 `;
 
 }
@@ -322,7 +527,7 @@ html;
 
 
 // =========================
-// SELECT OPTION
+// STUDENT OPTION SELECT
 // =========================
 
 window.selectOption =
@@ -356,18 +561,19 @@ questionNo
 ] = answer;
 
 };
-
-
 // =========================
-// SUBMIT
+// SUBMIT ASSESSMENT
 // =========================
 
-submitAssessmentBtn
-.addEventListener(
+submitAssessmentBtn?.addEventListener(
 "click",
-async ()=>{
+submitAssessment
+);
+
+async function submitAssessment(){
 
 const studentName =
+
 document.getElementById(
 "studentName"
 ).value.trim();
@@ -379,6 +585,7 @@ alert(
 );
 
 return;
+
 }
 
 if(!activeAssessment){
@@ -388,11 +595,70 @@ alert(
 );
 
 return;
+
+}
+
+try{
+
+// Prevent duplicate name submission
+
+const existingSnapshot =
+
+await getDocs(
+
+query(
+collection(
+db,
+"assessmentResponses"
+)
+)
+
+);
+
+let alreadySubmitted =
+false;
+
+existingSnapshot.forEach(doc=>{
+
+const data =
+doc.data();
+
+if(
+
+data.assessmentId ===
+activeAssessment.id
+
+&&
+
+data.studentName
+.toLowerCase()
+===
+
+studentName
+.toLowerCase()
+
+){
+
+alreadySubmitted =
+true;
+
+}
+
+});
+
+if(alreadySubmitted){
+
+alert(
+"This student name has already submitted."
+);
+
+return;
+
 }
 
 let score = 0;
 
-let detailed = [];
+let details = [];
 
 for(
 let i=1;
@@ -411,9 +677,7 @@ i-1
 let status =
 "notAttempted";
 
-if(
-studentAns
-){
+if(studentAns){
 
 if(
 studentAns ===
@@ -435,7 +699,7 @@ status =
 
 }
 
-detailed.push({
+details.push({
 
 question:i,
 
@@ -461,6 +725,12 @@ db,
 assessmentId:
 activeAssessment.id,
 
+assessmentTitle:
+activeAssessment.title,
+
+subject:
+activeAssessment.subject,
+
 studentName,
 
 score,
@@ -468,8 +738,7 @@ score,
 answers:
 studentAnswers,
 
-details:
-detailed,
+details,
 
 submittedAt:
 serverTimestamp()
@@ -483,58 +752,91 @@ document.getElementById(
 ).innerHTML =
 
 `
+✅ Submitted Successfully
+
+<br><br>
+
 Score :
+<b>
+
 ${score}
+
 /
+
 ${activeAssessment.totalQuestions}
+
+</b>
 `;
+
+submitAssessmentBtn.disabled =
+true;
 
 loadLeaderboard();
 
 }
+catch(err){
+
+console.error(err);
+
+alert(
+"Submission Failed"
 );
 
+}
+
+}
+
 
 // =========================
-// LEADERBOARD
+// LIVE LEADERBOARD
 // =========================
 
-async function
-loadLeaderboard(){
+async function loadLeaderboard(){
 
-if(!activeAssessment)
+const leaderboardBody =
+document.getElementById(
+"leaderboardBody"
+);
+
+if(
+!leaderboardBody ||
+!activeAssessment
+){
 return;
+}
 
-const q =
+const snapshot =
+
+await getDocs(
+
 query(
 collection(
 db,
 "assessmentResponses"
 )
+)
+
 );
 
-const snapshot =
-await getDocs(q);
-
-let data = [];
+let players = [];
 
 snapshot.forEach(doc=>{
 
-const d =
+const data =
 doc.data();
 
 if(
-d.assessmentId ===
+data.assessmentId ===
 activeAssessment.id
 ){
 
-data.push(d);
+players.push(data);
 
 }
 
 });
 
-data.sort(
+players.sort(
 (a,b)=>
 b.score-a.score
 );
@@ -543,7 +845,7 @@ let html = "";
 
 let rank = 1;
 
-data.forEach(row=>{
+players.forEach(player=>{
 
 html +=
 
@@ -556,11 +858,11 @@ html +=
 
 <br>
 
-${row.studentName}
+${player.studentName}
 
 <br>
 
-${row.score}
+${player.score}
 
 </div>
 `;
@@ -569,7 +871,7 @@ rank++;
 
 });
 
-if(!html){
+if(players.length===0){
 
 html =
 "No submissions yet";
@@ -583,10 +885,15 @@ html;
 
 
 // =========================
-// AUTO LOAD
+// INITIAL LOAD
 // =========================
 
 loadAssessment();
+
+setTimeout(
+loadLeaderboard,
+3000
+);
 
 setInterval(
 loadLeaderboard,
