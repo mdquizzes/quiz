@@ -1,5 +1,5 @@
 // =========================
-// MD ASSIGNMENT REPORT
+// ASSESSMENT REPORT V2
 // PART 1
 // =========================
 
@@ -18,14 +18,14 @@ from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 // ELEMENTS
 // =========================
 
-const assessmentSelect =
+const classStats =
 document.getElementById(
-"assessmentSelect"
+"classStats"
 );
 
-const leaderboardReport =
+const leaderboardTable =
 document.getElementById(
-"leaderboardReport"
+"leaderboardTable"
 );
 
 
@@ -33,17 +33,17 @@ document.getElementById(
 // GLOBALS
 // =========================
 
-let assessments = [];
+let allStudents = [];
 
-let selectedAssessment =
+let activeAssessmentId =
 null;
 
 
 // =========================
-// LOAD ASSESSMENTS
+// LOAD DATA
 // =========================
 
-async function loadAssessments(){
+async function loadReport(){
 
 try{
 
@@ -54,40 +54,56 @@ await getDocs(
 query(
 collection(
 db,
-"assessments"
+"assessmentResponses"
 )
 )
 
 );
 
-assessments = [];
+allStudents = [];
 
-snapshot.forEach(doc=>{
+snapshot.forEach(docSnap=>{
 
-assessments.push({
+const data =
+docSnap.data();
 
-id:doc.id,
+if(
+data.studentName
+){
 
-...doc.data()
+allStudents.push(data);
+
+}
 
 });
 
-});
+if(
+allStudents.length === 0
+){
 
-renderAssessmentDropdown();
+leaderboardTable.innerHTML =
+"No Student Data";
+
+return;
+
+}
+
+activeAssessmentId =
+
+allStudents[0]
+.assessmentId;
+
+generateStatistics();
+
+generateLeaderboard();
 
 }
 catch(err){
 
 console.error(err);
 
-assessmentSelect.innerHTML =
-
-`
-<option value="">
-Failed To Load
-</option>
-`;
+leaderboardTable.innerHTML =
+"Failed To Load";
 
 }
 
@@ -95,119 +111,134 @@ Failed To Load
 
 
 // =========================
-// DROPDOWN
+// CLASS STATS
 // =========================
 
-function renderAssessmentDropdown(){
+function generateStatistics(){
 
-let html =
+const totalStudents =
+allStudents.length;
 
-`
-<option value="">
-Select Assessment
-</option>
-`;
+let highest = 0;
 
-assessments.forEach(item=>{
+let lowest = 999999;
 
-html +=
+let totalScore = 0;
 
-`
+allStudents.forEach(student=>{
 
-<option value="${item.id}">
+const score =
+student.score || 0;
 
-${item.subject}
+if(score > highest)
+highest = score;
 
--
+if(score < lowest)
+lowest = score;
 
-${item.title}
-
-</option>
-
-`;
+totalScore += score;
 
 });
 
-assessmentSelect.innerHTML =
-html;
+const average =
+
+totalStudents
+
+?
+
+(
+totalScore /
+totalStudents
+).toFixed(2)
+
+:
+
+0;
+
+classStats.innerHTML =
+
+`
+
+<div class="statCard">
+
+<h3>
+
+Students
+
+</h3>
+
+<h1>
+
+${totalStudents}
+
+</h1>
+
+</div>
+
+<div class="statCard">
+
+<h3>
+
+Highest
+
+</h3>
+
+<h1>
+
+${highest}
+
+</h1>
+
+</div>
+
+<div class="statCard">
+
+<h3>
+
+Lowest
+
+</h3>
+
+<h1>
+
+${lowest}
+
+</h1>
+
+</div>
+
+<div class="statCard">
+
+<h3>
+
+Average
+
+</h3>
+
+<h1>
+
+${average}
+
+</h1>
+
+</div>
+
+`;
 
 }
 
 
 // =========================
-// SELECT ASSESSMENT
+// LEADERBOARD
 // =========================
 
-assessmentSelect.addEventListener(
-"change",
-function(){
+function generateLeaderboard(){
 
-const id =
-this.value;
-
-selectedAssessment =
-
-assessments.find(
-x=>x.id===id
-);
-
-if(
-selectedAssessment
-){
-
-loadLeaderboard();
-
-}
-
-}
-);
-
-
-// =========================
-// FINAL LEADERBOARD
-// =========================
-
-async function loadLeaderboard(){
-
-if(!selectedAssessment)
-return;
-
-const snapshot =
-
-await getDocs(
-
-query(
-collection(
-db,
-"assignmentResponses"
-)
-)
-
-);
-
-let rows = [];
-
-snapshot.forEach(doc=>{
-
-const data =
-doc.data();
-
-if(
-
-data.assessmentId ===
-selectedAssessment.id
-
-){
-
-rows.push(data);
-
-}
-
-});
-
-rows.sort(
+allStudents.sort(
 (a,b)=>
-b.score-a.score
+(b.score || 0)
+-
+(a.score || 0)
 );
 
 let html =
@@ -231,7 +262,11 @@ Score
 </th>
 
 <th>
-View
+Attempted
+</th>
+
+<th>
+Accuracy
 </th>
 
 </tr>
@@ -240,7 +275,30 @@ View
 
 let rank = 1;
 
-rows.forEach(row=>{
+allStudents.forEach(student=>{
+
+const attempted =
+
+Object.keys(
+student.answers || {}
+).length;
+
+const score =
+student.score || 0;
+
+const accuracy =
+
+attempted
+
+?
+
+Math.round(
+(score/attempted)*100
+)
+
+:
+
+0;
 
 html +=
 
@@ -256,25 +314,25 @@ ${rank}
 
 <td>
 
-${row.studentName}
+${student.studentName}
 
 </td>
 
 <td>
 
-${row.score}
+${score}
 
 </td>
 
 <td>
 
-<button
-class="studentBtn"
-onclick="showStudentDetail('${row.studentName}')">
+${attempted}
 
-View Detail
+</td>
 
-</button>
+<td>
+
+${accuracy}%
 
 </td>
 
@@ -289,393 +347,225 @@ rank++;
 html +=
 "</table>";
 
-leaderboardReport.innerHTML =
+leaderboardTable.innerHTML =
 html;
-
-window.reportStudents =
-rows;
 
 }
 
 
 // =========================
-// INITIAL LOAD
+// START
 // =========================
 
-loadAssessments();
+loadReport();
 // =========================
-// RANGE RESULT ENGINE
+// SEARCH STUDENT
 // PART 2
 // =========================
 
-const showRangeBtn =
+const searchBtn =
 document.getElementById(
-"showRangeBtn"
+"searchBtn"
 );
-
-const reportSummary =
-document.getElementById(
-"reportSummary"
-);
-
-showRangeBtn?.addEventListener(
-"click",
-showRangeResult
-);
-
-
-// =========================
-// RANGE RESULT
-// =========================
-
-async function showRangeResult(){
-
-if(!selectedAssessment){
-
-alert(
-"Select Assessment First"
-);
-
-return;
-
-}
-
-const fromQ =
-
-parseInt(
-document.getElementById(
-"fromQuestion"
-).value
-);
-
-const toQ =
-
-parseInt(
-document.getElementById(
-"toQuestion"
-).value
-);
-
-if(
-!fromQ ||
-!toQ ||
-fromQ > toQ
-){
-
-alert(
-"Invalid Question Range"
-);
-
-return;
-
-}
-
-const snapshot =
-
-await getDocs(
-
-query(
-collection(
-db,
-"assignmentResponses"
-)
-)
-
-);
-
-let results = [];
-
-snapshot.forEach(doc=>{
-
-const data =
-doc.data();
-
-if(
-data.assessmentId !==
-selectedAssessment.id
-){
-return;
-}
-
-let right = 0;
-let wrong = 0;
-let blank = 0;
-
-for(
-let q=fromQ;
-q<=toQ;
-q++
-){
-
-const detail =
-data.details.find(
-d=>d.question===q
-);
-
-if(!detail){
-continue;
-}
-
-if(
-detail.status ===
-"correct"
-){
-
-right++;
-
-}
-else if(
-detail.status ===
-"wrong"
-){
-
-wrong++;
-
-}
-else{
-
-blank++;
-
-}
-
-}
-
-const attempted =
-right + wrong;
-
-const accuracy =
-
-attempted === 0
-
-? 0
-
-:
-
-Math.round(
-(right/attempted)*100
-);
-
-results.push({
-
-studentName:
-data.studentName,
-
-right,
-wrong,
-blank,
-
-score:right,
-
-accuracy
-
-});
-
-});
-
-results.sort(
-(a,b)=>
-b.score-a.score
-);
-
-renderRangeTable(
-results,
-fromQ,
-toQ
-);
-
-}
-
-
-// =========================
-// RANGE TABLE
-// =========================
-
-function renderRangeTable(
-rows,
-fromQ,
-toQ
-){
-
-let html =
-
-`
-
-<div class="summaryBox">
-
-<h3>
-
-Question Range
-
-${fromQ}
--
-${toQ}
-
-</h3>
-
-<br>
-
-<table>
-
-<tr>
-
-<th>
-Rank
-</th>
-
-<th>
-Student
-</th>
-
-<th>
-Score
-</th>
-
-<th>
-Right
-</th>
-
-<th>
-Wrong
-</th>
-
-<th>
-Blank
-</th>
-
-<th>
-Accuracy
-</th>
-
-</tr>
-
-`;
-
-let rank = 1;
-
-rows.forEach(row=>{
-
-html +=
-
-`
-
-<tr>
-
-<td>
-${rank}
-</td>
-
-<td>
-${row.studentName}
-</td>
-
-<td>
-${row.score}
-</td>
-
-<td>
-${row.right}
-</td>
-
-<td>
-${row.wrong}
-</td>
-
-<td>
-${row.blank}
-</td>
-
-<td>
-${row.accuracy}%
-</td>
-
-</tr>
-
-`;
-
-rank++;
-
-});
-
-html +=
-
-`
-
-</table>
-
-</div>
-
-`;
-
-reportSummary.innerHTML =
-html;
-
-}
-// =========================
-// STUDENT DETAIL REPORT
-// PART 3
-// =========================
 
 const studentDetail =
 document.getElementById(
 "studentDetail"
 );
 
-const detailBody =
-document.getElementById(
-"detailBody"
+searchBtn.addEventListener(
+"click",
+searchStudent
 );
 
 
 // =========================
-// VIEW DETAIL
+// SEARCH
 // =========================
 
-window.showStudentDetail =
-function(studentName){
+function searchStudent(){
+
+const keyword =
+
+document.getElementById(
+"searchStudent"
+)
+.value
+.trim()
+.toLowerCase();
+
+if(!keyword){
+
+alert(
+"Enter Student Name"
+);
+
+return;
+
+}
 
 const student =
 
-window.reportStudents.find(
-x=>x.studentName===studentName
+allStudents.find(x=>
+
+x.studentName
+.toLowerCase()
+.includes(keyword)
+
 );
 
 if(!student){
-return;
-}
 
 studentDetail.style.display =
 "block";
+
+studentDetail.innerHTML =
+
+`
+<h3>
+Student Not Found
+</h3>
+`;
+
+return;
+
+}
+
+renderStudentDetail(
+student
+);
+
+}
+
+
+// =========================
+// STUDENT DETAIL
+// =========================
+
+function renderStudentDetail(
+student
+){
+
+studentDetail.style.display =
+"block";
+
+const answers =
+student.answers || {};
+
+const totalAttempted =
+
+Object.keys(
+answers
+).length;
+
+const score =
+student.score || 0;
+
+const wrong =
+
+totalAttempted - score;
+
+const accuracy =
+
+totalAttempted
+
+?
+
+Math.round(
+(score/totalAttempted)*100
+)
+
+:
+
+0;
 
 let html =
 
 `
 
-<h3>
+<h2>
 
 ${student.studentName}
 
+</h2>
+
+<br>
+
+<div class="statsGrid">
+
+<div class="statCard">
+
+<h3>
+Score
 </h3>
 
+<h1>
+${score}
+</h1>
+
+</div>
+
+<div class="statCard">
+
+<h3>
+Attempted
+</h3>
+
+<h1>
+${totalAttempted}
+</h1>
+
+</div>
+
+<div class="statCard">
+
+<h3>
+Wrong
+</h3>
+
+<h1>
+${wrong}
+</h1>
+
+</div>
+
+<div class="statCard">
+
+<h3>
+Accuracy
+</h3>
+
+<h1>
+${accuracy}%
+</h1>
+
+</div>
+
+</div>
+
 <br>
 
-<p>
+<h3>
+Question Analysis
+</h3>
 
-Score :
-<b>
-
-${student.score}
-
-</b>
-
-</p>
-
-<br>
-
-<div class="analysisGrid">
+<div class="qGrid">
 
 `;
 
-student.details.forEach(item=>{
+
+// =========================
+// QUESTION STATUS
+// =========================
+
+Object.keys(answerKey)
+.forEach(q=>{
+
+const studentAns =
+answers[q];
+
+const correctAns =
+answerKey[q];
 
 let cls =
 "blank";
@@ -683,9 +573,11 @@ let cls =
 let symbol =
 "⚪";
 
+if(studentAns){
+
 if(
-item.status ===
-"correct"
+studentAns ===
+correctAns
 ){
 
 cls =
@@ -695,17 +587,15 @@ symbol =
 "✅";
 
 }
-
-if(
-item.status ===
-"wrong"
-){
+else{
 
 cls =
 "wrong";
 
 symbol =
 "❌";
+
+}
 
 }
 
@@ -716,7 +606,7 @@ html +=
 <div
 class="qBox ${cls}">
 
-Q${item.question}
+Q${q}
 
 <br>
 
@@ -729,16 +619,22 @@ ${symbol}
 });
 
 html +=
+"</div>";
+
+
+// =========================
+// WRONG QUESTIONS
+// =========================
+
+html +=
 
 `
-
-</div>
 
 <br><br>
 
 <h3>
 
-Wrong Answers
+Wrong Questions
 
 </h3>
 
@@ -747,11 +643,18 @@ Wrong Answers
 let wrongFound =
 false;
 
-student.details.forEach(item=>{
+Object.keys(answerKey)
+.forEach(q=>{
+
+const studentAns =
+answers[q];
+
+const correctAns =
+answerKey[q];
 
 if(
-item.status ===
-"wrong"
+studentAns &&
+studentAns !== correctAns
 ){
 
 wrongFound = true;
@@ -760,25 +663,31 @@ html +=
 
 `
 
-<div class="summaryBox">
+<div
+style="
+background:#1e293b;
+padding:10px;
+margin-bottom:8px;
+border-radius:8px;
+">
 
 <b>
 
-Q${item.question}
+Q${q}
 
 </b>
 
-<br><br>
+<br>
 
-Student Answer :
+Student :
 
-${item.studentAns || "-"}
+${studentAns}
 
 <br>
 
-Correct Answer :
+Correct :
 
-${item.correctAns}
+${correctAns}
 
 </div>
 
@@ -794,7 +703,12 @@ html +=
 
 `
 
-<div class="summaryBox">
+<div
+style="
+background:#1e293b;
+padding:12px;
+border-radius:8px;
+">
 
 No Wrong Answers 🎉
 
@@ -804,110 +718,312 @@ No Wrong Answers 🎉
 
 }
 
-detailBody.innerHTML =
+studentDetail.innerHTML =
 html;
 
 window.scrollTo({
 
 top:
-studentDetail.offsetTop - 20,
+studentDetail.offsetTop,
 
 behavior:
 "smooth"
 
 });
 
-};
-
-
+}
 // =========================
-// DOWNLOAD FOUNDATION
+// DOWNLOAD REPORT
 // PART 3
 // =========================
 
-const downloadBtn =
+const downloadReportBtn =
 document.getElementById(
 "downloadReportBtn"
 );
 
-downloadBtn?.addEventListener(
+downloadReportBtn.addEventListener(
 "click",
-downloadReport
+downloadFullReport
 );
 
-function downloadReport(){
+function downloadFullReport(){
 
-if(
-!selectedAssessment
-){
+let report = "";
 
-alert(
-"Select Assessment First"
-);
+report +=
+"MD QUIZZES ASSESSMENT REPORT\n";
 
-return;
+report +=
+"============================\n\n";
 
-}
-
-let text = "";
-
-text +=
-"MD ASSIGNMENT REPORT\n\n";
-
-text +=
-"Assessment : " +
-selectedAssessment.title +
-"\n";
-
-text +=
-"Subject : " +
-selectedAssessment.subject +
+report +=
+"Total Students : " +
+allStudents.length +
 "\n\n";
 
-window.reportStudents.forEach(
-(student,index)=>{
 
-text +=
+// =========================
+// TOP RANKING
+// =========================
 
-(index+1) +
+report +=
+"FINAL LEADERBOARD\n";
+
+report +=
+"-----------------\n";
+
+allStudents.sort(
+(a,b)=>
+(b.score || 0)
+-
+(a.score || 0)
+);
+
+let rank = 1;
+
+allStudents.forEach(student=>{
+
+const attempted =
+
+Object.keys(
+student.answers || {}
+).length;
+
+const accuracy =
+
+attempted
+
+?
+
+Math.round(
+(
+(student.score || 0)
+/
+attempted
+)
+*100)
+
+:
+
+0;
+
+report +=
+
+rank +
+
 ". " +
 
 student.studentName +
 
 " | Score : " +
 
-student.score +
+(student.score || 0) +
+
+" | Accuracy : " +
+
+accuracy +
+
+"%\n";
+
+rank++;
+
+});
+
+
+// =========================
+// STUDENT DETAILS
+// =========================
+
+report +=
+
+"\n\nSTUDENT DETAILS\n";
+
+report +=
+
+"====================\n\n";
+
+allStudents.forEach(student=>{
+
+report +=
+
+"\n---------------------------------\n";
+
+report +=
+
+student.studentName +
+
+"\n";
+
+report +=
+
+"---------------------------------\n";
+
+const answers =
+student.answers || {};
+
+Object.keys(answerKey)
+.forEach(q=>{
+
+const studentAns =
+answers[q] || "-";
+
+const correctAns =
+answerKey[q];
+
+let status =
+"NOT ATTEMPTED";
+
+if(studentAns !== "-"){
+
+status =
+
+studentAns === correctAns
+
+?
+
+"CORRECT"
+
+:
+
+"WRONG";
+
+}
+
+report +=
+
+"Q" + q +
+
+" : " +
+
+studentAns +
+
+" | Correct : " +
+
+correctAns +
+
+" | " +
+
+status +
 
 "\n";
 
 });
 
+});
+
+
+// =========================
+// WEAK QUESTIONS
+// =========================
+
+report +=
+
+"\n\nWEAK QUESTION ANALYSIS\n";
+
+report +=
+
+"========================\n";
+
+let weakQuestions = {};
+
+Object.keys(answerKey)
+.forEach(q=>{
+
+weakQuestions[q] = 0;
+
+});
+
+allStudents.forEach(student=>{
+
+const answers =
+student.answers || {};
+
+Object.keys(answerKey)
+.forEach(q=>{
+
+const studentAns =
+answers[q];
+
+const correctAns =
+answerKey[q];
+
+if(
+studentAns &&
+studentAns !== correctAns
+){
+
+weakQuestions[q]++;
+
+}
+
+});
+
+});
+
+Object.keys(
+weakQuestions
+).forEach(q=>{
+
+report +=
+
+"Q" + q +
+
+" Wrong By : " +
+
+weakQuestions[q] +
+
+" Students\n";
+
+});
+
+
+// =========================
+// DOWNLOAD
+// =========================
+
 const blob =
 
 new Blob(
-[text],
+[report],
 {
 type:
 "text/plain"
 }
 );
 
-const a =
+const link =
 document.createElement(
 "a"
 );
 
-a.href =
+link.href =
 URL.createObjectURL(
 blob
 );
 
-a.download =
+link.download =
 
-selectedAssessment.title +
+"Assessment_Report.txt";
 
-"-Report.txt";
+document.body.appendChild(
+link
+);
 
-a.click();
+link.click();
+
+document.body.removeChild(
+link
+);
 
 }
+
+
+// =========================
+// AUTO REFRESH REPORT
+// =========================
+
+setInterval(
+loadReport,
+10000
+);
