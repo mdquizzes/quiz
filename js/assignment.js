@@ -422,13 +422,11 @@ studentRecord =
 snap.data();
 
 }
-
-
 // =========================
-// OVERRIDE STUDENT LOAD
+// LOAD STUDENT DATA
 // =========================
 
-async function loadStudentSheet(){
+async function loadStudentData(){
 
 const name =
 
@@ -466,7 +464,6 @@ ${currentStudent}
 `;
 
 }
-
 
 // =========================
 // SAVE PROGRESS
@@ -1513,7 +1510,7 @@ return;
 
 }
 
-await originalLoadStudent();
+await loadStudentData();
 
 lockStudentIdentity();
 
