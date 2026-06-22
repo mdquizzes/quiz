@@ -812,3 +812,274 @@ setTimeout(
 loadLeaderboard,
 1500
 );
+
+// =========================
+// TEACHER MODE
+// PART 4
+// =========================
+
+const params =
+new URLSearchParams(
+window.location.search
+);
+
+const isAdmin =
+params.get("admin") === "1";
+
+
+// =========================
+// ADMIN PANEL UI
+// =========================
+
+if(isAdmin){
+
+createAdminPanel();
+
+}
+
+function createAdminPanel(){
+
+const panel =
+document.createElement("div");
+
+panel.className =
+"card";
+
+panel.innerHTML =
+
+`
+
+<h2>
+Teacher Controls
+</h2>
+
+<input
+id="searchStudent"
+placeholder="Search Student">
+
+<button
+id="findStudentBtn">
+
+Find Student
+
+</button>
+
+<div
+id="adminStudentInfo"
+style="margin-top:15px;">
+</div>
+
+`;
+
+document
+.querySelector(".container")
+.prepend(panel);
+
+document
+.getElementById(
+"findStudentBtn"
+)
+.addEventListener(
+"click",
+findStudent
+);
+
+}
+
+
+// =========================
+// FIND STUDENT
+// =========================
+
+let adminStudentDoc =
+null;
+
+async function findStudent(){
+
+const name =
+
+document.getElementById(
+"searchStudent"
+).value.trim();
+
+if(!name){
+
+alert(
+"Enter Student Name"
+);
+
+return;
+
+}
+
+const docId =
+
+activeAssessment.id +
+
+"_" +
+
+name.replaceAll(
+" ",
+"_"
+);
+
+const snap =
+
+await getDoc(
+
+doc(
+db,
+"assessmentResponses",
+docId
+)
+
+);
+
+if(!snap.exists()){
+
+document.getElementById(
+"adminStudentInfo"
+).innerHTML =
+
+`
+Student Not Found
+`;
+
+return;
+
+}
+
+adminStudentDoc =
+snap.data();
+
+renderAdminStudent();
+
+}
+
+
+// =========================
+// SHOW STUDENT
+// =========================
+
+function renderAdminStudent(){
+
+let html =
+
+`
+
+<h3>
+
+${adminStudentDoc.studentName}
+
+</h3>
+
+<p>
+
+Score :
+
+<b>
+
+${adminStudentDoc.score || 0}
+
+</b>
+
+</p>
+
+<button
+onclick="unlockAllQuestions()">
+
+Unlock Student Sheet
+
+</button>
+
+<br><br>
+
+`;
+
+const answers =
+
+adminStudentDoc.answers || {};
+
+Object.keys(
+answers
+).forEach(q=>{
+
+html +=
+
+`
+
+<div
+style="
+padding:8px;
+background:#1e293b;
+margin-bottom:5px;
+border-radius:6px;
+">
+
+Q${q}
+
+:
+
+${answers[q]}
+
+</div>
+
+`;
+
+});
+
+document.getElementById(
+"adminStudentInfo"
+).innerHTML =
+html;
+
+}
+
+
+// =========================
+// UNLOCK STUDENT
+// =========================
+
+window.unlockAllQuestions =
+async function(){
+
+if(!adminStudentDoc)
+return;
+
+const name =
+adminStudentDoc.studentName;
+
+const docId =
+
+activeAssessment.id +
+
+"_" +
+
+name.replaceAll(
+" ",
+"_"
+);
+
+await updateDoc(
+
+doc(
+db,
+"assessmentResponses",
+docId
+),
+
+{
+
+lockedQuestions:[]
+
+}
+
+);
+
+alert(
+"Student Sheet Unlocked"
+);
+
+findStudent();
+
+};
