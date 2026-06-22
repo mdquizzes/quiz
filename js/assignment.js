@@ -1,6 +1,5 @@
 // =========================
-// MD ASSIGNMENT SYSTEM V2
-// assignment.js
+// MD ASSESSMENT V2
 // PART 1
 // =========================
 
@@ -24,14 +23,19 @@ document.getElementById(
 "assessmentInfo"
 );
 
-const omrSheet =
+const questionContainer =
 document.getElementById(
-"omrSheet"
+"questionContainer"
 );
 
 const leaderboardBody =
 document.getElementById(
 "leaderboardBody"
+);
+
+const loadStudentBtn =
+document.getElementById(
+"loadStudentBtn"
 );
 
 
@@ -42,8 +46,17 @@ document.getElementById(
 let activeAssessment =
 null;
 
-let studentAnswers =
-{};
+let currentStudent =
+null;
+
+let studentRecord =
+null;
+
+let answerKey = {};
+
+let currentStart = 1;
+
+let pageSize = 20;
 
 
 // =========================
@@ -65,8 +78,6 @@ db,
 
 );
 
-let latest = null;
-
 snapshot.forEach(doc=>{
 
 const data =
@@ -74,7 +85,7 @@ doc.data();
 
 if(data.active){
 
-latest = {
+activeAssessment = {
 
 id:doc.id,
 
@@ -86,108 +97,153 @@ id:doc.id,
 
 });
 
-if(!latest){
+if(!activeAssessment){
 
 assessmentInfo.innerHTML =
 
-`
-<b>
-No Active Assessment
-</b>
-`;
+"<b>No Active Assessment</b>";
 
 return;
 
 }
 
-activeAssessment =
-latest;
+answerKey =
+activeAssessment.answerKey || {};
+
+const totalQuestions =
+
+Object.keys(
+answerKey
+).length;
 
 assessmentInfo.innerHTML =
 
 `
 
-<b>Class :</b>
-${latest.className || "-"}
-
-<br><br>
-
 <b>Subject :</b>
-${latest.subject}
+
+${activeAssessment.subject}
 
 <br><br>
 
 <b>Assessment :</b>
-${latest.title}
+
+${activeAssessment.title}
 
 <br><br>
 
 <b>Total Questions :</b>
-${latest.totalQuestions}
+
+${totalQuestions}
 
 `;
-
-generateOMR(
-latest.totalQuestions
-);
 
 }
 
 
 // =========================
-// GENERATE OMR
+// LOAD STUDENT
 // =========================
 
-function generateOMR(
-count
-){
+loadStudentBtn.addEventListener(
+"click",
+loadStudentSheet
+);
+
+async function loadStudentSheet(){
+
+const name =
+
+document.getElementById(
+"studentName"
+).value.trim();
+
+if(!name){
+
+alert(
+"Enter Student Name"
+);
+
+return;
+
+}
+
+currentStudent =
+name;
+
+studentRecord = {
+
+answers:{},
+lockedQuestions:[]
+};
+
+currentStart = 1;
+
+renderQuestions();
+
+}
+
+
+// =========================
+// QUESTION PAGE
+// =========================
+
+function renderQuestions(){
+
+const totalQuestions =
+
+Object.keys(
+answerKey
+).length;
+
+const endQuestion =
+
+Math.min(
+currentStart + pageSize - 1,
+totalQuestions
+);
 
 let html =
 '<div class="omrGrid">';
 
 for(
-let i=1;
-i<=count;
-i++
+let q=currentStart;
+q<=endQuestion;
+q++
 ){
+
+const locked =
+
+studentRecord.lockedQuestions
+.includes(q);
+
+const selectedAnswer =
+
+studentRecord.answers[q] || "";
 
 html +=
 
 `
 
-<div class="qbox">
+<div class="qBox">
 
-<div class="qtitle">
+<div class="qTitle">
 
-Q${i}
+Q${q}
+
+${locked ? " 🔒" : ""}
 
 </div>
 
 <div class="options">
 
-<div
-class="option"
-onclick="selectAnswer(${i},'A',this)">
-A
-</div>
+${renderOption(q,"A",selectedAnswer,locked)}
 
-<div
-class="option"
-onclick="selectAnswer(${i},'B',this)">
-B
-</div>
+${renderOption(q,"B",selectedAnswer,locked)}
 
-<div
-class="option"
-onclick="selectAnswer(${i},'C',this)">
-C
-</div>
+${renderOption(q,"C",selectedAnswer,locked)}
 
-<div
-class="option"
-onclick="selectAnswer(${i},'D',this)">
-D
-</div>
+${renderOption(q,"D",selectedAnswer,locked)}
 
 </div>
 
@@ -199,8 +255,53 @@ D
 
 html += "</div>";
 
-omrSheet.innerHTML =
+questionContainer.innerHTML =
 html;
+
+}
+
+
+// =========================
+// OPTION HTML
+// =========================
+
+function renderOption(
+question,
+option,
+selected,
+locked
+){
+
+let cls = "option";
+
+if(selected === option){
+
+cls += " selected";
+
+}
+
+if(locked){
+
+cls += " locked";
+
+}
+
+return
+
+`
+
+<div
+class="${cls}"
+onclick="selectAnswer(
+${question},
+'${option}'
+)">
+
+${option}
+
+</div>
+
+`;
 
 }
 
@@ -211,65 +312,131 @@ html;
 
 window.selectAnswer =
 function(
-questionNo,
-answer,
-el
+question,
+answer
 ){
 
-const parent =
-el.parentElement;
+if(
 
-parent
-.querySelectorAll(
-".option"
-)
-.forEach(btn=>{
+studentRecord.lockedQuestions
+.includes(question)
 
-btn.classList.remove(
-"selected"
-);
+){
+return;
+}
 
-});
-
-el.classList.add(
-"selected"
-);
-
-studentAnswers[
-questionNo
+studentRecord.answers[
+question
 ] = answer;
+
+renderQuestions();
 
 };
 
 
 // =========================
-// INITIAL LOAD
+// LOAD FIRST
 // =========================
 
 loadAssessment();
 // =========================
-// SUBMIT ANSWERS
+// SAVE PROGRESS
+// PART 2
 // =========================
 
-const submitBtn =
+import {
+doc,
+getDoc,
+setDoc,
+updateDoc,
+serverTimestamp
+}
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const saveBtn =
 document.getElementById(
-"submitBtn"
+"saveBtn"
 );
 
-submitBtn?.addEventListener(
-"click",
-submitAnswers
+const nextBtn =
+document.getElementById(
+"nextBtn"
 );
 
-async function submitAnswers(){
+const statusBox =
+document.getElementById(
+"statusBox"
+);
 
-const studentName =
+
+// =========================
+// LOAD EXISTING STUDENT
+// =========================
+
+async function loadExistingStudent(){
+
+if(!currentStudent)
+return;
+
+const docId =
+
+activeAssessment.id +
+
+"_" +
+
+currentStudent
+.replaceAll(" ","_");
+
+const snap =
+
+await getDoc(
+
+doc(
+db,
+"assessmentResponses",
+docId
+)
+
+);
+
+if(!snap.exists()){
+
+studentRecord = {
+
+studentName:
+currentStudent,
+
+answers:{},
+
+lockedQuestions:[],
+
+score:0
+
+};
+
+return;
+
+}
+
+studentRecord =
+snap.data();
+
+}
+
+
+// =========================
+// OVERRIDE STUDENT LOAD
+// =========================
+
+async function loadStudentSheet(){
+
+const name =
 
 document.getElementById(
 "studentName"
 ).value.trim();
 
-if(!studentName){
+if(!name){
 
 alert(
 "Enter Student Name"
@@ -279,99 +446,85 @@ return;
 
 }
 
-if(!activeAssessment){
+currentStudent =
+name;
+
+await loadExistingStudent();
+
+currentStart = 1;
+
+renderQuestions();
+
+statusBox.innerHTML =
+
+`
+Welcome
+
+<b>
+${currentStudent}
+</b>
+`;
+
+}
+
+
+// =========================
+// SAVE PROGRESS
+// =========================
+
+saveBtn.addEventListener(
+"click",
+saveProgress
+);
+
+async function saveProgress(){
+
+if(!currentStudent){
 
 alert(
-"No Active Assessment"
+"Load Student First"
 );
 
 return;
 
 }
 
-try{
+let locked =
 
-// Check duplicate name
+studentRecord.lockedQuestions || [];
 
-const snapshot =
+Object.keys(
+studentRecord.answers
+).forEach(q=>{
 
-await getDocs(
-
-query(
-collection(
-db,
-"assignmentResponses"
-)
-)
-
-);
-
-let alreadySubmitted =
-false;
-
-snapshot.forEach(doc=>{
-
-const data =
-doc.data();
+q = parseInt(q);
 
 if(
-
-data.assessmentId ===
-activeAssessment.id
-
-&&
-
-data.studentName
-.toLowerCase()
-
-===
-
-studentName
-.toLowerCase()
-
+!locked.includes(q)
 ){
 
-alreadySubmitted =
-true;
+locked.push(q);
 
 }
 
 });
 
-if(alreadySubmitted){
-
-alert(
-"Student already submitted."
-);
-
-return;
-
-}
-
-// Score Calculation
+studentRecord.lockedQuestions =
+locked;
 
 let score = 0;
 
-let details = [];
-
-for(
-let i=1;
-i<=activeAssessment.totalQuestions;
-i++
-){
+Object.keys(
+studentRecord.answers
+).forEach(q=>{
 
 const studentAns =
-studentAnswers[i] || "";
+
+studentRecord.answers[q];
 
 const correctAns =
-activeAssessment.answerKey[
-i-1
-];
 
-let status =
-"notAttempted";
-
-if(studentAns){
+answerKey[q];
 
 if(
 studentAns ===
@@ -380,40 +533,28 @@ correctAns
 
 score++;
 
-status =
-"correct";
-
 }
-else{
-
-status =
-"wrong";
-
-}
-
-}
-
-details.push({
-
-question:i,
-
-studentAns,
-
-correctAns,
-
-status
 
 });
 
-}
+studentRecord.score =
+score;
 
-// Save
+const docId =
 
-await addDoc(
+activeAssessment.id +
 
-collection(
+"_" +
+
+currentStudent
+.replaceAll(" ","_");
+
+await setDoc(
+
+doc(
 db,
-"assignmentResponses"
+"assessmentResponses",
+docId
 ),
 
 {
@@ -421,70 +562,83 @@ db,
 assessmentId:
 activeAssessment.id,
 
-assessmentTitle:
-activeAssessment.title,
-
-subject:
-activeAssessment.subject,
-
-studentName,
-
-score,
+studentName:
+currentStudent,
 
 answers:
-studentAnswers,
+studentRecord.answers,
 
-details,
+lockedQuestions:
+studentRecord.lockedQuestions,
 
-submittedAt:
-new Date()
+score:
+studentRecord.score,
+
+updatedAt:
+serverTimestamp()
 
 }
 
 );
 
-document.getElementById(
-"studentResult"
-).innerHTML =
+statusBox.innerHTML =
 
 `
-✅ Submitted
+✅ Saved
 
 <br><br>
 
 Score :
+
 <b>
 
 ${score}
 
-/
-
-${activeAssessment.totalQuestions}
-
 </b>
 `;
 
-submitBtn.disabled =
-true;
+renderQuestions();
 
 loadLeaderboard();
-
-}
-catch(err){
-
-console.error(err);
-
-alert(
-"Submission Failed"
-);
-
-}
 
 }
 
 
 // =========================
+// NEXT 20 QUESTIONS
+// =========================
+
+nextBtn.addEventListener(
+"click",
+function(){
+
+const totalQuestions =
+
+Object.keys(
+answerKey
+).length;
+
+if(
+
+currentStart + pageSize
+
+<=
+
+totalQuestions
+
+){
+
+currentStart +=
+pageSize;
+
+renderQuestions();
+
+}
+
+});
+// =========================
 // LIVE LEADERBOARD
+// PART 3
 // =========================
 
 async function loadLeaderboard(){
@@ -499,7 +653,7 @@ await getDocs(
 query(
 collection(
 db,
-"assignmentResponses"
+"assessmentResponses"
 )
 )
 
@@ -507,10 +661,10 @@ db,
 
 let players = [];
 
-snapshot.forEach(doc=>{
+snapshot.forEach(docSnap=>{
 
 const data =
-doc.data();
+docSnap.data();
 
 if(
 data.assessmentId ===
@@ -525,36 +679,105 @@ players.push(data);
 
 players.sort(
 (a,b)=>
-b.score-a.score
+(b.score || 0)
+-
+(a.score || 0)
 );
 
-let html = "";
+renderLeaderboard(
+players
+);
+
+}
+
+
+// =========================
+// RENDER LEADERBOARD
+// =========================
+
+function renderLeaderboard(
+players
+){
+
+let html =
+
+`
+
+<table
+style="
+width:100%;
+border-collapse:collapse;
+font-size:14px;
+">
+
+<tr>
+
+<th>
+#
+</th>
+
+<th>
+Student
+</th>
+
+<th>
+Score
+</th>
+
+</tr>
+
+`;
 
 let rank = 1;
 
 players.forEach(player=>{
 
+let bg = "";
+
+if(rank===1){
+
+bg =
+"background:#f59e0b;color:black;font-weight:bold;";
+
+}
+else if(rank===2){
+
+bg =
+"background:#d1d5db;color:black;font-weight:bold;";
+
+}
+else if(rank===3){
+
+bg =
+"background:#b45309;color:white;font-weight:bold;";
+
+}
+
 html +=
 
 `
 
-<div class="leaderRow">
+<tr style="${bg}">
 
-<b>
+<td>
 
-#${rank}
+${rank}
 
-</b>
+</td>
 
-<br>
+<td>
 
 ${player.studentName}
 
-<br>
+</td>
 
-${player.score}
+<td>
 
-</div>
+${player.score || 0}
+
+</td>
+
+</tr>
 
 `;
 
@@ -562,12 +785,8 @@ rank++;
 
 });
 
-if(players.length===0){
-
-html =
-"No submissions yet";
-
-}
+html +=
+"</table>";
 
 leaderboardBody.innerHTML =
 html;
@@ -583,308 +802,13 @@ setInterval(
 loadLeaderboard,
 5000
 );
-// =========================
-// RANGE RESULT ENGINE
-// =========================
-
-const showResultBtn =
-document.getElementById(
-"showResultBtn"
-);
-
-showResultBtn?.addEventListener(
-"click",
-showRangeResult
-);
-
-async function showRangeResult(){
-
-const fromQ =
-
-parseInt(
-document.getElementById(
-"fromQuestion"
-).value
-);
-
-const toQ =
-
-parseInt(
-document.getElementById(
-"toQuestion"
-).value
-);
-
-if(
-!fromQ ||
-!toQ ||
-fromQ > toQ
-){
-
-alert(
-"Invalid question range"
-);
-
-return;
-
-}
-
-if(!activeAssessment){
-
-alert(
-"No Active Assessment"
-);
-
-return;
-
-}
-
-const snapshot =
-
-await getDocs(
-
-query(
-collection(
-db,
-"assignmentResponses"
-)
-)
-
-);
-
-let resultData = [];
-
-snapshot.forEach(doc=>{
-
-const data =
-doc.data();
-
-if(
-data.assessmentId !==
-activeAssessment.id
-){
-return;
-}
-
-let right = 0;
-let wrong = 0;
-let blank = 0;
-
-for(
-let q=fromQ;
-q<=toQ;
-q++
-){
-
-const detail =
-data.details.find(
-d=>d.question===q
-);
-
-if(!detail){
-continue;
-}
-
-if(
-detail.status ===
-"correct"
-){
-
-right++;
-
-}
-else if(
-
-detail.status ===
-"wrong"
-
-){
-
-wrong++;
-
-}
-else{
-
-blank++;
-
-}
-
-}
-
-const total =
-right + wrong;
-
-const accuracy =
-
-total === 0
-
-? 0
-
-:
-
-Math.round(
-(right/total)*100
-);
-
-resultData.push({
-
-studentName:
-data.studentName,
-
-right,
-wrong,
-blank,
-
-score:right,
-
-accuracy
-
-});
-
-});
-
-resultData.sort(
-(a,b)=>
-b.score-a.score
-);
-
-renderRangeTable(
-resultData,
-fromQ,
-toQ
-);
-
-}
 
 
 // =========================
-// RENDER RANGE TABLE
+// INITIAL LEADERBOARD
 // =========================
 
-function renderRangeTable(
-rows,
-fromQ,
-toQ
-){
-
-let html =
-
-`
-
-<h3>
-
-Question Range
-
-${fromQ}
--
-${toQ}
-
-</h3>
-
-<br>
-
-<table class="resultTable">
-
-<tr>
-
-<th>
-Rank
-</th>
-
-<th>
-Name
-</th>
-
-<th>
-Score
-</th>
-
-<th>
-Right
-</th>
-
-<th>
-Wrong
-</th>
-
-<th>
-Blank
-</th>
-
-<th>
-Accuracy
-</th>
-
-</tr>
-
-`;
-
-let rank = 1;
-
-rows.forEach(row=>{
-
-html +=
-
-`
-
-<tr>
-
-<td>
-
-${rank}
-
-</td>
-
-<td>
-
-${row.studentName}
-
-</td>
-
-<td>
-
-${row.score}
-
-</td>
-
-<td>
-
-${row.right}
-
-</td>
-
-<td>
-
-${row.wrong}
-
-</td>
-
-<td>
-
-${row.blank}
-
-</td>
-
-<td>
-
-${row.accuracy}%
-
-</td>
-
-</tr>
-
-`;
-
-rank++;
-
-});
-
-html +=
-"</table>";
-
-document.getElementById(
-"rangeResult"
-).innerHTML =
-html;
-
-}
+setTimeout(
+loadLeaderboard,
+1500
+);
