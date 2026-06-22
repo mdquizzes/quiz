@@ -9,7 +9,7 @@
 content="width=device-width, initial-scale=1.0">
 
 <title>
-MD Assignment Report
+Assessment Report V2
 </title>
 
 <style>
@@ -25,44 +25,29 @@ sans-serif;
 }
 
 body{
-background:
-linear-gradient(
-135deg,
-#020617,
-#0f172a,
-#020617
-);
+background:#0f172a;
 color:white;
-min-height:100vh;
 }
 
 header{
 background:#082f49;
-padding:15px 20px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
-
-.logo{
-font-size:28px;
-font-weight:700;
+padding:15px;
+font-size:24px;
+font-weight:bold;
 color:#facc15;
 }
 
 .container{
-max-width:1400px;
-margin:auto;
 padding:20px;
+max-width:1600px;
+margin:auto;
 }
 
 .card{
 background:#111827;
 padding:20px;
-border-radius:16px;
+border-radius:15px;
 margin-bottom:20px;
-box-shadow:
-0 0 20px rgba(0,0,0,.35);
 }
 
 h2{
@@ -70,14 +55,11 @@ color:#facc15;
 margin-bottom:15px;
 }
 
-select,
 input,
 button{
-width:100%;
-padding:12px;
+padding:10px;
 border:none;
-border-radius:10px;
-margin-top:10px;
+border-radius:8px;
 }
 
 button{
@@ -86,27 +68,29 @@ font-weight:bold;
 cursor:pointer;
 }
 
-button:hover{
-background:#fde047;
-}
-
-.rangeRow{
+.statsGrid{
 display:grid;
 grid-template-columns:
-1fr 1fr;
-gap:10px;
+repeat(4,1fr);
+gap:15px;
+}
+
+.statCard{
+background:#1e293b;
+padding:15px;
+border-radius:10px;
+text-align:center;
 }
 
 table{
 width:100%;
 border-collapse:collapse;
-margin-top:15px;
 }
 
 th,
 td{
-border:1px solid #334155;
 padding:10px;
+border:1px solid #334155;
 text-align:center;
 }
 
@@ -114,17 +98,29 @@ th{
 background:#1e293b;
 }
 
-.studentBtn{
-background:#2563eb;
-padding:6px 12px;
-border-radius:8px;
-cursor:pointer;
-color:white;
-border:none;
+.searchRow{
+display:flex;
+gap:10px;
+margin-bottom:20px;
 }
 
-.studentBtn:hover{
-background:#1d4ed8;
+#studentDetail{
+display:none;
+}
+
+.qGrid{
+display:grid;
+grid-template-columns:
+repeat(auto-fill,minmax(70px,1fr));
+gap:8px;
+margin-top:15px;
+}
+
+.qBox{
+padding:8px;
+border-radius:6px;
+text-align:center;
+font-weight:bold;
 }
 
 .correct{
@@ -139,41 +135,6 @@ background:#dc2626;
 background:#64748b;
 }
 
-.analysisGrid{
-display:grid;
-grid-template-columns:
-repeat(auto-fill,minmax(70px,1fr));
-gap:8px;
-margin-top:15px;
-}
-
-.qBox{
-padding:10px;
-border-radius:8px;
-text-align:center;
-font-weight:bold;
-}
-
-#studentDetail{
-display:none;
-}
-
-.downloadBtn{
-background:#22c55e;
-margin-top:15px;
-}
-
-.downloadBtn:hover{
-background:#16a34a;
-}
-
-.summaryBox{
-background:#1e293b;
-padding:15px;
-border-radius:10px;
-margin-top:15px;
-}
-
 </style>
 
 </head>
@@ -181,81 +142,20 @@ margin-top:15px;
 <body>
 
 <header>
-
-<div class="logo">
-MD ASSIGNMENT REPORT
-</div>
-
-<div>
-Teacher Dashboard
-</div>
-
+Assessment Report V2
 </header>
 
 <div class="container">
 
-<!-- Assessment Selection -->
-
 <div class="card">
 
 <h2>
-Select Assessment
+Class Statistics
 </h2>
 
-<select id="assessmentSelect">
-
-<option value="">
-Loading Assessments...
-</option>
-
-</select>
-
-</div>
-
-<!-- Range Result -->
-
-<div class="card">
-
-<h2>
-Question Range Result
-</h2>
-
-<div class="rangeRow">
-
-<input
-id="fromQuestion"
-type="number"
-placeholder="From Question">
-
-<input
-id="toQuestion"
-type="number"
-placeholder="To Question">
-
-</div>
-
-<button
-id="showRangeBtn">
-
-Show Result
-
-</button>
-
-<div id="reportSummary">
-
-</div>
-
-</div>
-
-<!-- Final Leaderboard -->
-
-<div class="card">
-
-<h2>
-🏆 Final Leaderboard
-</h2>
-
-<div id="leaderboardReport">
+<div
+class="statsGrid"
+id="classStats">
 
 Loading...
 
@@ -263,33 +163,48 @@ Loading...
 
 </div>
 
-<!-- Student Detail -->
-
-<div
-class="card"
-id="studentDetail">
-
-<h2>
-Student Detail Report
-</h2>
-
-<div id="detailBody">
-
-</div>
-
-</div>
-
-<!-- Download -->
-
 <div class="card">
 
 <h2>
-Download Assessment Report
+Leaderboard
 </h2>
 
+<div id="leaderboardTable">
+
+Loading...
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="searchRow">
+
+<input
+id="searchStudent"
+placeholder="Search Student">
+
 <button
-id="downloadReportBtn"
-class="downloadBtn">
+id="searchBtn">
+
+Search
+
+</button>
+
+</div>
+
+<div
+id="studentDetail">
+
+</div>
+
+</div>
+
+<div class="card">
+
+<button
+id="downloadReportBtn">
 
 Download Complete Report
 
@@ -301,7 +216,7 @@ Download Complete Report
 
 <script
 type="module"
-src="js/assignment-report.js">
+src="js/assessment-report-v2.js">
 </script>
 
 </body>
