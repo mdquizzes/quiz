@@ -9,7 +9,7 @@
 content="width=device-width, initial-scale=1.0">
 
 <title>
-MD Assignment System
+MD Assessment V2
 </title>
 
 <style>
@@ -25,7 +25,6 @@ sans-serif;
 }
 
 body{
-
 background:
 linear-gradient(
 135deg,
@@ -33,278 +32,140 @@ linear-gradient(
 #0f172a,
 #020617
 );
-
 color:white;
-
 min-height:100vh;
-
 }
 
 header{
-
 background:#082f49;
-
 padding:15px 20px;
-
 display:flex;
-
 justify-content:space-between;
-
 align-items:center;
-
 }
 
 .logo{
-
 font-size:28px;
-
 font-weight:700;
-
 color:#facc15;
-
 }
 
 .container{
-
-max-width:1400px;
-
+max-width:1500px;
 margin:auto;
-
 padding:20px;
-
 }
 
 .card{
-
 background:#111827;
-
 padding:20px;
-
 border-radius:16px;
-
 margin-bottom:20px;
-
 box-shadow:
-0 0 20px
-rgba(0,0,0,.35);
-
+0 0 20px rgba(0,0,0,.35);
 }
 
 h2{
-
 color:#facc15;
-
 margin-bottom:15px;
-
 }
 
 input,
-select,
 button{
-
 width:100%;
-
 padding:12px;
-
 border:none;
-
 border-radius:10px;
-
 margin-top:10px;
-
 }
 
 button{
-
 background:#facc15;
-
 font-weight:bold;
-
 cursor:pointer;
-
 }
 
 button:hover{
-
 background:#fde047;
-
-}
-
-.hide{
-display:none;
 }
 
 #assessmentInfo{
-
-font-size:18px;
-
 line-height:1.8;
-
-margin-bottom:20px;
-
+font-size:18px;
 }
 
 .omrGrid{
-
 display:grid;
-
 grid-template-columns:
-repeat(auto-fill,minmax(240px,1fr));
-
-gap:15px;
-
+repeat(auto-fill,minmax(220px,1fr));
+gap:12px;
 }
 
-.qbox{
-
+.qBox{
 background:#1e293b;
-
-padding:12px;
-
+padding:10px;
 border-radius:10px;
-
 }
 
-.qtitle{
-
+.qTitle{
 font-weight:bold;
-
 margin-bottom:8px;
-
 }
 
 .options{
-
 display:flex;
-
-gap:10px;
-
+gap:8px;
 flex-wrap:wrap;
-
 }
 
 .option{
-
 padding:8px 12px;
-
-border-radius:8px;
-
 background:#334155;
-
+border-radius:8px;
 cursor:pointer;
-
 }
 
 .option.selected{
-
 background:#22c55e;
+}
 
+.option.locked{
+background:#64748b;
+cursor:not-allowed;
 }
 
 #leaderboard{
-
 position:fixed;
-
 right:10px;
-
 top:80px;
-
-width:280px;
-
+width:300px;
 background:#111827;
-
 padding:15px;
-
 border-radius:12px;
-
-max-height:80vh;
-
+max-height:85vh;
 overflow:auto;
-
 }
 
 .leaderRow{
-
-padding:10px;
-
-background:#1e293b;
-
-margin-bottom:8px;
-
-border-radius:8px;
-
-}
-
-#teacherPanel{
-
-background:#7c2d12;
-
-}
-
-.rangeRow{
-
-display:grid;
-
-grid-template-columns:
-1fr 1fr;
-
-gap:10px;
-
-}
-
-#rangeResult{
-
-margin-top:20px;
-
-}
-
-.resultTable{
-
-width:100%;
-
-border-collapse:collapse;
-
-}
-
-.resultTable th,
-.resultTable td{
-
-border:1px solid #334155;
-
 padding:8px;
-
-text-align:center;
-
-}
-
-.resultTable th{
-
+margin-bottom:8px;
 background:#1e293b;
-
+border-radius:8px;
 }
 
-#studentResult{
-
-margin-top:20px;
-
-font-size:20px;
-
+#statusBox{
+margin-top:15px;
+font-size:18px;
 font-weight:bold;
-
 color:#facc15;
-
 }
 
-@media(max-width:900px){
+@media(max-width:1000px){
 
 #leaderboard{
-
 position:static;
-
 width:100%;
-
 margin-top:20px;
-
 }
 
 }
@@ -318,18 +179,16 @@ margin-top:20px;
 <header>
 
 <div class="logo">
-MD ASSIGNMENT
+MD Assessment V2
 </div>
 
 <div>
-Classroom Mode
+Live Classroom Mode
 </div>
 
 </header>
 
 <div class="container">
-
-<!-- Assessment Info -->
 
 <div class="card">
 
@@ -339,71 +198,61 @@ Assessment Information
 
 <div id="assessmentInfo">
 
-Loading assessment...
+Loading Assessment...
 
 </div>
 
 </div>
-
-<!-- Student Panel -->
 
 <div class="card">
 
 <h2>
-Student Submission
+Student Login
 </h2>
 
 <input
 id="studentName"
-placeholder="Enter Student Name">
-
-<div id="omrSheet">
-</div>
+placeholder="Enter Name (Rahul P.)">
 
 <button
-id="submitBtn">
+id="loadStudentBtn">
 
-Submit Answers
+Load My Sheet
 
 </button>
 
-<div id="studentResult">
 </div>
 
-</div>
-
-<!-- Teacher Result Panel -->
-
-<div
-class="card"
-id="teacherPanel">
+<div class="card">
 
 <h2>
-Teacher Result Control
+Answer Sheet
 </h2>
 
-<div class="rangeRow">
+<div id="questionContainer">
 
-<input
-id="fromQuestion"
-type="number"
-placeholder="From Question">
-
-<input
-id="toQuestion"
-type="number"
-placeholder="To Question">
+Load Student First
 
 </div>
 
-<button
-id="showResultBtn">
+<br>
 
-Show Range Result
+<button
+id="saveBtn">
+
+Save Progress
 
 </button>
 
-<div id="rangeResult">
+<button
+id="nextBtn">
+
+Load Next 20 Questions
+
+</button>
+
+<div id="statusBox">
+
 </div>
 
 </div>
@@ -413,7 +262,7 @@ Show Range Result
 <div id="leaderboard">
 
 <h2>
-🏆 Live Leaderboard
+🏆 Live Ranking
 </h2>
 
 <div id="leaderboardBody">
@@ -426,7 +275,7 @@ Loading...
 
 <script
 type="module"
-src="js/assignment.js">
+src="js/assessment-v2.js">
 </script>
 
 </body>
