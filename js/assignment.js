@@ -1,5 +1,5 @@
 // =========================
-// MD ASSESSMENT V2
+// MD ASSESSMENT
 // PART 1
 // =========================
 
@@ -8,8 +8,10 @@ from "./firebase-config.js";
 
 import {
 collection,
+query,
 getDocs,
-query
+doc,
+getDoc
 }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -23,76 +25,69 @@ document.getElementById(
 "assessmentInfo"
 );
 
+const studentName =
+document.getElementById(
+"studentName"
+);
+
+const loadStudentBtn =
+document.getElementById(
+"loadStudentBtn"
+);
+
 const questionContainer =
 document.getElementById(
 "questionContainer"
 );
 
-const leaderboardBody =
+const statusBox =
 document.getElementById(
-"leaderboardBody"
+"statusBox"
 );
 
-loadStudentBtn.addEventListener(
-"click",
-async ()=>{
-
-await loadStudentData();
-
-lockStudentIdentity();
-
-}
-);
 
 // =========================
 // GLOBALS
 // =========================
 
-let activeAssessment =
-null;
-
-let currentStudent =
-null;
-
-let studentRecord =
-null;
+let activeAssessment = null;
 
 let answerKey = {};
 
+let currentStudent = null;
+
+let studentRecord = null;
+
 let currentStart = 1;
 
-let pageSize = 20;
+const pageSize = 20;
 
 
 // =========================
-// LOAD ACTIVE ASSESSMENT
+// LOAD ASSESSMENT
 // =========================
 
 async function loadAssessment(){
 
-const snapshot =
-
-await getDocs(
-
+const snapshot = await getDocs(
 query(
 collection(
 db,
 "assessments"
 )
 )
-
 );
 
-snapshot.forEach(doc=>{
+snapshot.forEach(docSnap=>{
 
 const data =
-doc.data();
+docSnap.data();
 
 if(data.active){
 
 activeAssessment = {
 
-id:doc.id,
+id:docSnap.id,
 
 ...data
 
@@ -105,7 +100,6 @@ id:doc.id,
 if(!activeAssessment){
 
 assessmentInfo.innerHTML =
-
 "<b>No Active Assessment</b>";
 
 return;
@@ -115,31 +109,25 @@ return;
 answerKey =
 activeAssessment.answerKey || {};
 
-const totalQuestions =
-
-Object.keys(
-answerKey
-).length;
-
 assessmentInfo.innerHTML =
 
 `
 
-<b>Subject :</b>
+<b>Subject:</b>
 
 ${activeAssessment.subject}
 
 <br><br>
 
-<b>Assessment :</b>
+<b>Assessment:</b>
 
 ${activeAssessment.title}
 
 <br><br>
 
-<b>Total Questions :</b>
+<b>Total Questions:</b>
 
-${totalQuestions}
+${Object.keys(answerKey).length}
 
 `;
 
@@ -152,15 +140,99 @@ ${totalQuestions}
 
 loadStudentBtn.addEventListener(
 "click",
-loadStudentSheet
+loadStudent
 );
+
+async function loadStudent(){
+
+const name =
+studentName.value.trim();
+
+if(!name){
+
+alert(
+"Enter Student Name"
+);
+
+return;
+
+}
+
+currentStudent =
+name;
+
+const docId =
+
+activeAssessment.id +
+
+"_" +
+
+currentStudent
+.replaceAll(" ","_");
+
+const snap =
+
+await getDoc(
+
+doc(
+db,
+"assessmentResponses",
+docId
+)
+
+);
+
+if(snap.exists()){
+
+studentRecord =
+snap.data();
+
+}
+else{
+
+studentRecord = {
+
+studentName:
+currentStudent,
+
+answers:{},
+
+lockedQuestions:[],
+
+score:0
+
+};
+
+}
+
+studentName.disabled =
+true;
+
+currentStart = 1;
+
+renderQuestions();
+
+statusBox.innerHTML =
+
+`
+Welcome
+
+<b>
+${currentStudent}
+</b>
+`;
+
+}
 
 
 // =========================
-// QUESTION PAGE
+// RENDER QUESTIONS
 // =========================
 
 function renderQuestions(){
+
+if(!studentRecord)
+return;
 
 const totalQuestions =
 
@@ -184,14 +256,14 @@ q<=endQuestion;
 q++
 ){
 
+const selected =
+
+studentRecord.answers[q] || "";
+
 const locked =
 
 studentRecord.lockedQuestions
 .includes(q);
-
-const selectedAnswer =
-
-studentRecord.answers[q] || "";
 
 html +=
 
@@ -209,13 +281,13 @@ ${locked ? " 🔒" : ""}
 
 <div class="options">
 
-${renderOption(q,"A",selectedAnswer,locked)}
+${optionHTML(q,"A",selected,locked)}
 
-${renderOption(q,"B",selectedAnswer,locked)}
+${optionHTML(q,"B",selected,locked)}
 
-${renderOption(q,"C",selectedAnswer,locked)}
+${optionHTML(q,"C",selected,locked)}
 
-${renderOption(q,"D",selectedAnswer,locked)}
+${optionHTML(q,"D",selected,locked)}
 
 </div>
 
@@ -237,37 +309,35 @@ html;
 // OPTION HTML
 // =========================
 
-function renderOption(
+function optionHTML(
 question,
 option,
 selected,
 locked
 ){
 
-let cls = "option";
+let cls =
+"option";
 
-if(selected === option){
+if(selected===option){
 
-cls += " selected";
+cls +=
+" selected";
 
 }
 
 if(locked){
 
-cls += " locked";
+cls +=
+" locked";
 
 }
 
-return
-
-`
+return `
 
 <div
 class="${cls}"
-onclick="selectAnswer(
-${question},
-'${option}'
-)">
+onclick="selectAnswer(${question},'${option}')">
 
 ${option}
 
@@ -289,12 +359,12 @@ answer
 ){
 
 if(
-
 studentRecord.lockedQuestions
 .includes(question)
-
 ){
+
 return;
+
 }
 
 studentRecord.answers[
@@ -307,20 +377,18 @@ renderQuestions();
 
 
 // =========================
-// LOAD FIRST
+// START
 // =========================
 
 loadAssessment();
 // =========================
-// SAVE PROGRESS
 // PART 2
+// SAVE + LOCK + NEXT PAGE
 // =========================
 
 import {
 doc,
-getDoc,
 setDoc,
-updateDoc,
 serverTimestamp
 }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -335,107 +403,6 @@ document.getElementById(
 "nextBtn"
 );
 
-const statusBox =
-document.getElementById(
-"statusBox"
-);
-
-
-// =========================
-// LOAD EXISTING STUDENT
-// =========================
-
-async function loadExistingStudent(){
-
-if(!currentStudent)
-return;
-
-const docId =
-
-activeAssessment.id +
-
-"_" +
-
-currentStudent
-.replaceAll(" ","_");
-
-const snap =
-
-await getDoc(
-
-doc(
-db,
-"assessmentResponses",
-docId
-)
-
-);
-
-if(!snap.exists()){
-
-studentRecord = {
-
-studentName:
-currentStudent,
-
-answers:{},
-
-lockedQuestions:[],
-
-score:0
-
-};
-
-return;
-
-}
-
-studentRecord =
-snap.data();
-
-}
-// =========================
-// LOAD STUDENT DATA
-// =========================
-
-async function loadStudentData(){
-
-const name =
-
-document.getElementById(
-"studentName"
-).value.trim();
-
-if(!name){
-
-alert(
-"Enter Student Name"
-);
-
-return;
-
-}
-
-currentStudent =
-name;
-
-await loadExistingStudent();
-
-currentStart = 1;
-
-renderQuestions();
-
-statusBox.innerHTML =
-
-`
-Welcome
-
-<b>
-${currentStudent}
-</b>
-`;
-
-}
 
 // =========================
 // SAVE PROGRESS
@@ -488,11 +455,9 @@ studentRecord.answers
 ).forEach(q=>{
 
 const studentAns =
-
 studentRecord.answers[q];
 
 const correctAns =
-
 answerKey[q];
 
 if(
@@ -516,7 +481,10 @@ activeAssessment.id +
 "_" +
 
 currentStudent
-.replaceAll(" ","_");
+.replaceAll(
+" ",
+"_"
+);
 
 await setDoc(
 
@@ -546,6 +514,10 @@ studentRecord.score,
 updatedAt:
 serverTimestamp()
 
+},
+
+{
+merge:true
 }
 
 );
@@ -553,17 +525,19 @@ serverTimestamp()
 statusBox.innerHTML =
 
 `
-✅ Saved
+
+✅ Progress Saved
 
 <br><br>
 
-Score :
+Current Score :
 
 <b>
 
 ${score}
 
 </b>
+
 `;
 
 renderQuestions();
@@ -579,7 +553,7 @@ loadLeaderboard();
 
 nextBtn.addEventListener(
 "click",
-function(){
+()=>{
 
 const totalQuestions =
 
@@ -604,10 +578,151 @@ renderQuestions();
 
 }
 
+else{
+
+alert(
+"No More Questions"
+);
+
+}
+
 });
+
+
 // =========================
-// LIVE LEADERBOARD
+// AUTO SAVE
+// =========================
+
+setInterval(
+async ()=>{
+
+if(
+!currentStudent
+) return;
+
+if(
+!studentRecord
+) return;
+
+if(
+Object.keys(
+studentRecord.answers || {}
+).length === 0
+){
+return;
+}
+
+try{
+
+const docId =
+
+activeAssessment.id +
+
+"_" +
+
+currentStudent
+.replaceAll(
+" ",
+"_"
+);
+
+await setDoc(
+
+doc(
+db,
+"assessmentResponses",
+docId
+),
+
+{
+
+assessmentId:
+activeAssessment.id,
+
+studentName:
+currentStudent,
+
+answers:
+studentRecord.answers,
+
+lockedQuestions:
+studentRecord.lockedQuestions || [],
+
+score:
+studentRecord.score || 0,
+
+updatedAt:
+serverTimestamp()
+
+},
+
+{
+merge:true
+}
+
+);
+
+console.log(
+"Auto Saved"
+);
+
+}
+catch(err){
+
+console.error(
+err
+);
+
+}
+
+},
+30000
+);
+
+
+// =========================
+// SAVE NAME
+// =========================
+
+studentName.addEventListener(
+"change",
+function(){
+
+localStorage.setItem(
+"assessmentStudent",
+this.value
+);
+
+}
+);
+
+
+// =========================
+// RESTORE NAME
+// =========================
+
+window.addEventListener(
+"load",
+()=>{
+
+const savedName =
+
+localStorage.getItem(
+"assessmentStudent"
+);
+
+if(savedName){
+
+studentName.value =
+savedName;
+
+}
+
+}
+);
+// =========================
 // PART 3
+// LEADERBOARD + UNLOCK
 // =========================
 
 async function loadLeaderboard(){
@@ -615,17 +730,13 @@ async function loadLeaderboard(){
 if(!activeAssessment)
 return;
 
-const snapshot =
-
-await getDocs(
-
+const snapshot = await getDocs(
 query(
 collection(
 db,
 "assessmentResponses"
 )
 )
-
 );
 
 let players = [];
@@ -681,17 +792,11 @@ font-size:14px;
 
 <tr>
 
-<th>
-#
-</th>
+<th>#</th>
 
-<th>
-Student
-</th>
+<th>Student</th>
 
-<th>
-Score
-</th>
+<th>Score</th>
 
 </tr>
 
@@ -728,23 +833,11 @@ html +=
 
 <tr style="${bg}">
 
-<td>
+<td>${rank}</td>
 
-${rank}
+<td>${player.studentName}</td>
 
-</td>
-
-<td>
-
-${player.studentName}
-
-</td>
-
-<td>
-
-${player.score || 0}
-
-</td>
+<td>${player.score || 0}</td>
 
 </tr>
 
@@ -754,8 +847,7 @@ rank++;
 
 });
 
-html +=
-"</table>";
+html += "</table>";
 
 leaderboardBody.innerHTML =
 html;
@@ -764,18 +856,13 @@ html;
 
 
 // =========================
-// AUTO REFRESH
+// AUTO REFRESH LEADERBOARD
 // =========================
 
 setInterval(
 loadLeaderboard,
 5000
 );
-
-
-// =========================
-// INITIAL LEADERBOARD
-// =========================
 
 setTimeout(
 loadLeaderboard,
@@ -784,158 +871,91 @@ loadLeaderboard,
 
 
 // =========================
-// STUDENT PROTECTION SYSTEM
-// PART 7
+// PASSWORD UNLOCK
 // =========================
 
-let studentLocked = false;
-
-
-// =========================
-// LOCK STUDENT NAME
-// =========================
-
-function lockStudentIdentity(){
-
-const nameBox =
-document.getElementById(
-"studentName"
+const unlockBtn =
+document.createElement(
+"button"
 );
 
-if(!nameBox) return;
+unlockBtn.innerHTML =
+"🔓 Unlock Question";
 
-nameBox.disabled = true;
+unlockBtn.style.marginTop =
+"10px";
 
-studentLocked = true;
-
-}
-
-
-
-
-
-// =========================
-// DUPLICATE CHECK
-// =========================
-
-async function studentExists(name){
-
-const docId =
-
-activeAssessment.id +
-
-"_" +
-
-name.replaceAll(
-" ",
-"_"
+document
+.querySelector(".card:last-of-type")
+.appendChild(
+unlockBtn
 );
 
-const snap =
+const TEACHER_PASSWORD =
+"MD2025";
 
-await getDoc(
-
-doc(
-db,
-"assessmentResponses",
-docId
-)
-
+unlockBtn.addEventListener(
+"click",
+unlockQuestion
 );
 
-return snap.exists();
+function unlockQuestion(){
 
-}
+if(!studentRecord){
 
+alert(
+"Load Student First"
+);
 
-// =========================
-// AUTO SAVE
-// =========================
-
-setInterval(
-async ()=>{
-
-if(
-!currentStudent
-) return;
-
-if(
-Object.keys(
-studentRecord.answers || {}
-).length === 0
-){
 return;
-}
-
-try{
-
-await setDoc(
-
-doc(
-db,
-"assessmentResponses",
-
-activeAssessment.id +
-
-"_" +
-
-currentStudent
-.replaceAll(
-" ",
-"_"
-)
-
-),
-
-{
-
-assessmentId:
-activeAssessment.id,
-
-studentName:
-currentStudent,
-
-answers:
-studentRecord.answers,
-
-lockedQuestions:
-studentRecord.lockedQuestions || [],
-
-score:
-studentRecord.score || 0,
-
-updatedAt:
-serverTimestamp()
-
-},
-
-{
-merge:true
-}
-
-);
-
-console.log(
-"Auto Saved"
-);
-
-}
-catch(err){
-
-console.error(
-"Auto Save Failed",
-err
-);
 
 }
 
-},
-30000
+const qNo = prompt(
+"Question Number"
 );
+
+if(!qNo)
+return;
+
+const password = prompt(
+"Teacher Password"
+);
+
+if(
+password !==
+TEACHER_PASSWORD
+){
+
+alert(
+"Wrong Password"
+);
+
+return;
+
+}
+
+const q =
+parseInt(qNo);
+
+studentRecord.lockedQuestions =
+
+studentRecord.lockedQuestions
+.filter(x=>x!==q);
+
+renderQuestions();
+
+alert(
+"Question " +
+q +
+" Unlocked"
+);
+
+}
 
 
 // =========================
-// BEFORE REFRESH WARNING
+// REFRESH PROTECTION
 // =========================
 
 window.addEventListener(
@@ -944,6 +964,7 @@ function(e){
 
 if(
 currentStudent &&
+studentRecord &&
 Object.keys(
 studentRecord.answers || {}
 ).length > 0
@@ -960,76 +981,11 @@ e.returnValue = "";
 
 
 // =========================
-// SESSION RESTORE
+// LOAD INITIAL LEADERBOARD
 // =========================
 
-window.addEventListener(
-"load",
-()=>{
+loadLeaderboard();
 
-const savedName =
-
-localStorage.getItem(
-"assessmentStudent"
+console.log(
+"MD Assessment Ready"
 );
-
-if(savedName){
-
-document.getElementById(
-"studentName"
-).value =
-savedName;
-
-}
-
-}
-);
-
-
-// =========================
-// SAVE NAME
-// =========================
-
-document
-.getElementById(
-"studentName"
-)
-.addEventListener(
-"change",
-function(){
-
-localStorage.setItem(
-"assessmentStudent",
-this.value
-);
-
-}
-);
-
-
-// =========================
-// STATUS IMPROVEMENT
-// =========================
-
-function showStatus(msg){
-
-const box =
-document.getElementById(
-"statusBox"
-);
-
-if(!box) return;
-
-box.innerHTML = msg;
-
-setTimeout(()=>{
-
-if(box.innerHTML === msg){
-
-box.innerHTML = "";
-
-}
-
-},4000);
-
-}
