@@ -831,7 +831,10 @@ params.get("admin") === "1";
 // ADMIN PANEL UI
 // =========================
 
-if(isAdmin){
+if(
+isAdmin &&
+teacherAuthorized
+){
 
 createAdminPanel();
 
@@ -1083,3 +1086,656 @@ alert(
 findStudent();
 
 };
+// =========================
+// TEACHER EDIT ANSWERS
+// PART 5
+// =========================
+
+function renderAdminStudent(){
+
+let html =
+
+`
+
+<h3>
+
+${adminStudentDoc.studentName}
+
+</h3>
+
+<p>
+
+Score :
+
+<b>
+
+${adminStudentDoc.score || 0}
+
+</b>
+
+</p>
+
+<button
+onclick="unlockAllQuestions()">
+
+Unlock Student Sheet
+
+</button>
+
+<br><br>
+
+<h3>
+Edit Answers
+</h3>
+
+`;
+
+const answers =
+adminStudentDoc.answers || {};
+
+Object.keys(
+answers
+).forEach(q=>{
+
+html +=
+
+`
+
+<div
+style="
+padding:10px;
+background:#1e293b;
+margin-bottom:8px;
+border-radius:8px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+flex-wrap:wrap;
+">
+
+<div>
+
+<b>Q${q}</b>
+
+Current :
+
+${answers[q]}
+
+</div>
+
+<div>
+
+<select
+id="edit_${q}">
+
+<option value="A">A</option>
+<option value="B">B</option>
+<option value="C">C</option>
+<option value="D">D</option>
+
+</select>
+
+<button
+onclick="updateStudentAnswer(${q})">
+
+Update
+
+</button>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+document.getElementById(
+"adminStudentInfo"
+).innerHTML =
+html;
+
+setTimeout(()=>{
+
+Object.keys(
+answers
+).forEach(q=>{
+
+const el =
+document.getElementById(
+"edit_" + q
+);
+
+if(el){
+
+el.value =
+answers[q];
+
+}
+
+});
+
+},100);
+
+}
+
+
+// =========================
+// UPDATE ANSWER
+// =========================
+
+window.updateStudentAnswer =
+async function(questionNo){
+
+if(!adminStudentDoc)
+return;
+
+const newAnswer =
+
+document.getElementById(
+"edit_" + questionNo
+).value;
+
+adminStudentDoc.answers[
+questionNo
+] = newAnswer;
+
+let score = 0;
+
+Object.keys(
+adminStudentDoc.answers
+).forEach(q=>{
+
+const studentAns =
+adminStudentDoc.answers[q];
+
+const correctAns =
+answerKey[q];
+
+if(
+studentAns ===
+correctAns
+){
+
+score++;
+
+}
+
+});
+
+adminStudentDoc.score =
+score;
+
+const docId =
+
+activeAssessment.id +
+
+"_" +
+
+adminStudentDoc.studentName
+.replaceAll(
+" ",
+"_"
+);
+
+await updateDoc(
+
+doc(
+db,
+"assessmentResponses",
+docId
+),
+
+{
+
+answers:
+adminStudentDoc.answers,
+
+score:
+adminStudentDoc.score
+
+}
+
+);
+
+alert(
+"Answer Updated"
+);
+
+loadLeaderboard();
+
+findStudent();
+
+};
+// =========================
+// TEACHER PASSWORD SECURITY
+// PART 6
+// =========================
+
+const ADMIN_PASSWORD =
+"MD2025";
+
+const urlParams =
+new URLSearchParams(
+window.location.search
+);
+
+const adminMode =
+urlParams.get("admin");
+
+const adminPass =
+urlParams.get("pass");
+
+let teacherAuthorized =
+false;
+
+
+// =========================
+// ADMIN AUTH CHECK
+// =========================
+
+if(adminMode === "1"){
+
+if(
+adminPass ===
+ADMIN_PASSWORD
+){
+
+teacherAuthorized =
+true;
+
+}
+else{
+
+showTeacherLogin();
+
+}
+
+}
+
+
+// =========================
+// TEACHER LOGIN BOX
+// =========================
+
+function showTeacherLogin(){
+
+document.body.innerHTML =
+
+`
+
+<div
+style="
+max-width:500px;
+margin:80px auto;
+background:#111827;
+padding:30px;
+border-radius:15px;
+color:white;
+">
+
+<h2
+style="
+color:#facc15;
+margin-bottom:20px;
+">
+
+Teacher Access
+
+</h2>
+
+<input
+id="teacherPassword"
+type="password"
+placeholder="Enter Teacher Password"
+style="
+width:100%;
+padding:12px;
+border-radius:8px;
+margin-bottom:15px;
+">
+
+<button
+onclick="verifyTeacherPassword()"
+style="
+width:100%;
+padding:12px;
+background:#facc15;
+border:none;
+border-radius:8px;
+font-weight:bold;
+cursor:pointer;
+">
+
+Login
+
+</button>
+
+</div>
+
+`;
+
+}
+
+
+// =========================
+// VERIFY PASSWORD
+// =========================
+
+window.verifyTeacherPassword =
+function(){
+
+const pass =
+
+document.getElementById(
+"teacherPassword"
+).value;
+
+if(
+pass ===
+ADMIN_PASSWORD
+){
+
+location.href =
+
+location.pathname +
+
+"?admin=1&pass=" +
+
+ADMIN_PASSWORD;
+
+}
+else{
+
+alert(
+"Wrong Password"
+);
+
+}
+
+};
+
+
+// =========================
+// PROTECT ADMIN PANEL
+// =========================
+
+function adminAllowed(){
+
+return teacherAuthorized;
+
+}
+// =========================
+// STUDENT PROTECTION SYSTEM
+// PART 7
+// =========================
+
+let studentLocked = false;
+
+
+// =========================
+// LOCK STUDENT NAME
+// =========================
+
+function lockStudentIdentity(){
+
+const nameBox =
+document.getElementById(
+"studentName"
+);
+
+if(!nameBox) return;
+
+nameBox.disabled = true;
+
+studentLocked = true;
+
+}
+
+
+// =========================
+// OVERRIDE LOAD STUDENT
+// =========================
+
+const originalLoadStudent =
+loadStudentSheet;
+
+loadStudentSheet =
+async function(){
+
+if(studentLocked){
+
+alert(
+"Student already loaded"
+);
+
+return;
+
+}
+
+await originalLoadStudent();
+
+lockStudentIdentity();
+
+};
+
+
+// =========================
+// DUPLICATE CHECK
+// =========================
+
+async function studentExists(name){
+
+const docId =
+
+activeAssessment.id +
+
+"_" +
+
+name.replaceAll(
+" ",
+"_"
+);
+
+const snap =
+
+await getDoc(
+
+doc(
+db,
+"assessmentResponses",
+docId
+)
+
+);
+
+return snap.exists();
+
+}
+
+
+// =========================
+// AUTO SAVE
+// =========================
+
+setInterval(
+async ()=>{
+
+if(
+!currentStudent
+) return;
+
+if(
+Object.keys(
+studentRecord.answers || {}
+).length === 0
+){
+return;
+}
+
+try{
+
+await setDoc(
+
+doc(
+db,
+"assessmentResponses",
+
+activeAssessment.id +
+
+"_" +
+
+currentStudent
+.replaceAll(
+" ",
+"_"
+)
+
+),
+
+{
+
+assessmentId:
+activeAssessment.id,
+
+studentName:
+currentStudent,
+
+answers:
+studentRecord.answers,
+
+lockedQuestions:
+studentRecord.lockedQuestions || [],
+
+score:
+studentRecord.score || 0,
+
+updatedAt:
+serverTimestamp()
+
+},
+
+{
+merge:true
+}
+
+);
+
+console.log(
+"Auto Saved"
+);
+
+}
+catch(err){
+
+console.error(
+"Auto Save Failed",
+err
+);
+
+}
+
+},
+30000
+);
+
+
+// =========================
+// BEFORE REFRESH WARNING
+// =========================
+
+window.addEventListener(
+"beforeunload",
+function(e){
+
+if(
+currentStudent &&
+Object.keys(
+studentRecord.answers || {}
+).length > 0
+){
+
+e.preventDefault();
+
+e.returnValue = "";
+
+}
+
+}
+);
+
+
+// =========================
+// SESSION RESTORE
+// =========================
+
+window.addEventListener(
+"load",
+()=>{
+
+const savedName =
+
+localStorage.getItem(
+"assessmentStudent"
+);
+
+if(savedName){
+
+document.getElementById(
+"studentName"
+).value =
+savedName;
+
+}
+
+}
+);
+
+
+// =========================
+// SAVE NAME
+// =========================
+
+document
+.getElementById(
+"studentName"
+)
+.addEventListener(
+"change",
+function(){
+
+localStorage.setItem(
+"assessmentStudent",
+this.value
+);
+
+}
+);
+
+
+// =========================
+// STATUS IMPROVEMENT
+// =========================
+
+function showStatus(msg){
+
+const box =
+document.getElementById(
+"statusBox"
+);
+
+if(!box) return;
+
+box.innerHTML = msg;
+
+setTimeout(()=>{
+
+if(box.innerHTML === msg){
+
+box.innerHTML = "";
+
+}
+
+},4000);
+
+}
