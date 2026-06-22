@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>
+MD Assignment Report
+</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:
+Segoe UI,
+Arial,
+sans-serif;
+}
+
+body{
+background:
+linear-gradient(
+135deg,
+#020617,
+#0f172a,
+#020617
+);
+color:white;
+min-height:100vh;
+}
+
+header{
+background:#082f49;
+padding:15px 20px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.logo{
+font-size:28px;
+font-weight:700;
+color:#facc15;
+}
+
+.container{
+max-width:1400px;
+margin:auto;
+padding:20px;
+}
+
+.card{
+background:#111827;
+padding:20px;
+border-radius:16px;
+margin-bottom:20px;
+box-shadow:
+0 0 20px rgba(0,0,0,.35);
+}
+
+h2{
+color:#facc15;
+margin-bottom:15px;
+}
+
+select,
+input,
+button{
+width:100%;
+padding:12px;
+border:none;
+border-radius:10px;
+margin-top:10px;
+}
+
+button{
+background:#facc15;
+font-weight:bold;
+cursor:pointer;
+}
+
+button:hover{
+background:#fde047;
+}
+
+.rangeRow{
+display:grid;
+grid-template-columns:
+1fr 1fr;
+gap:10px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:15px;
+}
+
+th,
+td{
+border:1px solid #334155;
+padding:10px;
+text-align:center;
+}
+
+th{
+background:#1e293b;
+}
+
+.studentBtn{
+background:#2563eb;
+padding:6px 12px;
+border-radius:8px;
+cursor:pointer;
+color:white;
+border:none;
+}
+
+.studentBtn:hover{
+background:#1d4ed8;
+}
+
+.correct{
+background:#16a34a;
+}
+
+.wrong{
+background:#dc2626;
+}
+
+.blank{
+background:#64748b;
+}
+
+.analysisGrid{
+display:grid;
+grid-template-columns:
+repeat(auto-fill,minmax(70px,1fr));
+gap:8px;
+margin-top:15px;
+}
+
+.qBox{
+padding:10px;
+border-radius:8px;
+text-align:center;
+font-weight:bold;
+}
+
+#studentDetail{
+display:none;
+}
+
+.downloadBtn{
+background:#22c55e;
+margin-top:15px;
+}
+
+.downloadBtn:hover{
+background:#16a34a;
+}
+
+.summaryBox{
+background:#1e293b;
+padding:15px;
+border-radius:10px;
+margin-top:15px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">
+MD ASSIGNMENT REPORT
+</div>
+
+<div>
+Teacher Dashboard
+</div>
+
+</header>
+
+<div class="container">
+
+<!-- Assessment Selection -->
+
+<div class="card">
+
+<h2>
+Select Assessment
+</h2>
+
+<select id="assessmentSelect">
+
+<option value="">
+Loading Assessments...
+</option>
+
+</select>
+
+</div>
+
+<!-- Range Result -->
+
+<div class="card">
+
+<h2>
+Question Range Result
+</h2>
+
+<div class="rangeRow">
+
+<input
+id="fromQuestion"
+type="number"
+placeholder="From Question">
+
+<input
+id="toQuestion"
+type="number"
+placeholder="To Question">
+
+</div>
+
+<button
+id="showRangeBtn">
+
+Show Result
+
+</button>
+
+<div id="reportSummary">
+
+</div>
+
+</div>
+
+<!-- Final Leaderboard -->
+
+<div class="card">
+
+<h2>
+🏆 Final Leaderboard
+</h2>
+
+<div id="leaderboardReport">
+
+Loading...
+
+</div>
+
+</div>
+
+<!-- Student Detail -->
+
+<div
+class="card"
+id="studentDetail">
+
+<h2>
+Student Detail Report
+</h2>
+
+<div id="detailBody">
+
+</div>
+
+</div>
+
+<!-- Download -->
+
+<div class="card">
+
+<h2>
+Download Assessment Report
+</h2>
+
+<button
+id="downloadReportBtn"
+class="downloadBtn">
+
+Download Complete Report
+
+</button>
+
+</div>
+
+</div>
+
+<script
+type="module"
+src="js/assignment-report.js">
+</script>
+
+</body>
+</html>
