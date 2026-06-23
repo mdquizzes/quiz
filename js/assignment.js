@@ -11,7 +11,9 @@ collection,
 query,
 getDocs,
 doc,
-getDoc
+getDoc,
+setDoc,
+serverTimestamp
 }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -385,13 +387,6 @@ loadAssessment();
 // PART 2
 // SAVE + LOCK + NEXT PAGE
 // =========================
-
-import {
-doc,
-setDoc,
-serverTimestamp
-}
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const saveBtn =
 document.getElementById(
