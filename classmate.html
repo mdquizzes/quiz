@@ -93,6 +93,8 @@ background:var(--light);
 border-radius:15px;
 padding:25px;
 box-shadow:var(--shadow);
+max-width:600px;
+margin:0 auto;
 
 }
 
@@ -127,10 +129,12 @@ margin-top:8px;
 
 select{
 
+width:100%;
 padding:10px;
 font-size:18px;
 border-radius:8px;
 margin-top:8px;
+border:2px solid #ccc;
 
 }
 
@@ -142,6 +146,7 @@ font-size:18px;
 cursor:pointer;
 border-radius:10px;
 transition:.25s;
+margin-top:20px;
 
 }
 
@@ -234,6 +239,7 @@ padding:15px;
 background:#FFF8E1;
 border-radius:15px;
 padding:20px;
+overflow-y:auto;
 
 }
 
@@ -241,9 +247,32 @@ padding:20px;
 
 display:flex;
 justify-content:space-between;
-font-size:22px;
+align-items:center;
+font-size:16px;
 font-weight:bold;
 margin-bottom:15px;
+flex-wrap:wrap;
+gap:10px;
+
+}
+
+.timerBarContainer{
+
+flex:1;
+min-width:200px;
+height:20px;
+background:#ddd;
+border-radius:10px;
+overflow:hidden;
+
+}
+
+#timerBar{
+
+height:100%;
+background:#4CAF50;
+width:100%;
+transition:width 0.3s;
 
 }
 
@@ -253,31 +282,36 @@ flex:1;
 display:flex;
 justify-content:center;
 align-items:center;
-overflow:hidden;
+overflow:auto;
+padding:10px;
 
 }
 
 #grid{
 
 display:grid;
-gap:3px;
+gap:4px;
+padding:10px;
+background:white;
+border-radius:10px;
 
 }
 
 .cell{
 
-width:34px;
-height:34px;
+width:40px;
+height:40px;
 display:flex;
 justify-content:center;
 align-items:center;
 background:#ECEFF1;
 font-weight:bold;
-font-size:20px;
+font-size:16px;
 cursor:pointer;
 border-radius:6px;
 user-select:none;
 transition:.15s;
+border:2px solid transparent;
 
 }
 
@@ -291,6 +325,7 @@ background:#90CAF9;
 
 background:#2196F3;
 color:white;
+border:2px solid #0B3D91;
 
 }
 
@@ -307,12 +342,26 @@ display:flex;
 justify-content:space-between;
 align-items:center;
 margin-top:15px;
+gap:10px;
+flex-wrap:wrap;
 
 }
 
 #selectedWord{
 
-font-size:22px;
+font-size:18px;
+font-weight:bold;
+color:var(--blue);
+padding:10px;
+background:#F0F0F0;
+border-radius:8px;
+min-height:20px;
+
+}
+
+.wordCounter{
+
+font-size:16px;
 font-weight:bold;
 color:var(--blue);
 
@@ -325,11 +374,42 @@ gap:15px;
 
 }
 
+.controls button{
+
+margin:0;
+padding:10px 20px;
+font-size:16px;
+
+}
+
 #leaderboard{
 
-margin-top:20px;
-font-size:22px;
-line-height:2;
+margin-top:10px;
+font-size:18px;
+line-height:2.2;
+
+}
+
+.leaderboard-item{
+
+display:flex;
+justify-content:space-between;
+padding:5px 0;
+border-bottom:1px solid #ddd;
+
+}
+
+.leaderboard-item .rank{
+
+font-weight:bold;
+min-width:30px;
+
+}
+
+.leaderboard-item .score{
+
+font-weight:bold;
+color:var(--green);
 
 }
 
@@ -344,6 +424,7 @@ background:rgba(0,0,0,.6);
 display:none;
 justify-content:center;
 align-items:center;
+z-index:1000;
 
 }
 
@@ -354,12 +435,20 @@ padding:40px;
 border-radius:20px;
 text-align:center;
 width:420px;
+box-shadow:var(--shadow);
 
 }
 
 .popupBox h1{
 
 color:var(--blue);
+
+}
+
+.popupBox h2{
+
+color:var(--blue2);
+margin:20px 0;
 
 }
 
@@ -377,11 +466,7 @@ color:var(--blue);
 
 <div id="setupPage" class="page active">
 
-<div class="header">
-
-CLASSMATE WORD SEARCH
-
-</div>
+<div class="header">CLASSMATE WORD SEARCH</div>
 
 <div class="content">
 
@@ -389,19 +474,11 @@ CLASSMATE WORD SEARCH
 
 <h2>Teacher Setup</h2>
 
-<label>
-
-Student Names (One Per Line)
-
-</label>
+<label>Student Names (One Per Line)</label>
 
 <textarea id="studentInput"></textarea>
 
-<label>
-
-Time Limit
-
-</label>
+<label>Time Limit</label>
 
 <select id="timeSelect">
 
@@ -415,13 +492,21 @@ Time Limit
 
 </select>
 
-<br><br>
+<label>Grid Size</label>
 
-<button id="startBtn" class="primary">
+<select id="gridSelect">
 
-START GAME
+<option value="10">10x10</option>
 
-</button>
+<option value="15" selected>15x15</option>
+
+<option value="20">20x20</option>
+
+<option value="25">25x25</option>
+
+</select>
+
+<button id="startBtn" class="primary">START GAME</button>
 
 </div>
 
@@ -435,17 +520,11 @@ START GAME
 
 <div id="studentPage" class="page">
 
-<div class="header">
-
-SELECT YOUR NAME
-
-</div>
+<div class="header">SELECT YOUR NAME</div>
 
 <div class="content">
 
-<div id="studentGrid" class="studentGrid">
-
-</div>
+<div id="studentGrid" class="studentGrid"></div>
 
 </div>
 
@@ -457,11 +536,7 @@ SELECT YOUR NAME
 
 <div id="gamePage" class="page">
 
-<div class="header">
-
-CLASSMATE WORD SEARCH
-
-</div>
+<div class="header">CLASSMATE WORD SEARCH</div>
 
 <div class="content">
 
@@ -470,85 +545,36 @@ CLASSMATE WORD SEARCH
 <div class="left">
 
 <div class="infoBar">
-<div id="timerBarBox">
+
+<div class="timerBarContainer">
 <div id="timerBar"></div>
 </div>
-<div>
 
-Player :
+<div style="min-width:120px;">Player: <span id="playerName" style="font-weight:bold;color:var(--blue2)"></span></div>
 
-<span id="playerName"></span>
-
-</div>
-
-<div>
-
-Score :
-
-<span id="score">0</span>
-
-</div>
-
-<div>
-
-Time :
-
-<span id="timer">00:00</span>
-
-</div>
+<div style="min-width:100px;">Time: <span id="timer">00:00</span></div>
 
 </div>
 
 <div class="gridHolder">
-
-<div id="grid">
-
-</div>
-
+<div id="grid"></div>
 </div>
 
 <div class="bottomBar">
-  <div id="wordCounter">
 
-Words Found :
-
-<span id="foundCount">
-
-0
-
-</span>
-
-/
-
-<span id="totalWords">
-
-0
-
-</span>
-
+<div class="wordCounter">
+Found: <span id="foundCount">0</span> / <span id="totalWords">0</span>
 </div>
 
-<div>
-
-Selected :
-
-<span id="selectedWord"></span>
-
-</div>
+<div id="selectedWord"></div>
 
 <div class="controls">
 
-<button id="clearBtn" class="primary">
+<button id="clearBtn" class="primary">CLEAR</button>
 
-CLEAR
+<button id="submitBtn" class="success">SUBMIT</button>
 
-</button>
-
-<button id="finishBtn" class="success">
-
-FINISH TURN
-
-</button>
+<button id="finishBtn" class="primary">FINISH</button>
 
 </div>
 
@@ -558,17 +584,13 @@ FINISH TURN
 
 <div class="right">
 
-<h2 style="text-align:center;color:#F57C00">
+<h2 style="text-align:center;color:#F57C00">🏆 Leaderboard</h2>
 
-🏆 Leaderboard
+<div id="leaderboard">No Scores Yet</div>
 
-</h2>
+<h2 style="text-align:center;color:#1976D2;font-size:18px;margin-top:20px;">📝 Names</h2>
 
-<div id="leaderboard">
-
-No Scores Yet
-
-</div>
+<div id="namesList" style="font-size:14px;line-height:1.8;"></div>
 
 </div>
 
@@ -584,65 +606,41 @@ No Scores Yet
 
 <div class="popupBox">
 
-<h1>
+<h1>⏰ TIME UP</h1>
 
-TIME UP
+<h2 id="popupText"></h2>
 
-</h1>
-
-<h2 id="popupText">
-
-</h2>
-
-<br>
-
-<button id="nextBtn" class="primary">
-
-NEXT PLAYER
-
-</button>
+<button id="nextBtn" class="primary">NEXT PLAYER</button>
 
 </div>
 
 </div>
-<div id="winnerPopup">
 
-<div id="winnerCard">
+<div id="winnerPopup" class="popup">
 
-<h1>
+<div class="popupBox">
 
-🏆 Champion
+<h1>🏆 CHAMPION</h1>
 
-</h1>
+<h2 id="winnerName"></h2>
 
-<h2 id="winnerName">
-
-</h2>
-
-<table id="finalTable">
+<table id="finalTable" style="width:100%;margin:20px 0;border-collapse:collapse;">
 
 </table>
 
-<button id="newGameBtn"
-
-class="primary">
-
-NEW GAME
-
-</button>
+<button id="newGameBtn" class="primary">NEW GAME</button>
 
 </div>
 
 </div>
+
 <script>
 
 //==================================================
 // GLOBAL VARIABLES
 //==================================================
 
-const GRID_COLS = 30;
-const GRID_ROWS = 18;
-
+let gridSize = 15;
 let students = [];
 let leaderboard = [];
 
@@ -654,12 +652,9 @@ let timer = 120;
 let timerInterval = null;
 
 let puzzle = [];
-
-let foundWords = [];
-
 let selectedCells = [];
 let selectedWord = "";
-
+let foundWords = [];
 
 //==================================================
 // ELEMENTS
@@ -668,23 +663,15 @@ let selectedWord = "";
 const setupPage = document.getElementById("setupPage");
 const studentPage = document.getElementById("studentPage");
 const gamePage = document.getElementById("gamePage");
-
 const studentGrid = document.getElementById("studentGrid");
-
 const startBtn = document.getElementById("startBtn");
-
 const studentInput = document.getElementById("studentInput");
-
 const timeSelect = document.getElementById("timeSelect");
-
+const gridSelect = document.getElementById("gridSelect");
 const leaderboardDiv = document.getElementById("leaderboard");
-
 const playerName = document.getElementById("playerName");
-
 const scoreText = document.getElementById("score");
-
 const timerText = document.getElementById("timer");
-
 
 //==================================================
 // START GAME
@@ -694,55 +681,39 @@ startBtn.addEventListener("click", setupGame);
 
 function setupGame(){
 
-students = [];
+  students = [];
+  leaderboard = [];
 
-leaderboard = [];
+  let list = studentInput.value
+    .split("\n")
+    .map(x=>x.trim())
+    .filter(x=>x!="");
 
-let list = studentInput.value
-.split("\n")
-.map(x=>x.trim())
-.filter(x=>x!="");
+  list = [...new Set(list)];
 
-// remove duplicate names
+  if(list.length < 2){
+    alert("Please enter at least 2 students.");
+    return;
+  }
 
-list = [...new Set(list)];
+  gameTime = parseInt(timeSelect.value);
+  gridSize = parseInt(gridSelect.value);
+  students = list;
 
-if(list.length < 2){
+  students.forEach(name=>{
+    leaderboard.push({
+      name:name,
+      score:0,
+      played:false,
+      found:[]
+    });
+  });
 
-alert("Please enter at least 2 students.");
-
-return;
-
+  buildStudentCards();
+  refreshLeaderboard();
+  setupPage.classList.remove("active");
+  studentPage.classList.add("active");
 }
-
-gameTime = parseInt(timeSelect.value);
-
-students = list;
-
-students.forEach(name=>{
-
-leaderboard.push({
-
-name:name,
-
-score:0,
-
-played:false
-
-});
-
-});
-
-buildStudentCards();
-
-refreshLeaderboard();
-
-setupPage.classList.remove("active");
-
-studentPage.classList.add("active");
-
-}
-
 
 //==================================================
 // STUDENT CARDS
@@ -750,30 +721,19 @@ studentPage.classList.add("active");
 
 function buildStudentCards(){
 
-studentGrid.innerHTML="";
+  studentGrid.innerHTML="";
 
-students.forEach(name=>{
-
-let card=document.createElement("div");
-
-card.className="studentCard";
-
-card.dataset.name=name;
-
-card.innerHTML="👤<br>"+name;
-
-card.onclick=function(){
-
-beginTurn(name);
-
-};
-
-studentGrid.appendChild(card);
-
-});
-
+  students.forEach(name=>{
+    let card=document.createElement("div");
+    card.className="studentCard";
+    card.dataset.name=name;
+    card.innerHTML="👤<br>"+name;
+    card.onclick=function(){
+      beginTurn(name);
+    };
+    studentGrid.appendChild(card);
+  });
 }
-
 
 //==================================================
 // BEGIN TURN
@@ -781,34 +741,203 @@ studentGrid.appendChild(card);
 
 function beginTurn(name){
 
-currentPlayer=name;
+  currentPlayer=name;
+  currentScore=0;
+  selectedCells=[];
+  selectedWord="";
+  foundWords=[];
 
-currentScore=0;
+  playerName.innerHTML=name;
+  timer=gameTime;
+  updateTimer();
 
-selectedCells=[];
+  studentPage.classList.remove("active");
+  gamePage.classList.add("active");
 
-selectedWord="";
+  generatePuzzle();
+  renderGrid();
+  updateNamesList();
+  refreshLeaderboard();
 
-foundWords=[];
-
-playerName.innerHTML=name;
-
-scoreText.innerHTML="0";
-
-timer=gameTime;
-
-updateTimer();
-
-studentPage.classList.remove("active");
-
-gamePage.classList.add("active");
-
-startTimer();
-
-generatePuzzle();
-
+  startTimer();
 }
 
+//==================================================
+// GENERATE PUZZLE
+//==================================================
+
+function generatePuzzle(){
+
+  puzzle = [];
+  for(let i=0; i<gridSize*gridSize; i++){
+    puzzle.push({
+      letter: String.fromCharCode(65 + Math.floor(Math.random()*26)),
+      index: i,
+      isSelected: false
+    });
+  }
+
+  // Place student names in grid
+  students.forEach(name => {
+    placeNameInGrid(name.toUpperCase());
+  });
+}
+
+function placeNameInGrid(name){
+
+  const directions = [
+    {x:1, y:0},  // right
+    {x:-1, y:0}, // left
+    {x:0, y:1},  // down
+    {x:0, y:-1}, // up
+    {x:1, y:1},  // diagonal down-right
+    {x:-1, y:-1}, // diagonal up-left
+    {x:1, y:-1},  // diagonal down-left
+    {x:-1, y:1}   // diagonal up-right
+  ];
+
+  let placed = false;
+  let attempts = 0;
+
+  while(!placed && attempts < 50){
+    attempts++;
+
+    const direction = directions[Math.floor(Math.random()*directions.length)];
+    const startRow = Math.floor(Math.random()*gridSize);
+    const startCol = Math.floor(Math.random()*gridSize);
+
+    let canPlace = true;
+    let positions = [];
+
+    for(let i=0; i<name.length; i++){
+      const row = startRow + (direction.y * i);
+      const col = startCol + (direction.x * i);
+
+      if(row < 0 || row >= gridSize || col < 0 || col >= gridSize){
+        canPlace = false;
+        break;
+      }
+
+      const index = row * gridSize + col;
+      positions.push(index);
+    }
+
+    if(canPlace){
+      for(let i=0; i<name.length; i++){
+        puzzle[positions[i]].letter = name[i];
+      }
+      placed = true;
+    }
+  }
+}
+
+//==================================================
+// RENDER GRID
+//==================================================
+
+function renderGrid(){
+
+  const gridDiv = document.getElementById("grid");
+  gridDiv.innerHTML = "";
+  gridDiv.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+
+  puzzle.forEach((cell, index) => {
+    const cellDiv = document.createElement("div");
+    cellDiv.className = "cell";
+    cellDiv.textContent = cell.letter;
+    cellDiv.dataset.index = index;
+
+    if(cell.isSelected){
+      cellDiv.classList.add("selected");
+    }
+
+    cellDiv.onclick = function(){
+      selectCell(index);
+    };
+
+    gridDiv.appendChild(cellDiv);
+  });
+}
+
+//==================================================
+// CELL SELECTION
+//==================================================
+
+function selectCell(index){
+
+  const cell = puzzle[index];
+
+  if(selectedCells.includes(index)){
+    selectedCells = selectedCells.filter(i => i !== index);
+    cell.isSelected = false;
+  } else {
+    selectedCells.push(index);
+    cell.isSelected = true;
+  }
+
+  selectedWord = selectedCells.map(i => puzzle[i].letter).join("");
+  document.getElementById("selectedWord").textContent = selectedWord || "No selection";
+
+  renderGrid();
+}
+
+//==================================================
+// SUBMIT WORD
+//==================================================
+
+document.getElementById("submitBtn").onclick = function(){
+
+  if(selectedWord.length === 0){
+    alert("Select letters first!");
+    return;
+  }
+
+  const matchedName = students.find(name => name.toUpperCase() === selectedWord);
+
+  if(matchedName && !foundWords.includes(matchedName.toUpperCase())){
+    foundWords.push(matchedName.toUpperCase());
+    currentScore += matchedName.length * 10; // 10 points per letter
+
+    // Mark cells as correct
+    selectedCells.forEach(index => {
+      puzzle[index].isSelected = false;
+      puzzle[index].correct = true;
+    });
+
+    document.getElementById("foundCount").textContent = foundWords.length;
+
+    selectedCells = [];
+    selectedWord = "";
+    document.getElementById("selectedWord").textContent = "";
+
+    renderGrid();
+    updateLeaderboardScore();
+    updateNamesList();
+
+  } else if(matchedName){
+    alert("Already found: " + matchedName);
+    selectedCells = [];
+    selectedWord = "";
+    document.getElementById("selectedWord").textContent = "";
+    renderGrid();
+  } else {
+    alert("Not a classmate name!");
+    selectedCells = [];
+    selectedWord = "";
+    document.getElementById("selectedWord").textContent = "";
+    renderGrid();
+  }
+};
+
+document.getElementById("clearBtn").onclick = function(){
+  selectedCells.forEach(index => {
+    puzzle[index].isSelected = false;
+  });
+  selectedCells = [];
+  selectedWord = "";
+  document.getElementById("selectedWord").textContent = "";
+  renderGrid();
+};
 
 //==================================================
 // TIMER
@@ -816,219 +945,173 @@ generatePuzzle();
 
 function startTimer(){
 
-clearInterval(timerInterval);
+  clearInterval(timerInterval);
 
-timerInterval=setInterval(()=>{
+  timerInterval=setInterval(()=>{
+    timer--;
+    updateTimer();
 
-timer--;
-
-updateTimer();
-
-if(timer<=0){
-
-clearInterval(timerInterval);
-
-finishTurn();
-
-}
-
-},1000);
-
+    if(timer<=0){
+      clearInterval(timerInterval);
+      finishTurn();
+    }
+  },1000);
 }
 
 function updateTimer(){
 
-let m=Math.floor(timer/60);
+  let m=Math.floor(timer/60);
+  let s=timer%60;
 
-let s=timer%60;
+  timerText.innerHTML=
+    String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
 
-timerText.innerHTML=
+  let percent=(timer/gameTime)*100;
+  const bar=document.getElementById("timerBar");
 
-String(m).padStart(2,"0")
+  bar.style.width=percent+"%";
 
-+":"
+  if(percent<50){
+    bar.style.background="#F9A825";
+  }
 
-+
-
-String(s).padStart(2,"0");
-
-let percent=(timer/gameTime)*100;
-
-const bar=document.getElementById("timerBar");
-
-bar.style.width=percent+"%";
-
-if(percent<50){
-
-bar.style.background="#F9A825";
-
+  if(percent<25){
+    bar.style.background="#D32F2F";
+  }
 }
 
-if(percent<25){
+//==================================================
+// UPDATE NAMES LIST
+//==================================================
 
-bar.style.background="#D32F2F";
+function updateNamesList(){
 
+  const namesList = document.getElementById("namesList");
+  namesList.innerHTML = "";
+
+  students.forEach(name => {
+    const found = foundWords.includes(name.toUpperCase());
+    const span = document.createElement("div");
+    span.style.color = found ? "#4CAF50" : "#666";
+    span.textContent = (found ? "✓ " : "○ ") + name;
+    namesList.appendChild(span);
+  });
 }
-
-}
-
 
 //==================================================
 // LEADERBOARD
 //==================================================
 
-function refreshLeaderboard(){
+function updateLeaderboardScore(){
 
-leaderboard.sort((a,b)=>b.score-a.score);
+  leaderboard.forEach(player=>{
+    if(player.name==currentPlayer){
+      player.score=currentScore;
+    }
+  });
 
-leaderboardDiv.innerHTML="";
-
-leaderboard.forEach((player,index)=>{
-
-let row=document.createElement("div");
-
-row.style.marginBottom="10px";
-
-row.innerHTML=
-
-(index+1)+". "
-
-+
-
-player.name+
-
-"<span style='float:right'>"
-
-+
-
-player.score+
-
-"</span>";
-
-leaderboardDiv.appendChild(row);
-
-});
-
+  refreshLeaderboard();
 }
 
+function refreshLeaderboard(){
+
+  leaderboard.sort((a,b)=>b.score-a.score);
+
+  leaderboardDiv.innerHTML="";
+
+  leaderboard.forEach((player,index)=>{
+    const div = document.createElement("div");
+    div.className = "leaderboard-item";
+    div.innerHTML = `
+      <span class="rank">${index+1}.</span>
+      <span>${player.name}</span>
+      <span class="score">${player.score}</span>
+    `;
+    leaderboardDiv.appendChild(div);
+  });
+}
 
 //==================================================
 // FINISH TURN
 //==================================================
 
+document.getElementById("finishBtn").onclick = function(){
+  clearInterval(timerInterval);
+  finishTurn();
+};
+
 function finishTurn(){
 
-clearInterval(timerInterval);
+  clearInterval(timerInterval);
 
-leaderboard.forEach(player=>{
+  leaderboard.forEach(player=>{
+    if(player.name==currentPlayer){
+      player.score=currentScore;
+      player.played=true;
+    }
+  });
 
-if(player.name==currentPlayer){
+  refreshLeaderboard();
 
-player.score=currentScore;
-
-player.played=true;
-
+  document.getElementById("popup").style.display="flex";
+  document.getElementById("popupText").innerHTML=
+    currentPlayer+"<br><br>Score : <b>"+currentScore+"</b><br>Found: <b>"+foundWords.length+"</b> names";
 }
-
-});
-
-refreshLeaderboard();
-
-popup.style.display="flex";
-
-popupText.innerHTML=
-
-currentPlayer+
-
-"<br><br>Score : <b>"+
-
-currentScore+
-
-"</b>";
-
-}
-
 
 //==================================================
 // NEXT PLAYER
 //==================================================
 
-nextBtn.onclick=function(){
+document.getElementById("nextBtn").onclick=function(){
 
-popup.style.display="none";
+  document.getElementById("popup").style.display="none";
 
-document.querySelectorAll(".studentCard").forEach(card=>{
+  document.querySelectorAll(".studentCard").forEach(card=>{
+    if(card.dataset.name==currentPlayer){
+      card.classList.add("studentDone");
+    }
+  });
 
-if(card.dataset.name==currentPlayer){
+  gamePage.classList.remove("active");
+  studentPage.classList.add("active");
 
-card.classList.add("studentDone");
+  let finished=true;
 
-}
+  leaderboard.forEach(player=>{
+    if(!player.played){
+      finished=false;
+    }
+  });
 
-});
-
-gamePage.classList.remove("active");
-
-studentPage.classList.add("active");
-
-let finished=true;
-
-leaderboard.forEach(player=>{
-
-if(!player.played){
-
-finished=false;
-
-}
-
-});
-
-if(finished){
+  if(finished){
+    setTimeout(showWinner, 1000);
+  }
+};
 
 function showWinner(){
 
-leaderboard.sort((a,b)=>b.score-a.score);
+  leaderboard.sort((a,b)=>b.score-a.score);
 
-document.getElementById("winnerPopup").style.display="flex";
+  document.getElementById("winnerPopup").style.display="flex";
 
-document.getElementById("winnerName").innerHTML=
+  document.getElementById("winnerName").innerHTML=
+    leaderboard[0].name + " 🎉";
 
-leaderboard[0].name;
+  document.getElementById("finalTable").innerHTML="";
 
-document.getElementById("finalTable").innerHTML="";
-
-leaderboard.forEach(player=>{
-
-let row=document.createElement("tr");
-
-row.innerHTML="<td>"+player.name+"</td><td style='text-align:right'>"+player.score+"</td>";
-
-document.getElementById("finalTable").appendChild(row);
-
-});
-
+  leaderboard.forEach((player,index)=>{
+    let row=document.createElement("tr");
+    row.style.borderBottom="1px solid #ddd";
+    row.innerHTML=`
+      <td style="padding:10px;text-align:left;"><strong>${index+1}. ${player.name}</strong></td>
+      <td style="padding:10px;text-align:right;color:var(--green);font-weight:bold;">${player.score}</td>
+    `;
+    document.getElementById("finalTable").appendChild(row);
+  });
 }
-
-setTimeout(showWinner, 1000);
-
-}
-
-};
-
-nextBtn.onclick.newGameBtn = function(){
-
-setupPage.classList.add("active");
-
-document.getElementById("winnerPopup").style.display="none";
-
-};
 
 document.getElementById("newGameBtn").onclick = function(){
-
-setupPage.classList.add("active");
-
-document.getElementById("winnerPopup").style.display="none";
-
+  location.reload();
 };
 
 </script>
