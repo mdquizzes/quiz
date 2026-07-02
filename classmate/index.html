@@ -1,0 +1,1666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ClassMate Word Search</title>
+
+<style>
+
+:root{
+
+--blue:#0B3D91;
+--blue2:#1565C0;
+--light:#F5F7FB;
+--green:#2E7D32;
+--gold:#F9A825;
+--red:#D32F2F;
+--shadow:0 10px 25px rgba(0,0,0,.15);
+
+}
+
+*{
+
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,Arial,sans-serif;
+
+}
+
+body{
+
+background:#081b33;
+height:100vh;
+overflow:hidden;
+
+}
+
+#app{
+
+width:100%;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+
+}
+
+.page{
+
+display:none;
+width:96%;
+height:94%;
+background:white;
+border-radius:18px;
+overflow:hidden;
+box-shadow:var(--shadow);
+
+}
+
+.page.active{
+
+display:flex;
+flex-direction:column;
+
+}
+
+.header{
+
+background:var(--blue);
+color:white;
+padding:18px;
+font-size:30px;
+font-weight:bold;
+text-align:center;
+letter-spacing:2px;
+
+}
+
+.content{
+
+flex:1;
+padding:25px;
+overflow:auto;
+
+}
+
+.card{
+
+background:var(--light);
+border-radius:15px;
+padding:25px;
+box-shadow:var(--shadow);
+
+}
+
+h2{
+
+margin-bottom:20px;
+color:var(--blue);
+
+}
+
+label{
+
+display:block;
+margin-top:20px;
+font-weight:bold;
+font-size:18px;
+
+}
+
+textarea{
+
+width:100%;
+height:260px;
+padding:15px;
+font-size:18px;
+border-radius:10px;
+border:2px solid #ccc;
+resize:none;
+margin-top:8px;
+
+}
+
+select{
+
+padding:10px;
+font-size:18px;
+border-radius:8px;
+margin-top:8px;
+
+}
+
+button{
+
+border:none;
+padding:15px 35px;
+font-size:18px;
+cursor:pointer;
+border-radius:10px;
+transition:.25s;
+
+}
+
+.primary{
+
+background:var(--blue2);
+color:white;
+
+}
+
+.primary:hover{
+
+transform:scale(1.05);
+
+}
+
+.success{
+
+background:var(--green);
+color:white;
+
+}
+
+.success:hover{
+
+transform:scale(1.05);
+
+}
+
+.studentGrid{
+
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+gap:20px;
+
+}
+
+.studentCard{
+
+background:white;
+border:3px solid var(--blue2);
+padding:25px;
+text-align:center;
+font-size:24px;
+font-weight:bold;
+border-radius:15px;
+cursor:pointer;
+transition:.25s;
+
+}
+
+.studentCard:hover{
+
+background:var(--blue2);
+color:white;
+transform:scale(1.04);
+
+}
+
+.studentDone{
+
+background:var(--green)!important;
+color:white!important;
+border:none!important;
+pointer-events:none;
+
+}
+
+.gameContainer{
+
+display:grid;
+grid-template-columns:1fr 330px;
+gap:20px;
+height:100%;
+
+}
+
+.left{
+
+display:flex;
+flex-direction:column;
+background:#fafafa;
+border-radius:15px;
+padding:15px;
+
+}
+
+.right{
+
+background:#FFF8E1;
+border-radius:15px;
+padding:20px;
+
+}
+
+.infoBar{
+
+display:flex;
+justify-content:space-between;
+font-size:22px;
+font-weight:bold;
+margin-bottom:15px;
+
+}
+
+.gridHolder{
+
+flex:1;
+display:flex;
+justify-content:center;
+align-items:center;
+overflow:hidden;
+
+}
+
+#grid{
+
+display:grid;
+gap:3px;
+
+}
+
+.cell{
+
+width:34px;
+height:34px;
+display:flex;
+justify-content:center;
+align-items:center;
+background:#ECEFF1;
+font-weight:bold;
+font-size:20px;
+cursor:pointer;
+border-radius:6px;
+user-select:none;
+transition:.15s;
+
+}
+
+.cell:hover{
+
+background:#90CAF9;
+
+}
+
+.cell.selected{
+
+background:#2196F3;
+color:white;
+
+}
+
+.cell.correct{
+
+background:#4CAF50;
+color:white;
+
+}
+
+.bottomBar{
+
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-top:15px;
+
+}
+
+#selectedWord{
+
+font-size:22px;
+font-weight:bold;
+color:var(--blue);
+
+}
+
+.controls{
+
+display:flex;
+gap:15px;
+
+}
+
+#leaderboard{
+
+margin-top:20px;
+font-size:22px;
+line-height:2;
+
+}
+
+.popup{
+
+position:fixed;
+left:0;
+top:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.6);
+display:none;
+justify-content:center;
+align-items:center;
+
+}
+
+.popupBox{
+
+background:white;
+padding:40px;
+border-radius:20px;
+text-align:center;
+width:420px;
+
+}
+
+.popupBox h1{
+
+color:var(--blue);
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="app">
+
+<!-- ====================== -->
+<!-- TEACHER PAGE -->
+<!-- ====================== -->
+
+<div id="setupPage" class="page active">
+
+<div class="header">
+
+CLASSMATE WORD SEARCH
+
+</div>
+
+<div class="content">
+
+<div class="card">
+
+<h2>Teacher Setup</h2>
+
+<label>
+
+Student Names (One Per Line)
+
+</label>
+
+<textarea id="studentInput"></textarea>
+
+<label>
+
+Time Limit
+
+</label>
+
+<select id="timeSelect">
+
+<option value="60">1 Minute</option>
+
+<option value="120" selected>2 Minutes</option>
+
+<option value="180">3 Minutes</option>
+
+<option value="300">5 Minutes</option>
+
+</select>
+
+<br><br>
+
+<button id="startBtn" class="primary">
+
+START GAME
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- ====================== -->
+<!-- STUDENT PAGE -->
+<!-- ====================== -->
+
+<div id="studentPage" class="page">
+
+<div class="header">
+
+SELECT YOUR NAME
+
+</div>
+
+<div class="content">
+
+<div id="studentGrid" class="studentGrid">
+
+</div>
+
+</div>
+
+</div>
+
+<!-- ====================== -->
+<!-- GAME PAGE -->
+<!-- ====================== -->
+
+<div id="gamePage" class="page">
+
+<div class="header">
+
+CLASSMATE WORD SEARCH
+
+</div>
+
+<div class="content">
+
+<div class="gameContainer">
+
+<div class="left">
+
+<div class="infoBar">
+<div id="timerBarBox">
+<div id="timerBar"></div>
+</div>
+<div>
+
+Player :
+
+<span id="playerName"></span>
+
+</div>
+
+<div>
+
+Score :
+
+<span id="score">0</span>
+
+</div>
+
+<div>
+
+Time :
+
+<span id="timer">00:00</span>
+
+</div>
+
+</div>
+
+<div class="gridHolder">
+
+<div id="grid">
+
+</div>
+
+</div>
+
+<div class="bottomBar">
+  <div id="wordCounter">
+
+Words Found :
+
+<span id="foundCount">
+
+0
+
+</span>
+
+/
+
+<span id="totalWords">
+
+0
+
+</span>
+
+</div>
+
+<div>
+
+Selected :
+
+<span id="selectedWord"></span>
+
+</div>
+
+<div class="controls">
+
+<button id="clearBtn" class="primary">
+
+CLEAR
+
+</button>
+
+<button id="finishBtn" class="success">
+
+FINISH TURN
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="right">
+
+<h2 style="text-align:center;color:#F57C00">
+
+🏆 Leaderboard
+
+</h2>
+
+<div id="leaderboard">
+
+No Scores Yet
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div id="popup" class="popup">
+
+<div class="popupBox">
+
+<h1>
+
+TIME UP
+
+</h1>
+
+<h2 id="popupText">
+
+</h2>
+
+<br>
+
+<button id="nextBtn" class="primary">
+
+NEXT PLAYER
+
+</button>
+
+</div>
+
+</div>
+<div id="winnerPopup">
+
+<div id="winnerCard">
+
+<h1>
+
+🏆 Champion
+
+</h1>
+
+<h2 id="winnerName">
+
+</h2>
+
+<table id="finalTable">
+
+</table>
+
+<button id="newGameBtn"
+
+class="primary">
+
+NEW GAME
+
+</button>
+
+</div>
+
+</div>
+<script>
+
+//==================================================
+// GLOBAL VARIABLES
+//==================================================
+
+const GRID_COLS = 30;
+const GRID_ROWS = 18;
+
+let students = [];
+let leaderboard = [];
+
+let currentPlayer = "";
+let currentScore = 0;
+
+let gameTime = 120;
+let timer = 120;
+let timerInterval = null;
+
+let puzzle = [];
+
+let foundWords = [];
+
+let selectedCells = [];
+let selectedWord = "";
+
+
+//==================================================
+// ELEMENTS
+//==================================================
+
+const setupPage = document.getElementById("setupPage");
+const studentPage = document.getElementById("studentPage");
+const gamePage = document.getElementById("gamePage");
+
+const studentGrid = document.getElementById("studentGrid");
+
+const startBtn = document.getElementById("startBtn");
+
+const studentInput = document.getElementById("studentInput");
+
+const timeSelect = document.getElementById("timeSelect");
+
+const leaderboardDiv = document.getElementById("leaderboard");
+
+const playerName = document.getElementById("playerName");
+
+const scoreText = document.getElementById("score");
+
+const timerText = document.getElementById("timer");
+
+
+//==================================================
+// START GAME
+//==================================================
+
+startBtn.addEventListener("click", setupGame);
+
+function setupGame(){
+
+students = [];
+
+leaderboard = [];
+
+let list = studentInput.value
+.split("\n")
+.map(x=>x.trim())
+.filter(x=>x!="");
+
+// remove duplicate names
+
+list = [...new Set(list)];
+
+if(list.length < 2){
+
+alert("Please enter at least 2 students.");
+
+return;
+
+}
+
+gameTime = parseInt(timeSelect.value);
+
+students = list;
+
+students.forEach(name=>{
+
+leaderboard.push({
+
+name:name,
+
+score:0,
+
+played:false
+
+});
+
+});
+
+buildStudentCards();
+
+refreshLeaderboard();
+
+setupPage.classList.remove("active");
+
+studentPage.classList.add("active");
+
+}
+
+
+//==================================================
+// STUDENT CARDS
+//==================================================
+
+function buildStudentCards(){
+
+studentGrid.innerHTML="";
+
+students.forEach(name=>{
+
+let card=document.createElement("div");
+
+card.className="studentCard";
+
+card.dataset.name=name;
+
+card.innerHTML="👤<br>"+name;
+
+card.onclick=function(){
+
+beginTurn(name);
+
+};
+
+studentGrid.appendChild(card);
+
+});
+
+}
+
+
+//==================================================
+// BEGIN TURN
+//==================================================
+
+function beginTurn(name){
+
+currentPlayer=name;
+
+currentScore=0;
+
+selectedCells=[];
+
+selectedWord="";
+
+foundWords=[];
+
+playerName.innerHTML=name;
+
+scoreText.innerHTML="0";
+
+timer=gameTime;
+
+updateTimer();
+
+studentPage.classList.remove("active");
+
+gamePage.classList.add("active");
+
+startTimer();
+
+generatePuzzle();
+
+}
+
+
+//==================================================
+// TIMER
+//==================================================
+
+function startTimer(){
+
+clearInterval(timerInterval);
+
+timerInterval=setInterval(()=>{
+
+timer--;
+
+updateTimer();
+
+if(timer<=0){
+
+clearInterval(timerInterval);
+
+finishTurn();
+
+}
+
+},1000);
+
+}
+
+function updateTimer(){
+
+let m=Math.floor(timer/60);
+
+let s=timer%60;
+
+timerText.innerHTML=
+
+String(m).padStart(2,"0")
+
++":"
+
++
+
+String(s).padStart(2,"0");
+
+let percent=(timer/gameTime)*100;
+
+const bar=document.getElementById("timerBar");
+
+bar.style.width=percent+"%";
+
+if(percent<50){
+
+bar.style.background="#F9A825";
+
+}
+
+if(percent<25){
+
+bar.style.background="#D32F2F";
+
+}
+
+}
+
+
+//==================================================
+// LEADERBOARD
+//==================================================
+
+function refreshLeaderboard(){
+
+leaderboard.sort((a,b)=>b.score-a.score);
+
+leaderboardDiv.innerHTML="";
+
+leaderboard.forEach((player,index)=>{
+
+let row=document.createElement("div");
+
+row.style.marginBottom="10px";
+
+row.innerHTML=
+
+(index+1)+". "
+
++
+
+player.name+
+
+"<span style='float:right'>"
+
++
+
+player.score+
+
+"</span>";
+
+leaderboardDiv.appendChild(row);
+
+});
+
+}
+
+
+//==================================================
+// FINISH TURN
+//==================================================
+
+function finishTurn(){
+
+clearInterval(timerInterval);
+
+leaderboard.forEach(player=>{
+
+if(player.name==currentPlayer){
+
+player.score=currentScore;
+
+player.played=true;
+
+}
+
+});
+
+refreshLeaderboard();
+
+popup.style.display="flex";
+
+popupText.innerHTML=
+
+currentPlayer+
+
+"<br><br>Score : <b>"+
+
+currentScore+
+
+"</b>";
+
+}
+
+
+//==================================================
+// NEXT PLAYER
+//==================================================
+
+nextBtn.onclick=function(){
+
+popup.style.display="none";
+
+document.querySelectorAll(".studentCard").forEach(card=>{
+
+if(card.dataset.name==currentPlayer){
+
+card.classList.add("studentDone");
+
+}
+
+});
+
+gamePage.classList.remove("active");
+
+studentPage.classList.add("active");
+
+let finished=true;
+
+leaderboard.forEach(player=>{
+
+if(!player.played){
+
+finished=false;
+
+}
+
+});
+
+if(finished){
+
+setTimeout(()=>{
+
+showWinner();
+
+  function showWinner(){
+
+leaderboard.sort((a,b)=>b.score-a.score);
+
+document.getElementById("winnerPopup").style.display="flex";
+
+document.getElementById("winnerName").innerHTML=
+
+leaderboard[0].name+
+
+"<br><br>"+
+
+leaderboard[0].score+
+
+" Points";
+
+let table="";
+
+leaderboard.forEach((player,index)=>{
+
+table+=`
+
+<tr>
+
+<td>${index+1}</td>
+
+<td>${player.name}</td>
+
+<td>${player.score}</td>
+
+</tr>
+
+`;
+
+});
+
+document.getElementById("finalTable").innerHTML=table;
+
+}
+
+},200);
+
+}
+
+};
+
+
+//==================================================
+// BUTTONS
+//==================================================
+
+clearBtn.onclick=function(){
+
+clearSelection();
+
+};
+  
+selectedCells=[];
+
+selectedWord="";
+
+document.getElementById("selectedWord").innerHTML="";
+
+document.querySelectorAll(".cell").forEach(c=>{
+
+c.classList.remove("selected");
+
+});
+
+};
+
+finishBtn.onclick=function(){
+
+finishTurn();
+
+};
+
+
+//==================================================
+// PLACEHOLDER
+//==================================================
+
+//==================================================
+// GENERATE PUZZLE
+//==================================================
+
+function generatePuzzle(){
+
+const grid=[];
+
+const rows=GRID_ROWS;
+
+const cols=GRID_COLS;
+
+// create empty matrix
+
+for(let r=0;r<rows;r++){
+
+grid[r]=[];
+
+for(let c=0;c<cols;c++){
+
+grid[r][c]="";
+
+}
+
+}
+
+// every student except current player
+
+let words=students
+.filter(x=>x!=currentPlayer)
+.map(x=>x.toUpperCase());
+
+
+// longest first
+
+words.sort((a,b)=>b.length-a.length);
+
+
+// place words
+
+words.forEach(word=>{
+
+const ok=placeWord(grid,word);
+
+if(!ok){
+
+console.log(word+" could not be placed.");
+
+}
+
+});
+
+
+// random letters
+
+for(let r=0;r<rows;r++){
+
+for(let c=0;c<cols;c++){
+
+if(grid[r][c]==""){
+
+grid[r][c]=randomLetter();
+
+}
+
+}
+
+}
+
+
+// save
+
+puzzle=grid;
+
+
+// draw
+
+drawPuzzle();
+
+}
+  //==================================================
+// RANDOM LETTER
+//==================================================
+
+function randomLetter(){
+
+const letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+return letters[Math.floor(Math.random()*letters.length)];
+
+}
+  //==================================================
+// PLACE WORD
+//==================================================
+
+//==================================================
+// SMART WORD PLACEMENT
+//==================================================
+
+function placeWord(grid,word){
+
+const MAX_TRIES=2000;
+
+for(let attempt=0;attempt<MAX_TRIES;attempt++){
+
+    const horizontal=Math.random()<0.5;
+
+    let row,col;
+
+    if(horizontal){
+
+        row=Math.floor(Math.random()*GRID_ROWS);
+        col=Math.floor(Math.random()*(GRID_COLS-word.length+1));
+
+    }else{
+
+        row=Math.floor(Math.random()*(GRID_ROWS-word.length+1));
+        col=Math.floor(Math.random()*GRID_COLS);
+
+    }
+
+    if(canPlaceWord(grid,word,row,col,horizontal)){
+
+        writeWord(grid,word,row,col,horizontal);
+        return true;
+
+    }
+
+}
+
+console.warn("Could not place:",word);
+
+return false;
+
+}
+  //==================================================
+// CHECK IF WORD CAN FIT
+//==================================================
+
+function canPlaceWord(grid,word,row,col,horizontal){
+
+for(let i=0;i<word.length;i++){
+
+    let r=horizontal ? row : row+i;
+    let c=horizontal ? col+i : col;
+
+    let current=grid[r][c];
+
+    if(current!="" && current!=word[i]){
+
+        return false;
+
+    }
+
+}
+
+return true;
+
+}
+  //==================================================
+// WRITE WORD
+//==================================================
+
+function writeWord(grid,word,row,col,horizontal){
+
+for(let i=0;i<word.length;i++){
+
+    let r=horizontal ? row : row+i;
+    let c=horizontal ? col+i : col;
+
+    grid[r][c]=word[i];
+
+}
+
+}
+  //==================================================
+// DRAW GRID
+//==================================================
+
+function drawPuzzle(){
+t
+const gridDiv=document.getElementById("grid");
+
+gridDiv.innerHTML="";
+
+gridDiv.style.gridTemplateColumns=
+`repeat(${GRID_COLS},34px)`;
+
+for(let r=0;r<GRID_ROWS;r++){
+
+for(let c=0;c<GRID_COLS;c++){
+
+const cell=document.createElemen("div");
+
+cell.className="cell";
+
+cell.innerHTML=puzzle[r][c];
+
+cell.dataset.row=r;
+
+cell.dataset.col=c;
+
+cell.dataset.letter=puzzle[r][c];
+
+cell.onclick=function(){
+
+clickCell(this);
+
+};
+
+gridDiv.appendChild(cell);
+
+}
+
+}
+
+}
+  //==================================================
+// CLICK CELL
+//==================================================
+
+
+//==================================================
+// CLICK ENGINE
+//==================================================
+
+let direction = null;
+
+function clickCell(cell){
+
+if(cell.classList.contains("correct")) return;
+
+const row = Number(cell.dataset.row);
+const col = Number(cell.dataset.col);
+
+// first click
+
+if(selectedCells.length==0){
+
+cell.classList.add("selected");
+
+selectedCells.push(cell);
+
+selectedWord=cell.dataset.letter;
+
+document.getElementById("selectedWord").innerHTML=selectedWord;
+
+direction=null;
+
+return;
+
+}
+
+// don't click same cell twice
+
+if(selectedCells.includes(cell)) return;
+
+const last=selectedCells[selectedCells.length-1];
+
+const lastRow=Number(last.dataset.row);
+const lastCol=Number(last.dataset.col);
+
+// second click decides direction
+
+if(selectedCells.length==1){
+
+// horizontal
+
+if(row==lastRow && Math.abs(col-lastCol)==1){
+
+direction="H";
+
+}
+
+// vertical
+
+else if(col==lastCol && Math.abs(row-lastRow)==1){
+
+direction="V";
+
+}
+
+else{
+
+shakeSelection();
+
+return;
+
+}
+
+}
+
+// after second click
+
+else{
+
+if(direction=="H"){
+
+if(row!=lastRow){
+
+shakeSelection();
+
+return;
+
+}
+
+if(col!=lastCol+1){
+
+shakeSelection();
+
+return;
+
+}
+
+}
+
+if(direction=="V"){
+
+if(col!=lastCol){
+
+shakeSelection();
+
+return;
+
+}
+
+if(row!=lastRow+1){
+
+shakeSelection();
+
+return;
+
+}
+
+}
+
+}
+
+cell.classList.add("selected");
+
+selectedCells.push(cell);
+
+selectedWord+=cell.dataset.letter;
+
+document.getElementById("selectedWord").innerHTML=selectedWord;
+
+checkWord();
+
+}
+  //==================================================
+// WRONG SELECTION
+//==================================================
+
+function shakeSelection(){
+
+selectedCells.forEach(c=>{
+
+c.style.background="#E53935";
+
+c.style.color="white";
+
+});
+
+setTimeout(()=>{
+
+clearSelection();
+
+},500);
+
+}
+  //==================================================
+// CLEAR SELECTION
+//==================================================
+
+function clearSelection(){
+
+selectedCells.forEach(c=>{
+
+c.classList.remove("selected");
+
+c.style.background="";
+
+c.style.color="";
+
+});
+
+selectedCells=[];
+
+selectedWord="";
+
+direction=null;
+
+document.getElementById("selectedWord").innerHTML="";
+
+}
+  //==================================================
+// CHECK WORD
+//==================================================
+
+//==================================================
+// CHECK WORD
+//==================================================
+
+function checkWord(){
+
+const word=selectedWord.toUpperCase();
+
+if(word.length<2) return;
+
+const original=students.find(name=>
+
+name!==currentPlayer &&
+name.toUpperCase()===word
+
+);
+
+if(!original) return;
+
+if(foundWords.includes(original)) return;
+
+// mark found
+
+foundWords.push(original);
+
+selectedCells.forEach(cell=>{
+
+cell.classList.remove("selected");
+cell.classList.add("correct");
+
+});
+
+currentScore+=original.length*10;
+
+scoreText.textContent=currentScore;
+
+clearSelection();
+
+refreshLeaderboardLive();
+
+}
+  //==================================================
+// LIVE LEADERBOARD
+//==================================================
+
+function refreshLeaderboardLive(){
+
+leaderboard.forEach(player=>{
+
+if(player.name===currentPlayer){
+
+player.score=currentScore;
+
+}
+
+});
+
+refreshLeaderboard();
+
+}
+</script>
+
+</body>
+</html>
+<style>
+  /*=============================
+ TIMER BAR
+=============================*/
+
+#timerBarBox{
+
+width:100%;
+height:12px;
+
+background:#CFD8DC;
+
+border-radius:10px;
+
+overflow:hidden;
+
+margin:12px 0 18px;
+
+}
+
+#timerBar{
+
+width:100%;
+
+height:100%;
+
+background:#43A047;
+
+transition:.8s linear;
+
+}
+
+
+/*=============================
+ WORD COUNTER
+=============================*/
+
+#wordCounter{
+
+font-size:20px;
+
+font-weight:bold;
+
+color:#0B3D91;
+
+margin-top:15px;
+
+}
+
+
+/*=============================
+ WINNER POPUP
+=============================*/
+
+#winnerPopup{
+
+position:fixed;
+
+left:0;
+
+top:0;
+
+width:100%;
+
+height:100%;
+
+display:none;
+
+justify-content:center;
+
+align-items:center;
+
+background:rgba(0,0,0,.7);
+
+z-index:9999;
+
+}
+
+#winnerCard{
+
+width:550px;
+
+background:white;
+
+padding:40px;
+
+border-radius:20px;
+
+text-align:center;
+
+box-shadow:0 20px 50px rgba(0,0,0,.35);
+
+}
+
+#winnerCard h1{
+
+font-size:42px;
+
+color:#F9A825;
+
+margin-bottom:20px;
+
+}
+
+#winnerCard table{
+
+width:100%;
+
+margin-top:20px;
+
+border-collapse:collapse;
+
+}
+
+#winnerCard td{
+
+padding:10px;
+
+font-size:22px;
+
+border-bottom:1px solid #ddd;
+
+}
+
+#winnerCard button{
+
+margin-top:25px;
+
+}
+</style>
