@@ -127,6 +127,7 @@ margin-top:8px;
 
 }
 
+input[type="text"],
 select{
 
 width:100%;
@@ -135,6 +136,7 @@ font-size:18px;
 border-radius:8px;
 margin-top:8px;
 border:2px solid #ccc;
+box-sizing:border-box;
 
 }
 
@@ -218,7 +220,7 @@ pointer-events:none;
 .gameContainer{
 
 display:grid;
-grid-template-columns:1fr 330px;
+grid-template-columns:1fr 280px;
 gap:20px;
 height:100%;
 
@@ -370,7 +372,7 @@ color:var(--blue);
 .controls{
 
 display:flex;
-gap:15px;
+gap:10px;
 
 }
 
@@ -378,14 +380,14 @@ gap:15px;
 
 margin:0;
 padding:10px 20px;
-font-size:16px;
+font-size:14px;
 
 }
 
 #leaderboard{
 
 margin-top:10px;
-font-size:18px;
+font-size:16px;
 line-height:2.2;
 
 }
@@ -492,19 +494,9 @@ margin:20px 0;
 
 </select>
 
-<label>Grid Size</label>
+<label>Grid Size (e.g., 15x15)</label>
 
-<select id="gridSelect">
-
-<option value="10">10x10</option>
-
-<option value="15" selected>15x15</option>
-
-<option value="20">20x20</option>
-
-<option value="25">25x25</option>
-
-</select>
+<input type="text" id="gridInput" placeholder="e.g., 15x15" value="15x15">
 
 <button id="startBtn" class="primary">START GAME</button>
 
@@ -588,12 +580,6 @@ Found: <span id="foundCount">0</span> / <span id="totalWords">0</span>
 
 <div id="leaderboard">No Scores Yet</div>
 
-<h2 style="text-align:center;color:#1976D2;font-size:18px;margin-top:20px;">📝 Names</h2>
-
-<div id="namesList" style="font-size:14px;line-height:1.8;"></div>
-
-</div>
-
 </div>
 
 </div>
@@ -667,10 +653,9 @@ const studentGrid = document.getElementById("studentGrid");
 const startBtn = document.getElementById("startBtn");
 const studentInput = document.getElementById("studentInput");
 const timeSelect = document.getElementById("timeSelect");
-const gridSelect = document.getElementById("gridSelect");
+const gridInput = document.getElementById("gridInput");
 const leaderboardDiv = document.getElementById("leaderboard");
 const playerName = document.getElementById("playerName");
-const scoreText = document.getElementById("score");
 const timerText = document.getElementById("timer");
 
 //==================================================
@@ -697,15 +682,30 @@ function setupGame(){
   }
 
   gameTime = parseInt(timeSelect.value);
-  gridSize = parseInt(gridSelect.value);
+  
+  // Parse grid size
+  const gridText = gridInput.value.trim();
+  const match = gridText.match(/(\d+)\s*x\s*(\d+)/i);
+  
+  if(!match){
+    alert("Please enter grid size in format: 15x15");
+    return;
+  }
+  
+  gridSize = parseInt(match[1]);
+  
+  if(gridSize < 5 || gridSize > 30){
+    alert("Grid size must be between 5x5 and 30x30");
+    return;
+  }
+
   students = list;
 
   students.forEach(name=>{
     leaderboard.push({
       name:name,
       score:0,
-      played:false,
-      found:[]
+      played:false
     });
   });
 
@@ -756,7 +756,7 @@ function beginTurn(name){
 
   generatePuzzle();
   renderGrid();
-  updateNamesList();
+  updateTotalWords();
   refreshLeaderboard();
 
   startTimer();
@@ -773,7 +773,8 @@ function generatePuzzle(){
     puzzle.push({
       letter: String.fromCharCode(65 + Math.floor(Math.random()*26)),
       index: i,
-      isSelected: false
+      isSelected: false,
+      isCorrect: false
     });
   }
 
@@ -787,19 +788,13 @@ function placeNameInGrid(name){
 
   const directions = [
     {x:1, y:0},  // right
-    {x:-1, y:0}, // left
-    {x:0, y:1},  // down
-    {x:0, y:-1}, // up
-    {x:1, y:1},  // diagonal down-right
-    {x:-1, y:-1}, // diagonal up-left
-    {x:1, y:-1},  // diagonal down-left
-    {x:-1, y:1}   // diagonal up-right
+    {x:0, y:1}   // down
   ];
 
   let placed = false;
   let attempts = 0;
 
-  while(!placed && attempts < 50){
+  while(!placed && attempts < 100){
     attempts++;
 
     const direction = directions[Math.floor(Math.random()*directions.length)];
@@ -851,6 +846,10 @@ function renderGrid(){
       cellDiv.classList.add("selected");
     }
 
+    if(cell.isCorrect){
+      cellDiv.classList.add("correct");
+    }
+
     cellDiv.onclick = function(){
       selectCell(index);
     };
@@ -866,6 +865,8 @@ function renderGrid(){
 function selectCell(index){
 
   const cell = puzzle[index];
+  
+  if(cell.isCorrect) return; // Can't select already found words
 
   if(selectedCells.includes(index)){
     selectedCells = selectedCells.filter(i => i !== index);
@@ -896,12 +897,11 @@ document.getElementById("submitBtn").onclick = function(){
 
   if(matchedName && !foundWords.includes(matchedName.toUpperCase())){
     foundWords.push(matchedName.toUpperCase());
-    currentScore += matchedName.length * 10; // 10 points per letter
+    currentScore += matchedName.length * 10;
 
-    // Mark cells as correct
     selectedCells.forEach(index => {
       puzzle[index].isSelected = false;
-      puzzle[index].correct = true;
+      puzzle[index].isCorrect = true;
     });
 
     document.getElementById("foundCount").textContent = foundWords.length;
@@ -912,7 +912,6 @@ document.getElementById("submitBtn").onclick = function(){
 
     renderGrid();
     updateLeaderboardScore();
-    updateNamesList();
 
   } else if(matchedName){
     alert("Already found: " + matchedName);
@@ -981,25 +980,16 @@ function updateTimer(){
 }
 
 //==================================================
-// UPDATE NAMES LIST
+// UPDATE TOTAL WORDS
 //==================================================
 
-function updateNamesList(){
+function updateTotalWords(){
 
-  const namesList = document.getElementById("namesList");
-  namesList.innerHTML = "";
-
-  students.forEach(name => {
-    const found = foundWords.includes(name.toUpperCase());
-    const span = document.createElement("div");
-    span.style.color = found ? "#4CAF50" : "#666";
-    span.textContent = (found ? "✓ " : "○ ") + name;
-    namesList.appendChild(span);
-  });
+  document.getElementById("totalWords").textContent = students.length;
 }
 
 //==================================================
-// LEADERBOARD
+// UPDATE LEADERBOARD SCORE
 //==================================================
 
 function updateLeaderboardScore(){
@@ -1013,6 +1003,10 @@ function updateLeaderboardScore(){
   refreshLeaderboard();
 }
 
+//==================================================
+// LEADERBOARD
+//==================================================
+
 function refreshLeaderboard(){
 
   leaderboard.sort((a,b)=>b.score-a.score);
@@ -1020,14 +1014,19 @@ function refreshLeaderboard(){
   leaderboardDiv.innerHTML="";
 
   leaderboard.forEach((player,index)=>{
-    const div = document.createElement("div");
-    div.className = "leaderboard-item";
-    div.innerHTML = `
-      <span class="rank">${index+1}.</span>
-      <span>${player.name}</span>
-      <span class="score">${player.score}</span>
-    `;
-    leaderboardDiv.appendChild(div);
+
+    let row=document.createElement("div");
+    row.style.marginBottom="10px";
+    row.innerHTML=
+      (index+1)+". "
+      +
+      player.name+
+      "<span style='float:right'>"
+      +
+      player.score+
+      "</span>";
+
+    leaderboardDiv.appendChild(row);
   });
 }
 
@@ -1036,11 +1035,6 @@ function refreshLeaderboard(){
 //==================================================
 
 document.getElementById("finishBtn").onclick = function(){
-  clearInterval(timerInterval);
-  finishTurn();
-};
-
-function finishTurn(){
 
   clearInterval(timerInterval);
 
@@ -1054,8 +1048,17 @@ function finishTurn(){
   refreshLeaderboard();
 
   document.getElementById("popup").style.display="flex";
+
   document.getElementById("popupText").innerHTML=
-    currentPlayer+"<br><br>Score : <b>"+currentScore+"</b><br>Found: <b>"+foundWords.length+"</b> names";
+    currentPlayer+
+    "<br><br>Score : <b>"+
+    currentScore+
+    "</b>";
+}
+
+function finishTurn(){
+
+  document.getElementById("finishBtn").onclick();
 }
 
 //==================================================
@@ -1084,9 +1087,15 @@ document.getElementById("nextBtn").onclick=function(){
   });
 
   if(finished){
-    setTimeout(showWinner, 1000);
+    setTimeout(()=>{
+      showWinner();
+    },300);
   }
 };
+
+//==================================================
+// SHOW WINNER
+//==================================================
 
 function showWinner(){
 
@@ -1095,23 +1104,37 @@ function showWinner(){
   document.getElementById("winnerPopup").style.display="flex";
 
   document.getElementById("winnerName").innerHTML=
-    leaderboard[0].name + " 🎉";
+    leaderboard[0].name+
+    " 🎉";
 
-  document.getElementById("finalTable").innerHTML="";
+  const table = document.getElementById("finalTable");
+  table.innerHTML = "";
 
-  leaderboard.forEach((player,index)=>{
-    let row=document.createElement("tr");
-    row.style.borderBottom="1px solid #ddd";
-    row.innerHTML=`
-      <td style="padding:10px;text-align:left;"><strong>${index+1}. ${player.name}</strong></td>
-      <td style="padding:10px;text-align:right;color:var(--green);font-weight:bold;">${player.score}</td>
+  leaderboard.forEach((player, index) => {
+    const row = document.createElement("tr");
+    row.style.borderBottom = "1px solid #ddd";
+    row.style.padding = "10px 0";
+    row.innerHTML = `
+      <td style="text-align:left;padding:10px;">${index+1}. ${player.name}</td>
+      <td style="text-align:right;padding:10px;font-weight:bold;color:#2E7D32;">${player.score}</td>
     `;
-    document.getElementById("finalTable").appendChild(row);
+    table.appendChild(row);
   });
 }
 
-document.getElementById("newGameBtn").onclick = function(){
-  location.reload();
+//==================================================
+// NEW GAME
+//==================================================
+
+document.getElementById("newGameBtn").onclick=function(){
+
+  document.getElementById("winnerPopup").style.display="none";
+
+  setupPage.classList.add("active");
+  gamePage.classList.remove("active");
+
+  studentInput.value="";
+  gridInput.value="15x15";
 };
 
 </script>
