@@ -629,6 +629,7 @@ Found: <span id="foundCount">0</span> / <span id="totalWords">0</span>
 let gridSize = 15;
 let students = [];
 let leaderboard = [];
+let placedNames = [];
 
 let currentPlayer = "";
 let currentScore = 0;
@@ -668,6 +669,7 @@ function setupGame(){
 
   students = [];
   leaderboard = [];
+  placedNames = [];
 
   let list = studentInput.value
     .split("\n")
@@ -769,17 +771,23 @@ function beginTurn(name){
 function generatePuzzle(){
 
   puzzle = [];
+  placedNames = [];
+  
   for(let i=0; i<gridSize*gridSize; i++){
     puzzle.push({
       letter: String.fromCharCode(65 + Math.floor(Math.random()*26)),
       index: i,
       isSelected: false,
-      isCorrect: false
+      isCorrect: false,
+      nameIndices: []
     });
   }
 
-  // Place student names in grid
-  students.forEach(name => {
+  // Sort names by length (longer first) for better placement
+  let sortedNames = [...students].sort((a, b) => b.length - a.length);
+
+  // Place all student names in grid
+  sortedNames.forEach(name => {
     placeNameInGrid(name.toUpperCase());
   });
 }
@@ -793,8 +801,9 @@ function placeNameInGrid(name){
 
   let placed = false;
   let attempts = 0;
+  const maxAttempts = 200;
 
-  while(!placed && attempts < 100){
+  while(!placed && attempts < maxAttempts){
     attempts++;
 
     const direction = directions[Math.floor(Math.random()*directions.length)];
@@ -818,9 +827,17 @@ function placeNameInGrid(name){
     }
 
     if(canPlace){
+      // Place the name
       for(let i=0; i<name.length; i++){
         puzzle[positions[i]].letter = name[i];
+        if(!puzzle[positions[i]].nameIndices.includes(name)){
+          puzzle[positions[i]].nameIndices.push(name);
+        }
       }
+      placedNames.push({
+        name: name,
+        positions: positions
+      });
       placed = true;
     }
   }
@@ -876,10 +893,13 @@ function selectCell(index){
     cell.isSelected = true;
   }
 
-  selectedWord = selectedCells.map(i => puzzle[i].letter).join("");
-  document.getElementById("selectedWord").textContent = selectedWord || "No selection";
-
+  updateSelectedWord();
   renderGrid();
+}
+
+function updateSelectedWord(){
+  const selectedLetters = selectedCells.map(i => puzzle[i].letter);
+  document.getElementById("selectedWord").textContent = selectedLetters.join("") || "No selection";
 }
 
 //==================================================
@@ -888,11 +908,24 @@ function selectCell(index){
 
 document.getElementById("submitBtn").onclick = function(){
 
-  if(selectedWord.length === 0){
+  if(selectedCells.length === 0){
     alert("Select letters first!");
     return;
   }
 
+  // Check if all selected cells are on the same line (horizontal or vertical)
+  if(!isValidLine(selectedCells)){
+    alert("Letters must be on the same line (horizontally or vertically)!");
+    selectedCells = [];
+    updateSelectedWord();
+    renderGrid();
+    return;
+  }
+
+  const selectedLetters = selectedCells.map(i => puzzle[i].letter);
+  const selectedWord = selectedLetters.join("");
+
+  // Check if selected word matches any student name
   const matchedName = students.find(name => name.toUpperCase() === selectedWord);
 
   if(matchedName && !foundWords.includes(matchedName.toUpperCase())){
@@ -907,8 +940,7 @@ document.getElementById("submitBtn").onclick = function(){
     document.getElementById("foundCount").textContent = foundWords.length;
 
     selectedCells = [];
-    selectedWord = "";
-    document.getElementById("selectedWord").textContent = "";
+    updateSelectedWord();
 
     renderGrid();
     updateLeaderboardScore();
@@ -916,25 +948,42 @@ document.getElementById("submitBtn").onclick = function(){
   } else if(matchedName){
     alert("Already found: " + matchedName);
     selectedCells = [];
-    selectedWord = "";
-    document.getElementById("selectedWord").textContent = "";
+    updateSelectedWord();
     renderGrid();
   } else {
     alert("Not a classmate name!");
     selectedCells = [];
-    selectedWord = "";
-    document.getElementById("selectedWord").textContent = "";
+    updateSelectedWord();
     renderGrid();
   }
 };
+
+function isValidLine(cells){
+  if(cells.length < 2) return true;
+
+  // Get row and col for each cell
+  const positions = cells.map(index => ({
+    row: Math.floor(index / gridSize),
+    col: index % gridSize
+  }));
+
+  // Check if all in same row (horizontal)
+  const allSameRow = positions.every(p => p.row === positions[0].row);
+  if(allSameRow) return true;
+
+  // Check if all in same col (vertical)
+  const allSameCol = positions.every(p => p.col === positions[0].col);
+  if(allSameCol) return true;
+
+  return false;
+}
 
 document.getElementById("clearBtn").onclick = function(){
   selectedCells.forEach(index => {
     puzzle[index].isSelected = false;
   });
   selectedCells = [];
-  selectedWord = "";
-  document.getElementById("selectedWord").textContent = "";
+  updateSelectedWord();
   renderGrid();
 };
 
