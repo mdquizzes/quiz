@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mobile Number Wordle</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+    background:#f4f6fb;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    min-height:100vh;
+    padding:30px;
+}
+
+.container{
+    width:100%;
+    max-width:700px;
+    background:#fff;
+    border-radius:15px;
+    padding:25px;
+    box-shadow:0 8px 25px rgba(0,0,0,.15);
+}
+
+h1{
+    text-align:center;
+    margin-bottom:10px;
+    color:#222;
+}
+
+.subtitle{
+    text-align:center;
+    color:#666;
+    margin-bottom:25px;
+}
+
+.topBar{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:25px;
+    font-size:20px;
+    font-weight:bold;
+}
+
+.inputArea{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+}
+
+#guess{
+    flex:1;
+    height:50px;
+    border:2px solid #bbb;
+    border-radius:8px;
+    padding:10px;
+    font-size:24px;
+    text-align:center;
+    letter-spacing:3px;
+}
+
+#guess:focus{
+    outline:none;
+    border-color:#2d8cff;
+}
+
+button{
+    cursor:pointer;
+    border:none;
+    border-radius:8px;
+    padding:14px 22px;
+    font-size:18px;
+    font-weight:bold;
+    transition:.3s;
+}
+
+#checkBtn{
+    background:#2d8cff;
+    color:#fff;
+}
+
+#checkBtn:hover{
+    background:#0b74ef;
+}
+
+#newGame{
+    background:#2ecc71;
+    color:white;
+}
+
+#newGame:hover{
+    background:#25ae60;
+}
+
+.bottom{
+    margin-top:25px;
+    text-align:center;
+}
+
+#message{
+    text-align:center;
+    min-height:30px;
+    margin-bottom:15px;
+    font-size:18px;
+    font-weight:bold;
+    color:#d63031;
+}
+
+#history{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.row{
+    display:flex;
+    justify-content:center;
+    gap:6px;
+}
+
+.cell{
+    width:48px;
+    height:48px;
+    border:2px solid #cfcfcf;
+    border-radius:6px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:22px;
+    font-weight:bold;
+    background:white;
+    transition:.3s;
+}
+
+.green{
+    background:#2ecc71;
+    color:#fff;
+    border-color:#2ecc71;
+}
+
+.blue{
+    background:#3498db;
+    color:#fff;
+    border-color:#3498db;
+}
+
+.gray{
+    background:#dfe6e9;
+    color:#555;
+    border-color:#dfe6e9;
+}
+
+.win{
+    color:#27ae60!important;
+}
+
+.lose{
+    color:#e74c3c!important;
+}
+
+@keyframes pop{
+
+0%{
+transform:scale(.5);
+opacity:0;
+}
+
+100%{
+transform:scale(1);
+opacity:1;
+}
+
+}
+
+.row .cell{
+    animation:pop .25s ease;
+}
+
+@media(max-width:600px){
+
+.container{
+padding:15px;
+}
+
+.inputArea{
+flex-direction:column;
+}
+
+button{
+width:100%;
+}
+
+.topBar{
+font-size:16px;
+}
+
+.cell{
+width:34px;
+height:34px;
+font-size:18px;
+}
+
+#guess{
+font-size:20px;
+letter-spacing:2px;
+}
+
+}
+
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<h1>📱 Mobile Number Challenge</h1>
+
+<p class="subtitle">
+Guess the hidden 10-digit mobile number
+</p>
+
+<div class="topBar">
+
+<div>
+⏱ Time :
+<span id="timer">0</span> sec
+</div>
+
+<div>
+⭐ Score :
+<span id="score">1000</span>
+</div>
+
+</div>
+
+
+<div class="inputArea">
+
+<input
+type="text"
+id="guess"
+maxlength="10"
+placeholder="Enter 10 digit number">
+
+<button id="checkBtn">
+Check
+</button>
+
+</div>
+
+
+<div id="message"></div>
+
+
+<div id="history">
+
+</div>
+
+
+<div class="bottom">
+
+<button id="newGame">
+New Game
+</button>
+
+</div>
+
+</div>
+
+
+<script>
+
+// ========= GAME VARIABLES =========
+
+let targetNumber = "";
+let time = 0;
+let score = 1000;
+let gameOver = false;
+let timer;
+
+// ========= ELEMENTS =========
+
+const guessInput = document.getElementById("guess");
+const checkBtn = document.getElementById("checkBtn");
+const history = document.getElementById("history");
+const message = document.getElementById("message");
+const timerText = document.getElementById("timer");
+const scoreText = document.getElementById("score");
+const newGameBtn = document.getElementById("newGame");
+
+// ========= RANDOM MOBILE NUMBER =========
+
+function generateNumber(){
+
+targetNumber = "";
+
+targetNumber += (6 + Math.floor(Math.random()*4));
+
+for(let i=1;i<10;i++){
+
+targetNumber += Math.floor(Math.random()*10);
+
+}
+
+console.log(targetNumber);
+
+}
+
+// ========= START TIMER =========
+
+function startTimer(){
+
+clearInterval(timer);
+
+time = 0;
+
+timerText.innerHTML = 0;
+
+timer = setInterval(function(){
+
+time++;
+
+timerText.innerHTML = time;
+
+},1000);
+
+}
+
+// ========= CHECK BUTTON =========
+
+checkBtn.onclick = function(){
+
+if(gameOver) return;
+
+let guess = guessInput.value.trim();
+
+if(!/^[0-9]{10}$/.test(guess)){
+
+message.innerHTML = "Enter a valid 10 digit number.";
+
+return;
+
+}
+
+message.innerHTML = "";
+
+createRow(guess);
+
+guessInput.value="";
+
+};
+
+// ========= CREATE RESULT ROW =========
+
+function createRow(guess){
+
+const row = document.createElement("div");
+
+row.className="row";
+
+for(let i=0;i<10;i++){
+
+const box = document.createElement("div");
+
+box.className="cell";
+
+box.innerHTML = guess[i];
+
+if(guess[i]===targetNumber[i]){
+
+box.classList.add("green");
+
+}
+else if(targetNumber.includes(guess[i])){
+
+box.classList.add("blue");
+
+}
+else{
+
+box.classList.add("gray");
+
+}
+
+row.appendChild(box);
+
+}
+
+history.prepend(row);
+
+// Win check
+
+if(guess===targetNumber){
+
+gameOver=true;
+
+clearInterval(timer);
+
+message.className="win";
+
+message.innerHTML="🎉 Congratulations!";
+
+}
+
+}
+
+// ========= START =========
+
+generateNumber();
+
+startTimer();
+  // ========= SETTINGS =========
+
+const MAX_GUESSES = 8;
+let guessCount = 0;
+
+// ========= LIVE SCORE =========
+
+// Timer को replace करें
+clearInterval(timer);
+
+function startTimer(){
+
+    clearInterval(timer);
+
+    time = 0;
+    score = 1000;
+
+    timerText.innerHTML = time;
+    scoreText.innerHTML = score;
+
+    timer = setInterval(function(){
+
+        if(gameOver) return;
+
+        time++;
+
+        // हर सेकंड 5 अंक कम
+        score = Math.max(0,1000-(time*5));
+
+        timerText.innerHTML = time;
+        scoreText.innerHTML = score;
+
+    },1000);
+
+}
+
+// ========= CREATE ROW OVERRIDE =========
+
+// Part-3 वाली createRow() function को
+// इस function से REPLACE कर दें.
+
+function createRow(guess){
+
+    guessCount++;
+
+    const row=document.createElement("div");
+    row.className="row";
+
+    for(let i=0;i<10;i++){
+
+        const box=document.createElement("div");
+
+        box.className="cell";
+
+        box.innerHTML=guess[i];
+
+        if(guess[i]==targetNumber[i]){
+
+            box.classList.add("green");
+
+        }
+        else if(targetNumber.includes(guess[i])){
+
+            box.classList.add("blue");
+
+        }
+        else{
+
+            box.classList.add("gray");
+
+        }
+
+        row.appendChild(box);
+
+    }
+
+    history.prepend(row);
+
+    // WIN
+
+    if(guess===targetNumber){
+
+        gameOver=true;
+
+        clearInterval(timer);
+
+        message.className="win";
+
+        message.innerHTML=
+        "🏆 Correct!<br><br>Score : "+score;
+
+        return;
+
+    }
+
+    // LOSE
+
+    if(guessCount>=MAX_GUESSES){
+
+        gameOver=true;
+
+        clearInterval(timer);
+
+        message.className="lose";
+
+        message.innerHTML=
+        "Game Over!<br><br>Correct Number : <b>"+targetNumber+"</b>";
+
+    }
+
+}
+
+// ========= NEW GAME =========
+
+newGameBtn.onclick=function(){
+
+    gameOver=false;
+
+    guessCount=0;
+
+    history.innerHTML="";
+
+    message.className="";
+
+    message.innerHTML="";
+
+    guessInput.value="";
+
+    generateNumber();
+
+    startTimer();
+
+};
+
+</script>
+
+</body>
+</html>
