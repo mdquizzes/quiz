@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Interactive Quadrilateral Explorer</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>Interactive Quadrilateral Explorer</h1>
+<p>Drag the four vertices to explore properties.</p>
+
+<div id="container">
+<svg id="svg" width="700" height="500">
+
+<polygon id="quad" fill="#4CAF5060" stroke="#2196F3" stroke-width="3"></polygon>
+
+<line id="d1" stroke="red" stroke-dasharray="5"/>
+<line id="d2" stroke="red" stroke-dasharray="5"/>
+
+<circle class="point" id="A" r="8"></circle>
+<circle class="point" id="B" r="8"></circle>
+<circle class="point" id="C" r="8"></circle>
+<circle class="point" id="D" r="8"></circle>
+
+</svg>
+
+<div class="info">
+<h2>Properties</h2>
+
+<div id="type"></div>
+
+<h3>Sides</h3>
+<div id="sides"></div>
+
+<h3>Angles</h3>
+<div id="angles"></div>
+
+</div>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
