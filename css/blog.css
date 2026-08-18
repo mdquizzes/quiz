@@ -1,5 +1,12 @@
 /* ===== GLOBAL ===== */
+/* ===== MAIN CONTAINER ===== */
 
+.container{
+    width:100%;
+    max-width:1200px;
+    margin:0 auto;
+    padding:0 20px;
+}
 *{
 box-sizing:border-box;
 }
@@ -36,7 +43,21 @@ height:auto;
 display:block;
 border-radius:6px;
 }
+/* ===== BLOGGER HEADER ===== */
 
+header{
+    width:100%;
+    max-width:1200px;
+    margin:0 auto;
+    padding:10px 20px;
+}
+
+header img{
+    width:100%;
+    height:auto;
+    display:block;
+    border-radius:6px;
+}
 /* ===== TOPBAR ===== */
 
 .topbar{
@@ -343,9 +364,20 @@ height:500px;
 
 }
 .main-wrapper{
-display:flex;
-gap:25px;
-align-items:flex-start;
+    display:flex;
+    gap:25px;
+    align-items:flex-start;
+    width:100%;
+}
+
+.main{
+    flex:3;
+    min-width:0;
+}
+
+.sidebar{
+    flex:1;
+    min-width:260px;
 }
 
 .main{
