@@ -179,18 +179,6 @@ renderQ();
 };
 
 
-/* PREVIOUS */
-
-prevBtn.onclick=()=>{
-
-if(idx>0){
-idx--;
-renderQ();
-}
-
-};
-
-
 /* RESULT */
 
 function showResult(){
