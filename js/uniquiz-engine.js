@@ -1,91 +1,55 @@
 ```javascript
-// ========================================
-// MD QUIZZES
-// UNIQUIZ ENGINE
-// ========================================
-
-
-// ========================================
-// ELEMENT HELPER
-// ========================================
-
 const el = id => document.getElementById(id);
 
 
 // ========================================
-// MAIN ELEMENTS
+// ELEMENTS
 // ========================================
 
-const settings = el('settings');
-const quiz = el('quiz');
-const result = el('result');
+const settings = el('settings'),
+      quiz = el('quiz'),
+      result = el('result');
 
+const qCountEl = el('qCount'),
+      posMarksEl = el('posMarks'),
+      negMarksEl = el('negMarks'),
+      timerModeEl = el('timerMode');
 
-// ========================================
-// SETTINGS ELEMENTS
-// ========================================
+const progressEl = el('progress'),
+      scoreEl = el('score'),
+      timerEl = el('timer');
 
-const qCountEl = el('qCount');
-const posMarksEl = el('posMarks');
-const negMarksEl = el('negMarks');
-const timerModeEl = el('timerMode');
+const qEl = el('question'),
+      optsEl = el('options'),
+      nextBtn = el('nextBtn');
 
-
-// ========================================
-// QUIZ HUD
-// ========================================
-
-const progressEl = el('progress');
-const scoreEl = el('score');
-const timerEl = el('timer');
-
-
-// ========================================
-// QUESTION ELEMENTS
-// ========================================
-
-const qEl = el('question');
-const optsEl = el('options');
-const nextBtn = el('nextBtn');
-
-
-// ========================================
-// RESULT ELEMENTS
-// ========================================
-
-const rName = el('rName');
-const rScore = el('rScore');
-const rPercent = el('rPercent');
-const rAccuracy = el('rAccuracy');
-const rGrade = el('rGrade');
+const rName = el('rName'),
+      rScore = el('rScore'),
+      rPercent = el('rPercent'),
+      rAccuracy = el('rAccuracy'),
+      rGrade = el('rGrade');
 
 const officialScoreEl = el("officialScore");
 
 
 // ========================================
-// QUIZ VARIABLES
+// VARIABLES
 // ========================================
 
-let quizQs = [];
-let idx = 0;
+let quizQs = [],
+    idx = 0;
 
 let practiceScore = 0;
 let officialScore = 0;
 
-let POS = 4;
-let NEG = 2;
+let POS = 4,
+    NEG = 2,
+    attempted = 0,
+    correctCount = 0;
 
-let attempted = 0;
-let correctCount = 0;
-
-
-// ========================================
-// TIMER VARIABLES
-// ========================================
-
-let timerOn = true;
-let totalTime = 0;
-let tInt = null;
+let timerOn = true,
+    totalTime = 0,
+    tInt = null;
 
 
 // ========================================
@@ -96,99 +60,13 @@ let userAnswers = [];
 
 
 // ========================================
-// START QUIZ
+// NOTE
 // ========================================
-
-el('startBtn').onclick = () => {
-
-    const ALL = window.QUIZ_DATA;
-
-    if (!ALL) {
-
-        alert("Quiz data not loaded");
-        return;
-
-    }
-
-
-    // ------------------------------------
-    // GET SETTINGS
-    // ------------------------------------
-
-    const n = +qCountEl.value;
-
-    POS = +posMarksEl.value;
-    NEG = +negMarksEl.value;
-
-    timerOn = timerModeEl.value === 'on';
-
-
-    // ------------------------------------
-    // CREATE RANDOM QUESTIONS
-    // ------------------------------------
-
-    quizQs = shuffle([...ALL]).slice(0, n);
-
-
-    // ------------------------------------
-    // SHOW QUIZ
-    // ------------------------------------
-
-    settings.classList.add('hide');
-    quiz.classList.remove('hide');
-
-
-    // ------------------------------------
-    // RESET VARIABLES
-    // ------------------------------------
-
-    idx = 0;
-
-    practiceScore = 0;
-    officialScore = 0;
-
-    attempted = 0;
-    correctCount = 0;
-
-    userAnswers = [];
-
-
-    // ------------------------------------
-    // RESET TIMER
-    // ------------------------------------
-
-    if (tInt) {
-
-        clearInterval(tInt);
-        tInt = null;
-
-    }
-
-
-    // ------------------------------------
-    // START TIMER
-    // ------------------------------------
-
-    if (timerOn) {
-
-        totalTime = quizQs.length * 60;
-
-        startTimer();
-
-    } else {
-
-        timerEl.classList.add('hide');
-
-    }
-
-
-    // ------------------------------------
-    // DISPLAY FIRST QUESTION
-    // ------------------------------------
-
-    renderQ();
-
-};
+// Start Quiz is handled by index.html
+// through loadQuizData().
+//
+// DO NOT add another startBtn onclick here.
+// ========================================
 
 
 // ========================================
@@ -197,20 +75,14 @@ el('startBtn').onclick = () => {
 
 function renderQ() {
 
-    // ------------------------------------
-    // HIDE NEXT BUTTON UNTIL ANSWER
-    // ------------------------------------
-
+    // Hide Next until answer is selected
     nextBtn.classList.add('hide');
 
-
-    // ------------------------------------
-    // GET CURRENT QUESTION
-    // ------------------------------------
 
     const q = quizQs[idx];
 
 
+    // Safety check
     if (!q) {
 
         showResult();
@@ -219,49 +91,31 @@ function renderQ() {
     }
 
 
-    // ------------------------------------
-    // PROGRESS
-    // ------------------------------------
-
+    // Progress
     progressEl.textContent =
         `Q ${idx + 1}/${quizQs.length}`;
 
 
-    // ------------------------------------
-    // PRACTICE SCORE
-    // ------------------------------------
-
+    // Score
     scoreEl.textContent =
         `Practice Score : ${practiceScore.toFixed(2)}`;
 
 
-    // ------------------------------------
-    // QUESTION
-    // ------------------------------------
-
+    // Question
     qEl.textContent = q.question;
 
 
-    // ------------------------------------
-    // CLEAR OLD OPTIONS
-    // ------------------------------------
-
+    // Clear options
     optsEl.innerHTML = '';
 
 
-    // ------------------------------------
-    // SHUFFLE OPTIONS
-    // ------------------------------------
-
+    // Shuffle options
     const shuffled = shuffle([...q.answers]);
 
     quizQs[idx]._shuffled = shuffled;
 
 
-    // ------------------------------------
-    // CREATE OPTIONS
-    // ------------------------------------
-
+    // Create options
     shuffled.forEach((a, i) => {
 
         const d = document.createElement('div');
@@ -291,41 +145,25 @@ function renderQ() {
 
 function select(correct, elOpt, index) {
 
-
-    // ------------------------------------
-    // PREVENT MULTIPLE ANSWERS
-    // ------------------------------------
-
+    // Prevent multiple answers
     if (!nextBtn.classList.contains('hide')) {
-
         return;
-
     }
 
-
-    // ------------------------------------
-    // COUNT ATTEMPT
-    // ------------------------------------
 
     attempted++;
 
 
-    // ------------------------------------
-    // STORE USER ANSWER
-    // ------------------------------------
-
+    // Store user answer
     userAnswers[idx] = index;
 
 
-    // ------------------------------------
-    // CORRECT ANSWER
-    // ------------------------------------
-
+    // Correct
     if (correct) {
 
         practiceScore += POS;
 
-        // Official scoring remains fixed
+        // Official score remains fixed
         officialScore += 4;
 
         correctCount++;
@@ -333,24 +171,18 @@ function select(correct, elOpt, index) {
     }
 
 
-    // ------------------------------------
-    // WRONG ANSWER
-    // ------------------------------------
-
+    // Wrong
     else {
 
         practiceScore -= NEG;
 
-        // Official scoring remains fixed
+        // Official score remains fixed
         officialScore -= 1;
 
     }
 
 
-    // ------------------------------------
-    // SHOW CORRECT ANSWER
-    // ------------------------------------
-
+    // Show correct answer
     Array.from(optsEl.children).forEach((o, i) => {
 
         if (quizQs[idx]._shuffled[i].correct) {
@@ -362,10 +194,7 @@ function select(correct, elOpt, index) {
     });
 
 
-    // ------------------------------------
-    // SHOW WRONG ANSWER
-    // ------------------------------------
-
+    // Show wrong answer
     if (!correct) {
 
         elOpt.classList.add('wrong');
@@ -373,18 +202,12 @@ function select(correct, elOpt, index) {
     }
 
 
-    // ------------------------------------
-    // UPDATE SCORE
-    // ------------------------------------
-
+    // Update score
     scoreEl.textContent =
         `Practice Score : ${practiceScore.toFixed(2)}`;
 
 
-    // ------------------------------------
-    // SHOW NEXT BUTTON
-    // ------------------------------------
-
+    // Show Next
     nextBtn.classList.remove('hide');
 
 }
@@ -399,10 +222,6 @@ nextBtn.onclick = () => {
     idx++;
 
 
-    // ------------------------------------
-    // LAST QUESTION
-    // ------------------------------------
-
     if (idx >= quizQs.length) {
 
         showResult();
@@ -410,10 +229,6 @@ nextBtn.onclick = () => {
 
     }
 
-
-    // ------------------------------------
-    // NEXT QUESTION
-    // ------------------------------------
 
     renderQ();
 
@@ -426,11 +241,7 @@ nextBtn.onclick = () => {
 
 function showResult() {
 
-
-    // ------------------------------------
-    // STOP TIMER
-    // ------------------------------------
-
+    // Stop timer
     if (tInt) {
 
         clearInterval(tInt);
@@ -439,23 +250,10 @@ function showResult() {
     }
 
 
-    // ------------------------------------
-    // HIDE QUIZ
-    // ------------------------------------
-
     quiz.classList.add('hide');
-
-
-    // ------------------------------------
-    // SHOW RESULT
-    // ------------------------------------
 
     result.classList.remove('hide');
 
-
-    // ------------------------------------
-    // CALCULATE SCORE
-    // ------------------------------------
 
     const max = quizQs.length * POS;
 
@@ -476,10 +274,6 @@ function showResult() {
         attempted - correctCount;
 
 
-    // ------------------------------------
-    // RESULT TEXT
-    // ------------------------------------
-
     rName.textContent = "User";
 
 
@@ -499,21 +293,13 @@ function showResult() {
         `Accuracy : ${acc.toFixed(1)}%`;
 
 
-    // ------------------------------------
-    // GRADE
-    // ------------------------------------
-
     rGrade.textContent =
-
         percent >= 80
             ? 'Excellent'
-
             : percent >= 60
                 ? 'Good'
-
                 : percent >= 40
                     ? 'Average'
-
                     : 'Needs Improvement';
 
 
@@ -526,27 +312,22 @@ function showResult() {
 
     quizQs.forEach((q, i) => {
 
-
         const userIndex = userAnswers[i];
 
 
         const userAns =
-            q._shuffled?.[userIndex]?.text
-            || "Not Attempted";
+            q._shuffled[userIndex]?.text ||
+            "Not Attempted";
 
 
-        const correctAnswerObj =
+        const correctObj =
             q.answers.find(a => a.correct);
 
 
         const correctAns =
-            correctAnswerObj
-                ? correctAnswerObj.text
+            correctObj
+                ? correctObj.text
                 : "Not Available";
-
-
-        const isCorrect =
-            userAns === correctAns;
 
 
         reviewHTML += `
@@ -558,7 +339,7 @@ function showResult() {
             <br><br>
 
             Your Answer :
-            <span style="color:${isCorrect ? 'lime' : 'red'}">
+            <span style="color:${userAns === correctAns ? 'lime' : 'red'}">
                 ${userAns}
             </span>
 
@@ -584,11 +365,7 @@ function showResult() {
     });
 
 
-    // ------------------------------------
-    // ADD REVIEW
-    // ------------------------------------
-
-    result.innerHTML += reviewHTML;
+    document.getElementById("result").innerHTML += reviewHTML;
 
 
     // ====================================
@@ -596,7 +373,6 @@ function showResult() {
     // ====================================
 
     if (window.saveOfficialScore) {
-
 
         window.saveOfficialScore(
             officialScore,
@@ -645,57 +421,33 @@ function showResult() {
 
 function startTimer() {
 
-
-    // ------------------------------------
-    // SHOW TIMER
-    // ------------------------------------
-
     timerEl.classList.remove('hide');
 
 
-    // ------------------------------------
-    // CLEAR OLD TIMER
-    // ------------------------------------
-
+    // Clear old timer
     if (tInt) {
 
         clearInterval(tInt);
+        tInt = null;
 
     }
 
 
-    // ------------------------------------
-    // INITIAL TIMER DISPLAY
-    // ------------------------------------
+    // Show initial time
+    updateTimer();
 
-    updateTimerDisplay();
-
-
-    // ------------------------------------
-    // START COUNTDOWN
-    // ------------------------------------
 
     tInt = setInterval(() => {
-
 
         totalTime--;
 
 
-        // --------------------------------
-        // UPDATE DISPLAY
-        // --------------------------------
+        updateTimer();
 
-        updateTimerDisplay();
-
-
-        // --------------------------------
-        // TIME FINISHED
-        // --------------------------------
 
         if (totalTime <= 0) {
 
             clearInterval(tInt);
-
             tInt = null;
 
             showResult();
@@ -712,8 +464,7 @@ function startTimer() {
 // HH:MM:SS
 // ========================================
 
-function updateTimerDisplay() {
-
+function updateTimer() {
 
     const hours =
         Math.floor(totalTime / 3600);
@@ -751,13 +502,7 @@ function updateTimerDisplay() {
 
 function shuffle(a) {
 
-
-    for (
-        let i = a.length - 1;
-        i > 0;
-        i--
-    ) {
-
+    for (let i = a.length - 1; i > 0; i--) {
 
         const j =
             Math.floor(Math.random() * (i + 1));
@@ -772,3 +517,4 @@ function shuffle(a) {
     return a;
 
 }
+```
