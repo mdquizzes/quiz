@@ -57,37 +57,69 @@ let userAnswers = [];
 
 function loadQuizData(data) {
 
-    if (!Array.isArray(data)) {
+    // If index.html passes quiz data, use it.
+    if (Array.isArray(data)) {
+        quizQs = data;
+    }
+
+    // If no argument was passed, try common global
+    // variables created by index.html.
+    if (!quizQs.length) {
+
+        if (Array.isArray(window.quizData)) {
+            quizQs = window.quizData;
+        }
+
+        else if (Array.isArray(window.questions)) {
+            quizQs = window.questions;
+        }
+
+        else if (Array.isArray(window.quizQuestions)) {
+            quizQs = window.quizQuestions;
+        }
+    }
+
+    // Still no questions?
+    if (!Array.isArray(quizQs) || quizQs.length === 0) {
+
         console.error(
-            'loadQuizData: quiz data must be an array.',
-            data
+            'loadQuizData: No quiz questions found.'
         );
+
         return;
     }
 
-    quizQs = data;
-
+    // Reset quiz
     idx = 0;
+
     practiceScore = 0;
     officialScore = 0;
+
     attempted = 0;
     correctCount = 0;
+
     userAnswers = [];
 
+    // Hide result
     if (result) {
         result.classList.add('hide');
     }
 
+    // Show quiz
     if (quiz) {
         quiz.classList.remove('hide');
     }
 
+    // Hide Next
     if (nextBtn) {
         nextBtn.classList.add('hide');
     }
 
+    // Start first question
     renderQ();
 }
+
+window.loadQuizData = loadQuizData;
 
 // IMPORTANT:
 // index.html can call loadQuizData()
