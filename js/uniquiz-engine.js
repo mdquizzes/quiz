@@ -1,73 +1,138 @@
-```javascript
 const el = id => document.getElementById(id);
-
 
 // ========================================
 // ELEMENTS
 // ========================================
 
-const settings = el('settings'),
-      quiz = el('quiz'),
-      result = el('result');
+const settings = el('settings');
+const quiz = el('quiz');
+const result = el('result');
 
-const qCountEl = el('qCount'),
-      posMarksEl = el('posMarks'),
-      negMarksEl = el('negMarks'),
-      timerModeEl = el('timerMode');
+const qCountEl = el('qCount');
+const posMarksEl = el('posMarks');
+const negMarksEl = el('negMarks');
+const timerModeEl = el('timerMode');
 
-const progressEl = el('progress'),
-      scoreEl = el('score'),
-      timerEl = el('timer');
+const progressEl = el('progress');
+const scoreEl = el('score');
+const timerEl = el('timer');
 
-const qEl = el('question'),
-      optsEl = el('options'),
-      nextBtn = el('nextBtn');
+const qEl = el('question');
+const optsEl = el('options');
+const nextBtn = el('nextBtn');
 
-const rName = el('rName'),
-      rScore = el('rScore'),
-      rPercent = el('rPercent'),
-      rAccuracy = el('rAccuracy'),
-      rGrade = el('rGrade');
+const rName = el('rName');
+const rScore = el('rScore');
+const rPercent = el('rPercent');
+const rAccuracy = el('rAccuracy');
+const rGrade = el('rGrade');
 
-const officialScoreEl = el("officialScore");
-
+const officialScoreEl = el('officialScore');
 
 // ========================================
 // VARIABLES
 // ========================================
 
-let quizQs = [],
-    idx = 0;
+let quizQs = [];
+let idx = 0;
 
 let practiceScore = 0;
 let officialScore = 0;
 
-let POS = 4,
-    NEG = 2,
-    attempted = 0,
-    correctCount = 0;
+let POS = 4;
+let NEG = 2;
 
-let timerOn = true,
-    totalTime = 0,
-    tInt = null;
+let attempted = 0;
+let correctCount = 0;
 
-
-// ========================================
-// USER ANSWERS
-// ========================================
+let timerOn = true;
+let totalTime = 0;
+let tInt = null;
 
 let userAnswers = [];
 
-
 // ========================================
-// NOTE
-// ========================================
-// Start Quiz is handled by index.html
-// through loadQuizData().
-//
-// DO NOT add another startBtn onclick here.
+// LOAD QUIZ DATA
 // ========================================
 
+function loadQuizData(data) {
+
+    if (!Array.isArray(data)) {
+        console.error(
+            'loadQuizData: quiz data must be an array.',
+            data
+        );
+        return;
+    }
+
+    quizQs = data;
+
+    idx = 0;
+    practiceScore = 0;
+    officialScore = 0;
+    attempted = 0;
+    correctCount = 0;
+    userAnswers = [];
+
+    if (result) {
+        result.classList.add('hide');
+    }
+
+    if (quiz) {
+        quiz.classList.remove('hide');
+    }
+
+    if (nextBtn) {
+        nextBtn.classList.add('hide');
+    }
+
+    renderQ();
+}
+
+// IMPORTANT:
+// index.html can call loadQuizData()
+window.loadQuizData = loadQuizData;
+
+// ========================================
+// QUIZ CONFIG
+// ========================================
+
+function setQuizConfig(config = {}) {
+
+    if (config.posMarks !== undefined) {
+        const value = Number(config.posMarks);
+
+        if (Number.isFinite(value)) {
+            POS = value;
+        }
+    }
+
+    if (config.negMarks !== undefined) {
+        const value = Number(config.negMarks);
+
+        if (Number.isFinite(value)) {
+            NEG = value;
+        }
+    }
+
+    if (config.timerOn !== undefined) {
+        timerOn = Boolean(config.timerOn);
+    }
+
+    if (config.totalTime !== undefined) {
+        const value = Number(config.totalTime);
+
+        if (Number.isFinite(value)) {
+            totalTime = Math.max(0, value);
+        }
+    }
+
+    if (timerOn && totalTime > 0) {
+        startTimer();
+    }
+}
+
+window.setQuizConfig = setQuizConfig;
 
 // ========================================
 // LOAD QUESTION
@@ -75,69 +140,97 @@ let userAnswers = [];
 
 function renderQ() {
 
-    // Hide Next until answer is selected
-    nextBtn.classList.add('hide');
+    if (!qEl || !optsEl) {
+        console.error(
+            'Quiz HTML elements missing: question/options'
+        );
+        return;
+    }
 
+    if (nextBtn) {
+        nextBtn.classList.add('hide');
+    }
 
     const q = quizQs[idx];
 
-
-    // Safety check
     if (!q) {
-
         showResult();
         return;
-
     }
 
-
+    // ------------------------------------
     // Progress
-    progressEl.textContent =
-        `Q ${idx + 1}/${quizQs.length}`;
+    // ------------------------------------
 
+    if (progressEl) {
 
+        progressEl.textContent =
+            `Q ${idx + 1}/${quizQs.length}`;
+    }
+
+    // ------------------------------------
     // Score
-    scoreEl.textContent =
-        `Practice Score : ${practiceScore.toFixed(2)}`;
+    // ------------------------------------
 
+    if (scoreEl) {
 
+        scoreEl.textContent =
+            `Practice Score : ${practiceScore.toFixed(2)}`;
+    }
+
+    // ------------------------------------
     // Question
-    qEl.textContent = q.question;
+    // ------------------------------------
 
+    qEl.textContent = q.question || '';
 
+    // ------------------------------------
     // Clear options
+    // ------------------------------------
+
     optsEl.innerHTML = '';
 
+    // ------------------------------------
+    // Answers
+    // ------------------------------------
 
-    // Shuffle options
-    const shuffled = shuffle([...q.answers]);
+    const answers =
+        Array.isArray(q.answers)
+            ? q.answers
+            : [];
+
+    const shuffled =
+        shuffle([...answers]);
 
     quizQs[idx]._shuffled = shuffled;
 
-
+    // ------------------------------------
     // Create options
+    // ------------------------------------
+
     shuffled.forEach((a, i) => {
 
-        const d = document.createElement('div');
+        const d =
+            document.createElement('div');
 
         d.className = 'opt';
 
-        d.textContent = a.text;
-
+        d.textContent =
+            a.text ?? '';
 
         d.onclick = () => {
 
-            select(a.correct, d, i);
+            select(
+                Boolean(a.correct),
+                d,
+                i
+            );
 
         };
 
-
         optsEl.appendChild(d);
-
     });
-
 }
-
 
 // ========================================
 // SELECT ANSWER
@@ -145,95 +238,106 @@ function renderQ() {
 
 function select(correct, elOpt, index) {
 
+    if (!nextBtn || !optsEl) {
+        return;
+    }
+
     // Prevent multiple answers
     if (!nextBtn.classList.contains('hide')) {
         return;
     }
 
-
     attempted++;
 
-
-    // Store user answer
     userAnswers[idx] = index;
 
-
+    // ------------------------------------
     // Correct
+    // ------------------------------------
+
     if (correct) {
 
         practiceScore += POS;
 
-        // Official score remains fixed
+        // Official score
         officialScore += 4;
 
         correctCount++;
-
     }
 
-
+    // ------------------------------------
     // Wrong
+    // ------------------------------------
+
     else {
 
         practiceScore -= NEG;
 
-        // Official score remains fixed
+        // Official score
         officialScore -= 1;
-
     }
 
-
+    // ------------------------------------
     // Show correct answer
-    Array.from(optsEl.children).forEach((o, i) => {
+    // ------------------------------------
 
-        if (quizQs[idx]._shuffled[i].correct) {
+    const shuffled =
+        quizQs[idx]?._shuffled || [];
 
-            o.classList.add('correct');
+    Array.from(optsEl.children)
+        .forEach((o, i) => {
 
-        }
+            if (shuffled[i]?.correct) {
 
-    });
+                o.classList.add('correct');
+            }
+        });
 
-
+    // ------------------------------------
     // Show wrong answer
-    if (!correct) {
+    // ------------------------------------
+
+    if (!correct && elOpt) {
 
         elOpt.classList.add('wrong');
-
     }
 
-
+    // ------------------------------------
     // Update score
-    scoreEl.textContent =
-        `Practice Score : ${practiceScore.toFixed(2)}`;
+    // ------------------------------------
 
+    if (scoreEl) {
 
-    // Show Next
+        scoreEl.textContent =
+            `Practice Score : ${practiceScore.toFixed(2)}`;
+    }
+
+    // ------------------------------------
+    // Show next
+    // ------------------------------------
+
     nextBtn.classList.remove('hide');
-
 }
-
 
 // ========================================
 // NEXT QUESTION
 // ========================================
 
-nextBtn.onclick = () => {
+if (nextBtn) {
 
-    idx++;
+    nextBtn.onclick = () => {
 
+        idx++;
 
-    if (idx >= quizQs.length) {
+        if (idx >= quizQs.length) {
 
-        showResult();
-        return;
+            showResult();
+            return;
+        }
 
-    }
-
-
-    renderQ();
-
-};
-
+        renderQ();
+    };
+}
 
 // ========================================
 // RESULT
@@ -241,179 +345,261 @@ nextBtn.onclick = () => {
 
 function showResult() {
 
+    // ------------------------------------
     // Stop timer
+    // ------------------------------------
+
     if (tInt) {
 
         clearInterval(tInt);
-        tInt = null;
 
+        tInt = null;
     }
 
+    // ------------------------------------
+    // Show result
+    // ------------------------------------
 
-    quiz.classList.add('hide');
+    if (quiz) {
 
-    result.classList.remove('hide');
+        quiz.classList.add('hide');
+    }
 
+    if (result) {
 
-    const max = quizQs.length * POS;
+        result.classList.remove('hide');
+    }
 
+    // ------------------------------------
+    // Calculate result
+    // ------------------------------------
+
+    const max =
+        quizQs.length * POS;
 
     const percent =
         max > 0
-            ? Math.max(0, (practiceScore / max) * 100)
+            ? Math.max(
+                0,
+                (practiceScore / max) * 100
+            )
             : 0;
 
-
     const acc =
-        attempted
+        attempted > 0
             ? (correctCount / attempted) * 100
             : 0;
 
-
     const wrongCount =
-        attempted - correctCount;
+        Math.max(
+            0,
+            attempted - correctCount
+        );
 
+    // ------------------------------------
+    // Result fields
+    // ------------------------------------
 
-    rName.textContent = "User";
+    if (rName) {
 
+        rName.textContent =
+            'User';
+    }
 
-    rScore.textContent =
-        `Practice Score : ${practiceScore.toFixed(2)} / ${max}`;
+    if (rScore) {
 
+        rScore.textContent =
+            `Practice Score : ${practiceScore.toFixed(2)} / ${max}`;
+    }
 
-    officialScoreEl.textContent =
-        `Earning Points : ${officialScore}`;
+    if (officialScoreEl) {
 
+        officialScoreEl.textContent =
+            `Earning Points : ${officialScore}`;
+    }
 
-    rPercent.textContent =
-        `Percentage : ${percent.toFixed(1)}%`;
+    if (rPercent) {
 
+        rPercent.textContent =
+            `Percentage : ${percent.toFixed(1)}%`;
+    }
 
-    rAccuracy.textContent =
-        `Accuracy : ${acc.toFixed(1)}%`;
+    if (rAccuracy) {
 
+        rAccuracy.textContent =
+            `Accuracy : ${acc.toFixed(1)}%`;
+    }
 
-    rGrade.textContent =
-        percent >= 80
-            ? 'Excellent'
-            : percent >= 60
-                ? 'Good'
-                : percent >= 40
-                    ? 'Average'
-                    : 'Needs Improvement';
+    if (rGrade) {
 
+        rGrade.textContent =
+            percent >= 80
+                ? 'Excellent'
+                : percent >= 60
+                    ? 'Good'
+                    : percent >= 40
+                        ? 'Average'
+                        : 'Needs Improvement';
+    }
 
     // ====================================
     // ANSWER REVIEW
     // ====================================
 
-    let reviewHTML = "<h3>Answer Review</h3>";
-
+    let reviewHTML =
+        '<h3>Answer Review</h3>';
 
     quizQs.forEach((q, i) => {
 
-        const userIndex = userAnswers[i];
+        const userIndex =
+            userAnswers[i];
 
+        const shuffled =
+            q._shuffled || [];
 
         const userAns =
-            q._shuffled[userIndex]?.text ||
-            "Not Attempted";
-
+            shuffled[userIndex]?.text ||
+            'Not Attempted';
 
         const correctObj =
-            q.answers.find(a => a.correct);
-
+            Array.isArray(q.answers)
+                ? q.answers.find(
+                    a => a.correct
+                )
+                : null;
 
         const correctAns =
             correctObj
                 ? correctObj.text
-                : "Not Available";
+                : 'Not Available';
 
+        const isCorrect =
+            userAns !== 'Not Attempted' &&
+            userAns === correctAns;
 
         reviewHTML += `
 
-        <div class="review-card">
+            <div class="review-card">
 
-            <b>Q${i + 1}. ${q.question}</b>
+                <b>
+                    Q${i + 1}.
+                    ${escapeHTML(q.question || '')}
+                </b>
 
-            <br><br>
+                <br><br>
 
-            Your Answer :
-            <span style="color:${userAns === correctAns ? 'lime' : 'red'}">
-                ${userAns}
-            </span>
+                Your Answer :
 
-            <br>
+                <span
+                    style="color:${isCorrect ? 'lime' : 'red'}"
+                >
+                    ${escapeHTML(String(userAns))}
+                </span>
 
-            Correct Answer :
-            <span style="color:lime">
-                ${correctAns}
-            </span>
+                <br>
 
-            <br><br>
+                Correct Answer :
 
-            <b>Solution:</b>
+                <span style="color:lime">
+                    ${escapeHTML(String(correctAns))}
+                </span>
 
-            <div class="solution">
-                ${q.solution || "No explanation"}
+                <br><br>
+
+                <b>Solution:</b>
+
+                <div class="solution">
+                    ${q.solution || 'No explanation'}
+                </div>
+
             </div>
-
-        </div>
-
         `;
-
     });
 
+    // ------------------------------------
+    // Insert review
+    // ------------------------------------
 
-    document.getElementById("result").innerHTML += reviewHTML;
+    const reviewContainer =
+        document.getElementById(
+            'answerReview'
+        );
 
+    if (reviewContainer) {
+
+        reviewContainer.innerHTML =
+            reviewHTML;
+
+    } else if (result) {
+
+        let generatedReview =
+            document.getElementById(
+                'generatedAnswerReview'
+            );
+
+        if (!generatedReview) {
+
+            generatedReview =
+                document.createElement('div');
+
+            generatedReview.id =
+                'generatedAnswerReview';
+
+            result.appendChild(
+                generatedReview
+            );
+        }
+
+        generatedReview.innerHTML =
+            reviewHTML;
+    }
 
     // ====================================
     // SAVE LEADERBOARD SCORE
     // ====================================
 
-    if (window.saveOfficialScore) {
+    if (
+        typeof window.saveOfficialScore ===
+        'function'
+    ) {
 
-        window.saveOfficialScore(
-            officialScore,
-            correctCount,
-            wrongCount
+        Promise.resolve(
+
+            window.saveOfficialScore(
+                officialScore,
+                correctCount,
+                wrongCount
+            )
+
         )
-
         .then(() => {
 
             const saveStatus =
-                document.getElementById("saveStatus");
-
+                document.getElementById(
+                    'saveStatus'
+                );
 
             if (saveStatus) {
 
                 saveStatus.innerText =
-                    "Score added to leaderboard";
-
+                    'Score added to leaderboard';
             }
-
         })
-
         .catch(() => {
 
             const saveStatus =
-                document.getElementById("saveStatus");
-
+                document.getElementById(
+                    'saveStatus'
+                );
 
             if (saveStatus) {
 
                 saveStatus.innerText =
-                    "Login required to save score";
-
+                    'Login required to save score';
             }
-
         });
-
     }
-
 }
-
 
 // ========================================
 // TIMER
@@ -421,43 +607,45 @@ function showResult() {
 
 function startTimer() {
 
+    if (!timerEl) {
+        return;
+    }
+
     timerEl.classList.remove('hide');
 
-
-    // Clear old timer
+    // Clear previous timer
     if (tInt) {
 
         clearInterval(tInt);
-        tInt = null;
 
+        tInt = null;
     }
 
-
-    // Show initial time
     updateTimer();
-
 
     tInt = setInterval(() => {
 
         totalTime--;
 
-
         updateTimer();
-
 
         if (totalTime <= 0) {
 
             clearInterval(tInt);
+
             tInt = null;
 
-            showResult();
+            totalTime = 0;
 
+            updateTimer();
+
+            showResult();
         }
 
     }, 1000);
-
 }
 
+window.startTimer = startTimer;
 
 // ========================================
 // TIMER DISPLAY
@@ -466,35 +654,44 @@ function startTimer() {
 
 function updateTimer() {
 
-    const hours =
-        Math.floor(totalTime / 3600);
+    if (!timerEl) {
+        return;
+    }
 
+    const hours =
+        Math.floor(
+            totalTime / 3600
+        );
 
     const minutes =
-        Math.floor((totalTime % 3600) / 60);
-
+        Math.floor(
+            (totalTime % 3600) / 60
+        );
 
     const seconds =
         totalTime % 60;
 
-
     const hh =
-        String(hours).padStart(2, '0');
-
+        String(hours).padStart(
+            2,
+            '0'
+        );
 
     const mm =
-        String(minutes).padStart(2, '0');
-
+        String(minutes).padStart(
+            2,
+            '0'
+        );
 
     const ss =
-        String(seconds).padStart(2, '0');
-
+        String(seconds).padStart(
+            2,
+            '0'
+        );
 
     timerEl.textContent =
         `Time Left: ${hh}:${mm}:${ss}`;
-
 }
-
 
 // ========================================
 // SHUFFLE
@@ -502,19 +699,69 @@ function updateTimer() {
 
 function shuffle(a) {
 
-    for (let i = a.length - 1; i > 0; i--) {
+    for (
+        let i = a.length - 1;
+        i > 0;
+        i--
+    ) {
 
         const j =
-            Math.floor(Math.random() * (i + 1));
+            Math.floor(
+                Math.random() * (i + 1)
+            );
 
-
-        [a[i], a[j]] =
-            [a[j], a[i]];
-
+        [
+            a[i],
+            a[j]
+        ] = [
+            a[j],
+            a[i]
+        ];
     }
 
-
     return a;
-
 }
-```
+
+// ========================================
+// HTML ESCAPE
+// ========================================
+
+function escapeHTML(value) {
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            '&amp;'
+        )
+
+        .replace(
+            /</g,
+            '&lt;'
+        )
+
+        .replace(
+            />/g,
+            '&gt;'
+        )
+
+        .replace(
+            /"/g,
+            '&quot;'
+        )
+
+        .replace(
+            /'/g,
+            '&#039;'
+        );
+}
+
+// ========================================
+// GLOBAL FUNCTIONS
+// ========================================
+
+window.renderQ = renderQ;
+
+window.showResult = showResult;
+
+window.selectQuizAnswer = select;
