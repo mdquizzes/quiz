@@ -1,413 +1,879 @@
-const el = id => document.getElementById(id);
+// ============================================================
+// MD QUIZZES - UNQUIZ ENGINE
+// ============================================================
+//
+// IMPORTANT:
+//
+// Quiz DATA loading is handled by quiz1.html.
+//
+// This file ONLY handles:
+// - quiz state
+// - question rendering
+// - answer selection
+// - scoring
+// - timer
+// - next question
+// - result
+// - answer review
+// - leaderboard save
+//
+// DO NOT define window.loadQuizData here.
+// ============================================================
 
-// ========================================
+
+"use strict";
+
+
+// ============================================================
+// ELEMENT HELPER
+// ============================================================
+
+const $ = id =>
+    document.getElementById(id);
+
+
+// ============================================================
 // ELEMENTS
-// ========================================
+// ============================================================
 
-const settings = el('settings');
-const quiz = el('quiz');
-const result = el('result');
+const settings =
+    $("settings");
 
-const qCountEl = el('qCount');
-const posMarksEl = el('posMarks');
-const negMarksEl = el('negMarks');
-const timerModeEl = el('timerMode');
+const quiz =
+    $("quiz");
 
-const progressEl = el('progress');
-const scoreEl = el('score');
-const timerEl = el('timer');
+const result =
+    $("result");
 
-const qEl = el('question');
-const optsEl = el('options');
-const nextBtn = el('nextBtn');
+const qCountEl =
+    $("qCount");
 
-const rName = el('rName');
-const rScore = el('rScore');
-const rPercent = el('rPercent');
-const rAccuracy = el('rAccuracy');
-const rGrade = el('rGrade');
+const posMarksEl =
+    $("posMarks");
 
-const officialScoreEl = el('officialScore');
+const negMarksEl =
+    $("negMarks");
 
-// ========================================
-// VARIABLES
-// ========================================
+const timerModeEl =
+    $("timerMode");
+
+const progressEl =
+    $("progress");
+
+const scoreEl =
+    $("score");
+
+const timerEl =
+    $("timer");
+
+const qEl =
+    $("question");
+
+const optsEl =
+    $("options");
+
+const nextBtn =
+    $("nextBtn");
+
+const rName =
+    $("rName");
+
+const rScore =
+    $("rScore");
+
+const rPercent =
+    $("rPercent");
+
+const rAccuracy =
+    $("rAccuracy");
+
+const rGrade =
+    $("rGrade");
+
+const officialScoreEl =
+    $("officialScore");
+
+const saveStatus =
+    $("saveStatus");
+
+const answerReview =
+    $("answerReview");
+
+
+// ============================================================
+// QUIZ VARIABLES
+// ============================================================
 
 let quizQs = [];
+
 let idx = 0;
 
 let practiceScore = 0;
+
 let officialScore = 0;
 
 let POS = 4;
-let NEG = 2;
+
+let NEG = 0;
 
 let attempted = 0;
+
 let correctCount = 0;
 
 let timerOn = true;
+
 let totalTime = 0;
+
 let tInt = null;
 
 let userAnswers = [];
 
-// ========================================
-// LOAD QUIZ DATA
-// ========================================
 
-function loadQuizData(data) {
+// ============================================================
+// CONFIGURE QUIZ
+// ============================================================
 
-    // If index.html passes quiz data, use it.
-    if (Array.isArray(data)) {
-        quizQs = data;
+function configureQuiz(config = {}){
+
+
+    if(
+        config.posMarks !== undefined
+    ){
+
+        const value =
+            Number(
+                config.posMarks
+            );
+
+
+        if(
+            Number.isFinite(value)
+        ){
+
+            POS = value;
+
+        }
+
     }
 
-    // If no argument was passed, try common global
-    // variables created by index.html.
-    if (!quizQs.length) {
 
-        if (Array.isArray(window.quizData)) {
-            quizQs = window.quizData;
+    if(
+        config.negMarks !== undefined
+    ){
+
+        const value =
+            Number(
+                config.negMarks
+            );
+
+
+        if(
+            Number.isFinite(value)
+        ){
+
+            NEG = value;
+
         }
 
-        else if (Array.isArray(window.questions)) {
-            quizQs = window.questions;
-        }
-
-        else if (Array.isArray(window.quizQuestions)) {
-            quizQs = window.quizQuestions;
-        }
     }
 
-    // Still no questions?
-    if (!Array.isArray(quizQs) || quizQs.length === 0) {
+
+    if(
+        config.timerOn !== undefined
+    ){
+
+        timerOn =
+            Boolean(
+                config.timerOn
+            );
+
+    }
+
+}
+
+
+// Make available to quiz1.html.
+
+window.configureQuiz =
+    configureQuiz;
+
+
+// ============================================================
+// START QUIZ
+// ============================================================
+
+function startQuiz(questions){
+
+
+    /*
+     * Validate.
+     */
+
+    if(
+        !Array.isArray(questions)
+        ||
+        questions.length === 0
+    ){
 
         console.error(
-            'loadQuizData: No quiz questions found.'
+            "startQuiz: No questions supplied."
         );
 
         return;
+
     }
 
-    // Reset quiz
+
+    /*
+     * Stop old timer.
+     */
+
+    stopTimer();
+
+
+    /*
+     * Copy questions.
+     */
+
+    quizQs =
+        questions.map(
+            q => normalizeQuestion(q)
+        );
+
+
+    /*
+     * Reset state.
+     */
+
     idx = 0;
 
     practiceScore = 0;
+
     officialScore = 0;
 
     attempted = 0;
+
     correctCount = 0;
 
     userAnswers = [];
 
-    // Hide result
-    if (result) {
-        result.classList.add('hide');
-    }
 
-    // Show quiz
-    if (quiz) {
-        quiz.classList.remove('hide');
-    }
+    /*
+     * Reset result.
+     */
 
-    // Hide Next
-    if (nextBtn) {
-        nextBtn.classList.add('hide');
-    }
+    if(result){
 
-    // Start first question
-    renderQ();
-}
-
-window.loadQuizData = loadQuizData;
-
-// IMPORTANT:
-// index.html can call loadQuizData()
-window.loadQuizData = loadQuizData;
-
-// ========================================
-// QUIZ CONFIG
-// ========================================
-
-function setQuizConfig(config = {}) {
-
-    if (config.posMarks !== undefined) {
-        const value = Number(config.posMarks);
-
-        if (Number.isFinite(value)) {
-            POS = value;
-        }
-    }
-
-    if (config.negMarks !== undefined) {
-        const value = Number(config.negMarks);
-
-        if (Number.isFinite(value)) {
-            NEG = value;
-        }
-    }
-
-    if (config.timerOn !== undefined) {
-        timerOn = Boolean(config.timerOn);
-    }
-
-    if (config.totalTime !== undefined) {
-        const value = Number(config.totalTime);
-
-        if (Number.isFinite(value)) {
-            totalTime = Math.max(0, value);
-        }
-    }
-
-    if (timerOn && totalTime > 0) {
-        startTimer();
-    }
-}
-
-window.setQuizConfig = setQuizConfig;
-
-// ========================================
-// LOAD QUESTION
-// ========================================
-
-function renderQ() {
-
-    if (!qEl || !optsEl) {
-        console.error(
-            'Quiz HTML elements missing: question/options'
+        result.classList.add(
+            "hide"
         );
-        return;
+
     }
 
-    if (nextBtn) {
-        nextBtn.classList.add('hide');
+
+    /*
+     * Show quiz.
+     */
+
+    if(settings){
+
+        settings.classList.add(
+            "hide"
+        );
+
     }
 
-    const q = quizQs[idx];
 
-    if (!q) {
-        showResult();
-        return;
+    if(quiz){
+
+        quiz.classList.remove(
+            "hide"
+        );
+
     }
 
-    // ------------------------------------
-    // Progress
-    // ------------------------------------
 
-    if (progressEl) {
+    /*
+     * Reset score display.
+     */
 
-        progressEl.textContent =
-            `Q ${idx + 1}/${quizQs.length}`;
-    }
-
-    // ------------------------------------
-    // Score
-    // ------------------------------------
-
-    if (scoreEl) {
+    if(scoreEl){
 
         scoreEl.textContent =
-            `Practice Score : ${practiceScore.toFixed(2)}`;
+            "Practice Score : 0.00";
+
     }
 
-    // ------------------------------------
-    // Question
-    // ------------------------------------
 
-    qEl.textContent = q.question || '';
+    /*
+     * Start timer.
+     */
 
-    // ------------------------------------
-    // Clear options
-    // ------------------------------------
+    if(timerOn){
 
-    optsEl.innerHTML = '';
+        totalTime =
+            quizQs.length * 60;
 
-    // ------------------------------------
-    // Answers
-    // ------------------------------------
+        startTimer();
 
-    const answers =
-        Array.isArray(q.answers)
-            ? q.answers
-            : [];
+    }
+    else{
 
-    const shuffled =
-        shuffle([...answers]);
+        if(timerEl){
 
-    quizQs[idx]._shuffled = shuffled;
-
-    // ------------------------------------
-    // Create options
-    // ------------------------------------
-
-    shuffled.forEach((a, i) => {
-
-        const d =
-            document.createElement('div');
-
-        d.className = 'opt';
-
-        d.textContent =
-            a.text ?? '';
-
-        d.onclick = () => {
-
-            select(
-                Boolean(a.correct),
-                d,
-                i
+            timerEl.classList.add(
+                "hide"
             );
+
+        }
+
+    }
+
+
+    /*
+     * Render first question.
+     */
+
+    renderQ();
+
+}
+
+
+// Make available to quiz1.html.
+
+window.startQuiz =
+    startQuiz;
+
+
+// ============================================================
+// NORMALIZE QUESTION
+// ============================================================
+
+function normalizeQuestion(q){
+
+
+    if(!q){
+
+        return {
+
+            question:
+                "",
+
+            answers:
+                []
 
         };
 
-        optsEl.appendChild(d);
-    });
+    }
+
+
+    /*
+     * Original format:
+     *
+     * {
+     *   question: "...",
+     *   answers: [...]
+     * }
+     *
+     * Also support:
+     *
+     * options: [...]
+     */
+
+    let answers =
+        Array.isArray(q.answers)
+            ? q.answers
+            : Array.isArray(q.options)
+                ? q.options
+                : [];
+
+
+    answers =
+        answers.map(
+            a => ({
+
+                text:
+                    a?.text ??
+                    a?.label ??
+                    a?.value ??
+                    "",
+
+                correct:
+                    Boolean(
+                        a?.correct
+                    )
+
+            })
+        );
+
+
+    return {
+
+        ...q,
+
+        question:
+            q.question ??
+            q.questionText ??
+            "",
+
+        answers
+
+    };
+
 }
 
-// ========================================
-// SELECT ANSWER
-// ========================================
 
-function select(correct, elOpt, index) {
+// ============================================================
+// RENDER QUESTION
+// ============================================================
 
-    if (!nextBtn || !optsEl) {
+function renderQ(){
+
+
+    if(
+        !qEl
+        ||
+        !optsEl
+    ){
+
+        console.error(
+            "Quiz elements are missing."
+        );
+
         return;
+
     }
 
-    // Prevent multiple answers
-    if (!nextBtn.classList.contains('hide')) {
+
+    /*
+     * No more questions.
+     */
+
+    if(
+        idx >= quizQs.length
+    ){
+
+        showResult();
+
         return;
+
     }
 
-    attempted++;
 
-    userAnswers[idx] = index;
+    /*
+     * Hide Next.
+     */
 
-    // ------------------------------------
-    // Correct
-    // ------------------------------------
+    if(nextBtn){
 
-    if (correct) {
+        nextBtn.classList.add(
+            "hide"
+        );
 
-        practiceScore += POS;
-
-        // Official score
-        officialScore += 4;
-
-        correctCount++;
     }
 
-    // ------------------------------------
-    // Wrong
-    // ------------------------------------
 
-    else {
+    /*
+     * Current question.
+     */
 
-        practiceScore -= NEG;
+    const q =
+        quizQs[idx];
 
-        // Official score
-        officialScore -= 1;
+
+    /*
+     * Progress.
+     */
+
+    if(progressEl){
+
+        progressEl.textContent =
+            `Q ${idx + 1}/${quizQs.length}`;
+
     }
 
-    // ------------------------------------
-    // Show correct answer
-    // ------------------------------------
 
-    const shuffled =
-        quizQs[idx]?._shuffled || [];
+    /*
+     * Score.
+     */
 
-    Array.from(optsEl.children)
-        .forEach((o, i) => {
-
-            if (shuffled[i]?.correct) {
-
-                o.classList.add('correct');
-            }
-        });
-
-    // ------------------------------------
-    // Show wrong answer
-    // ------------------------------------
-
-    if (!correct && elOpt) {
-
-        elOpt.classList.add('wrong');
-    }
-
-    // ------------------------------------
-    // Update score
-    // ------------------------------------
-
-    if (scoreEl) {
+    if(scoreEl){
 
         scoreEl.textContent =
             `Practice Score : ${practiceScore.toFixed(2)}`;
+
     }
 
-    // ------------------------------------
-    // Show next
-    // ------------------------------------
 
-    nextBtn.classList.remove('hide');
-}
+    /*
+     * Question text.
+     */
 
-// ========================================
-// NEXT QUESTION
-// ========================================
+    qEl.textContent =
+        q.question;
 
-if (nextBtn) {
 
-    nextBtn.onclick = () => {
+    /*
+     * Clear old options.
+     */
 
-        idx++;
+    optsEl.innerHTML =
+        "";
 
-        if (idx >= quizQs.length) {
 
-            showResult();
-            return;
+    /*
+     * Shuffle answers.
+     */
+
+    const shuffled =
+        shuffleQuestions(
+            [...q.answers]
+        );
+
+
+    /*
+     * Save shuffled answers.
+     */
+
+    q._shuffled =
+        shuffled;
+
+
+    /*
+     * Create options.
+     */
+
+    shuffled.forEach(
+        (answer, optionIndex) => {
+
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+
+            div.className =
+                "opt";
+
+
+            div.textContent =
+                answer.text;
+
+
+            div.dataset.index =
+                optionIndex;
+
+
+            div.addEventListener(
+                "click",
+                () => {
+
+                    selectAnswer(
+                        Boolean(
+                            answer.correct
+                        ),
+                        div,
+                        optionIndex
+                    );
+
+                }
+            );
+
+
+            optsEl.appendChild(
+                div
+            );
+
         }
+    );
 
-        renderQ();
-    };
 }
 
-// ========================================
-// RESULT
-// ========================================
 
-function showResult() {
+// Make available for debugging if needed.
 
-    // ------------------------------------
-    // Stop timer
-    // ------------------------------------
+window.renderQ =
+    renderQ;
 
-    if (tInt) {
 
-        clearInterval(tInt);
+// ============================================================
+// SELECT ANSWER
+// ============================================================
 
-        tInt = null;
+function selectAnswer(
+    correct,
+    selectedElement,
+    selectedIndex
+){
+
+
+    /*
+     * Prevent second selection.
+     */
+
+    if(
+        nextBtn
+        &&
+        !nextBtn.classList.contains(
+            "hide"
+        )
+    ){
+
+        return;
+
     }
 
-    // ------------------------------------
-    // Show result
-    // ------------------------------------
 
-    if (quiz) {
+    /*
+     * Prevent clicking another option
+     * after answer selection.
+     */
 
-        quiz.classList.add('hide');
+    if(optsEl){
+
+        Array.from(
+            optsEl.children
+        ).forEach(
+            option => {
+
+                option.classList.add(
+                    "disabled"
+                );
+
+                option.style.pointerEvents =
+                    "none";
+
+            }
+        );
+
     }
 
-    if (result) {
 
-        result.classList.remove('hide');
+    /*
+     * Store answer.
+     */
+
+    userAnswers[idx] =
+        selectedIndex;
+
+
+    attempted++;
+
+
+    /*
+     * Correct answer.
+     */
+
+    if(correct){
+
+        /*
+         * Practice score uses
+         * selected positive marks.
+         */
+
+        practiceScore += POS;
+
+
+        /*
+         * Official score:
+         * fixed +4.
+         */
+
+        officialScore += 4;
+
+
+        correctCount++;
+
     }
 
-    // ------------------------------------
-    // Calculate result
-    // ------------------------------------
+
+    /*
+     * Wrong answer.
+     */
+
+    else{
+
+        /*
+         * Practice score uses
+         * selected negative marks.
+         */
+
+        practiceScore -= NEG;
+
+
+        /*
+         * Official score:
+         * fixed -1.
+         */
+
+        officialScore -= 1;
+
+    }
+
+
+    /*
+     * Show correct answer.
+     */
+
+    const shuffled =
+        quizQs[idx]?._shuffled
+        || [];
+
+
+    if(optsEl){
+
+        Array.from(
+            optsEl.children
+        ).forEach(
+            (option, i) => {
+
+                if(
+                    shuffled[i]
+                    &&
+                    shuffled[i].correct
+                ){
+
+                    option.classList.add(
+                        "correct"
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /*
+     * Show wrong selected answer.
+     */
+
+    if(
+        !correct
+        &&
+        selectedElement
+    ){
+
+        selectedElement.classList.add(
+            "wrong"
+        );
+
+    }
+
+
+    /*
+     * Update score.
+     */
+
+    if(scoreEl){
+
+        scoreEl.textContent =
+            `Practice Score : ${practiceScore.toFixed(2)}`;
+
+    }
+
+
+    /*
+     * Show Next.
+     */
+
+    if(nextBtn){
+
+        nextBtn.classList.remove(
+            "hide"
+        );
+
+    }
+
+}
+
+
+// ============================================================
+// NEXT QUESTION
+// ============================================================
+
+if(nextBtn){
+
+    nextBtn.addEventListener(
+        "click",
+        () => {
+
+
+            idx++;
+
+
+            if(
+                idx >= quizQs.length
+            ){
+
+                showResult();
+
+                return;
+
+            }
+
+
+            renderQ();
+
+        }
+    );
+
+}
+
+
+// ============================================================
+// SHOW RESULT
+// ============================================================
+
+function showResult(){
+
+
+    /*
+     * Stop timer.
+     */
+
+    stopTimer();
+
+
+    /*
+     * Hide quiz.
+     */
+
+    if(quiz){
+
+        quiz.classList.add(
+            "hide"
+        );
+
+    }
+
+
+    /*
+     * Show result.
+     */
+
+    if(result){
+
+        result.classList.remove(
+            "hide"
+        );
+
+    }
+
+
+    /*
+     * Maximum practice score.
+     */
 
     const max =
         quizQs.length * POS;
+
+
+    /*
+     * Percentage.
+     */
 
     const percent =
         max > 0
@@ -417,383 +883,561 @@ function showResult() {
             )
             : 0;
 
-    const acc =
+
+    /*
+     * Accuracy.
+     */
+
+    const accuracy =
         attempted > 0
-            ? (correctCount / attempted) * 100
+            ? (
+                correctCount /
+                attempted
+            ) * 100
             : 0;
 
+
+    /*
+     * Wrong.
+     */
+
     const wrongCount =
-        Math.max(
-            0,
-            attempted - correctCount
-        );
+        attempted -
+        correctCount;
 
-    // ------------------------------------
-    // Result fields
-    // ------------------------------------
 
-    if (rName) {
+    /*
+     * Result fields.
+     */
+
+    if(rName){
 
         rName.textContent =
-            'User';
+            "User";
+
     }
 
-    if (rScore) {
+
+    if(rScore){
 
         rScore.textContent =
             `Practice Score : ${practiceScore.toFixed(2)} / ${max}`;
+
     }
 
-    if (officialScoreEl) {
+
+    if(officialScoreEl){
 
         officialScoreEl.textContent =
             `Earning Points : ${officialScore}`;
+
     }
 
-    if (rPercent) {
+
+    if(rPercent){
 
         rPercent.textContent =
             `Percentage : ${percent.toFixed(1)}%`;
+
     }
 
-    if (rAccuracy) {
+
+    if(rAccuracy){
 
         rAccuracy.textContent =
-            `Accuracy : ${acc.toFixed(1)}%`;
+            `Accuracy : ${accuracy.toFixed(1)}%`;
+
     }
 
-    if (rGrade) {
+
+    if(rGrade){
 
         rGrade.textContent =
             percent >= 80
-                ? 'Excellent'
+                ? "Excellent"
                 : percent >= 60
-                    ? 'Good'
+                    ? "Good"
                     : percent >= 40
-                        ? 'Average'
-                        : 'Needs Improvement';
+                        ? "Average"
+                        : "Needs Improvement";
+
     }
 
-    // ====================================
-    // ANSWER REVIEW
-    // ====================================
 
-    let reviewHTML =
-        '<h3>Answer Review</h3>';
+    /*
+     * Answer review.
+     */
 
-    quizQs.forEach((q, i) => {
+    renderAnswerReview();
 
-        const userIndex =
-            userAnswers[i];
 
-        const shuffled =
-            q._shuffled || [];
+    /*
+     * Save official score.
+     */
 
-        const userAns =
-            shuffled[userIndex]?.text ||
-            'Not Attempted';
+    saveLeaderboardScore(
+        wrongCount
+    );
 
-        const correctObj =
-            Array.isArray(q.answers)
-                ? q.answers.find(
-                    a => a.correct
-                )
-                : null;
-
-        const correctAns =
-            correctObj
-                ? correctObj.text
-                : 'Not Available';
-
-        const isCorrect =
-            userAns !== 'Not Attempted' &&
-            userAns === correctAns;
-
-        reviewHTML += `
-
-            <div class="review-card">
-
-                <b>
-                    Q${i + 1}.
-                    ${escapeHTML(q.question || '')}
-                </b>
-
-                <br><br>
-
-                Your Answer :
-
-                <span
-                    style="color:${isCorrect ? 'lime' : 'red'}"
-                >
-                    ${escapeHTML(String(userAns))}
-                </span>
-
-                <br>
-
-                Correct Answer :
-
-                <span style="color:lime">
-                    ${escapeHTML(String(correctAns))}
-                </span>
-
-                <br><br>
-
-                <b>Solution:</b>
-
-                <div class="solution">
-                    ${q.solution || 'No explanation'}
-                </div>
-
-            </div>
-        `;
-    });
-
-    // ------------------------------------
-    // Insert review
-    // ------------------------------------
-
-    const reviewContainer =
-        document.getElementById(
-            'answerReview'
-        );
-
-    if (reviewContainer) {
-
-        reviewContainer.innerHTML =
-            reviewHTML;
-
-    } else if (result) {
-
-        let generatedReview =
-            document.getElementById(
-                'generatedAnswerReview'
-            );
-
-        if (!generatedReview) {
-
-            generatedReview =
-                document.createElement('div');
-
-            generatedReview.id =
-                'generatedAnswerReview';
-
-            result.appendChild(
-                generatedReview
-            );
-        }
-
-        generatedReview.innerHTML =
-            reviewHTML;
-    }
-
-    // ====================================
-    // SAVE LEADERBOARD SCORE
-    // ====================================
-
-    if (
-        typeof window.saveOfficialScore ===
-        'function'
-    ) {
-
-        Promise.resolve(
-
-            window.saveOfficialScore(
-                officialScore,
-                correctCount,
-                wrongCount
-            )
-
-        )
-        .then(() => {
-
-            const saveStatus =
-                document.getElementById(
-                    'saveStatus'
-                );
-
-            if (saveStatus) {
-
-                saveStatus.innerText =
-                    'Score added to leaderboard';
-            }
-        })
-        .catch(() => {
-
-            const saveStatus =
-                document.getElementById(
-                    'saveStatus'
-                );
-
-            if (saveStatus) {
-
-                saveStatus.innerText =
-                    'Login required to save score';
-            }
-        });
-    }
 }
 
-// ========================================
-// TIMER
-// ========================================
 
-function startTimer() {
+// ============================================================
+// ANSWER REVIEW
+// ============================================================
 
-    if (!timerEl) {
+function renderAnswerReview(){
+
+
+    if(!answerReview){
+
         return;
+
     }
 
-    timerEl.classList.remove('hide');
 
-    // Clear previous timer
-    if (tInt) {
+    let html =
+        "<h3>Answer Review</h3>";
 
-        clearInterval(tInt);
 
-        tInt = null;
+    quizQs.forEach(
+        (q, i) => {
+
+
+            const userIndex =
+                userAnswers[i];
+
+
+            const shuffled =
+                q._shuffled
+                || [];
+
+
+            const userAnswer =
+                shuffled[userIndex]?.text
+                ||
+                "Not Attempted";
+
+
+            const correctObject =
+                q.answers.find(
+                    answer =>
+                        answer.correct
+                );
+
+
+            const correctAnswer =
+                correctObject?.text
+                ||
+                "Not Available";
+
+
+            const isCorrect =
+                userAnswer !==
+                    "Not Attempted"
+                &&
+                userAnswer ===
+                    correctAnswer;
+
+
+            const answerColor =
+                isCorrect
+                    ? "lime"
+                    : "red";
+
+
+            html += `
+
+                <div class="review-card">
+
+                    <b>
+                        Q${i + 1}.
+                        ${escapeHTML(
+                            q.question
+                        )}
+                    </b>
+
+                    <br><br>
+
+                    Your Answer :
+
+                    <span
+                        style="color:${answerColor}"
+                    >
+                        ${escapeHTML(
+                            userAnswer
+                        )}
+                    </span>
+
+                    <br>
+
+                    Correct Answer :
+
+                    <span
+                        style="color:lime"
+                    >
+                        ${escapeHTML(
+                            correctAnswer
+                        )}
+                    </span>
+
+                    <br><br>
+
+                    <b>
+                        Solution:
+                    </b>
+
+                    <div class="solution">
+                        ${
+                            q.solution
+                            ||
+                            "No explanation"
+                        }
+                    </div>
+
+                </div>
+
+            `;
+
+        }
+    );
+
+
+    answerReview.innerHTML =
+        html;
+
+}
+
+
+// ============================================================
+// LEADERBOARD
+// ============================================================
+
+function saveLeaderboardScore(
+    wrongCount
+){
+
+
+    if(
+        typeof window.saveOfficialScore
+        !==
+        "function"
+    ){
+
+        if(saveStatus){
+
+            saveStatus.innerText =
+                "Leaderboard save unavailable.";
+
+        }
+
+        return;
+
     }
+
+
+    Promise.resolve(
+
+        window.saveOfficialScore(
+            officialScore,
+            correctCount,
+            wrongCount
+        )
+
+    )
+    .then(
+        () => {
+
+            if(saveStatus){
+
+                saveStatus.innerText =
+                    "Score added to leaderboard";
+
+            }
+
+        }
+    )
+    .catch(
+        () => {
+
+            if(saveStatus){
+
+                saveStatus.innerText =
+                    "Login required to save score";
+
+            }
+
+        }
+    );
+
+}
+
+
+// ============================================================
+// TIMER
+// ============================================================
+
+function startTimer(){
+
+
+    if(!timerEl){
+
+        return;
+
+    }
+
+
+    /*
+     * Clear previous timer.
+     */
+
+    stopTimer();
+
+
+    timerEl.classList.remove(
+        "hide"
+    );
+
+
+    /*
+     * Initial display.
+     */
 
     updateTimer();
 
-    tInt = setInterval(() => {
 
-        totalTime--;
+    /*
+     * Start interval.
+     */
 
-        updateTimer();
+    tInt =
+        setInterval(
+            () => {
 
-        if (totalTime <= 0) {
 
-            clearInterval(tInt);
+                totalTime--;
 
-            tInt = null;
 
-            totalTime = 0;
+                if(
+                    totalTime <= 0
+                ){
 
-            updateTimer();
+                    totalTime = 0;
 
-            showResult();
-        }
 
-    }, 1000);
+                    updateTimer();
+
+
+                    stopTimer();
+
+
+                    showResult();
+
+
+                    return;
+
+                }
+
+
+                updateTimer();
+
+
+            },
+            1000
+        );
+
 }
 
-window.startTimer = startTimer;
 
-// ========================================
-// TIMER DISPLAY
-// HH:MM:SS
-// ========================================
+// Make available if required.
 
-function updateTimer() {
+window.startTimer =
+    startTimer;
 
-    if (!timerEl) {
-        return;
+
+// ============================================================
+// STOP TIMER
+// ============================================================
+
+function stopTimer(){
+
+
+    if(tInt){
+
+        clearInterval(
+            tInt
+        );
+
+        tInt = null;
+
     }
+
+}
+
+
+// ============================================================
+// TIMER DISPLAY
+// ============================================================
+
+function updateTimer(){
+
+
+    if(!timerEl){
+
+        return;
+
+    }
+
 
     const hours =
         Math.floor(
             totalTime / 3600
         );
 
+
     const minutes =
         Math.floor(
             (totalTime % 3600) / 60
         );
 
+
     const seconds =
         totalTime % 60;
 
+
     const hh =
-        String(hours).padStart(
-            2,
-            '0'
-        );
+        String(hours)
+            .padStart(
+                2,
+                "0"
+            );
+
 
     const mm =
-        String(minutes).padStart(
-            2,
-            '0'
-        );
+        String(minutes)
+            .padStart(
+                2,
+                "0"
+            );
+
 
     const ss =
-        String(seconds).padStart(
-            2,
-            '0'
-        );
+        String(seconds)
+            .padStart(
+                2,
+                "0"
+            );
+
 
     timerEl.textContent =
         `Time Left: ${hh}:${mm}:${ss}`;
+
 }
 
-// ========================================
+
+// ============================================================
 // SHUFFLE
-// ========================================
+// ============================================================
 
-function shuffle(a) {
+function shuffleQuestions(array){
 
-    for (
-        let i = a.length - 1;
+
+    for(
+        let i = array.length - 1;
         i > 0;
         i--
-    ) {
+    ){
 
         const j =
             Math.floor(
-                Math.random() * (i + 1)
+                Math.random() *
+                (i + 1)
             );
 
+
         [
-            a[i],
-            a[j]
-        ] = [
-            a[j],
-            a[i]
+            array[i],
+            array[j]
+        ] =
+        [
+            array[j],
+            array[i]
         ];
+
     }
 
-    return a;
+
+    return array;
+
 }
 
-// ========================================
-// HTML ESCAPE
-// ========================================
 
-function escapeHTML(value) {
+// Make available to quiz1.html.
+
+window.shuffleQuestions =
+    shuffleQuestions;
+
+
+// ============================================================
+// HTML ESCAPE
+// ============================================================
+
+function escapeHTML(value){
+
 
     return String(value)
 
         .replace(
             /&/g,
-            '&amp;'
+            "&amp;"
         )
 
         .replace(
             /</g,
-            '&lt;'
+            "&lt;"
         )
 
         .replace(
             />/g,
-            '&gt;'
+            "&gt;"
         )
 
         .replace(
             /"/g,
-            '&quot;'
+            "&quot;"
         )
 
         .replace(
             /'/g,
-            '&#039;'
+            "&#039;"
         );
+
 }
 
-// ========================================
-// GLOBAL FUNCTIONS
-// ========================================
 
-window.renderQ = renderQ;
+// ============================================================
+// INITIAL STATE
+// ============================================================
 
-window.showResult = showResult;
+if(timerEl){
 
-window.selectQuizAnswer = select;
+    timerEl.textContent =
+        "Time Left";
+
+}
+
+
+if(scoreEl){
+
+    scoreEl.textContent =
+        "Practice Score : 0.00";
+
+}
+
+
+if(progressEl){
+
+    progressEl.textContent =
+        "Q 0/0";
+
+}
