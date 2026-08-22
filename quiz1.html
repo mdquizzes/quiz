@@ -4,622 +4,993 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
 
 <title>MD QUIZZES</title>
 
-<link rel="stylesheet" href="css/quiz-style.css">
+<link rel="stylesheet"
+      href="css/quiz-style.css">
 
 <style>
 
 body{
-margin:0;
-font-family:
-"Segoe UI",
-"Noto Sans",
-Arial,
-sans-serif;
-background:
-linear-gradient(to right,#020617,#0f172a,#020617);
-color:white;
+    margin:0;
+    font-family:
+        "Segoe UI",
+        "Noto Sans",
+        Arial,
+        sans-serif;
+
+    background:
+        linear-gradient(
+            to right,
+            #020617,
+            #0f172a,
+            #020617
+        );
+
+    color:white;
 }
 
 .topbar{
-background:#082f49;
-padding:15px 25px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-flex-wrap:wrap;
+    background:#082f49;
+    padding:15px 25px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    flex-wrap:wrap;
 }
 
 .logo{
-font-size:32px;
-font-weight:700;
-color:#facc15;
+    font-size:32px;
+    font-weight:700;
+    color:#facc15;
 }
 
 .open-btn{
-background:#facc15;
-color:black;
-padding:10px 18px;
-border-radius:10px;
-font-weight:600;
-text-decoration:none;
+    background:#facc15;
+    color:black;
+
+    padding:10px 18px;
+
+    border-radius:10px;
+
+    font-weight:600;
+    text-decoration:none;
 }
 
 .quiz-wrap{
-max-width:1000px;
-margin:30px auto;
-background:#111827;
-padding:25px;
-border-radius:18px;
-box-shadow:0 0 25px rgba(0,0,0,0.4);
+    max-width:1000px;
+
+    margin:30px auto;
+
+    background:#111827;
+
+    padding:25px;
+
+    border-radius:18px;
+
+    box-shadow:
+        0 0 25px rgba(0,0,0,0.4);
 }
 
 .center{
-text-align:center;
+    text-align:center;
 }
 
 h1{
-color:#facc15;
-margin-bottom:30px;
+    color:#facc15;
+    margin-bottom:30px;
 }
 
 .row{
-margin-bottom:18px;
+    margin-bottom:18px;
 }
 
 .row label{
-display:block;
-margin-bottom:8px;
-font-weight:600;
-font-size:15px;
+    display:block;
+
+    margin-bottom:8px;
+
+    font-weight:600;
+    font-size:15px;
 }
 
 .row select{
-width:100%;
-padding:12px;
-border:none;
-border-radius:10px;
-font-size:15px;
-background:#f8fafc;
+    width:100%;
+
+    padding:12px;
+
+    border:none;
+
+    border-radius:10px;
+
+    font-size:15px;
+
+    background:#f8fafc;
 }
 
 .btn{
-padding:14px 24px;
-background:#facc15;
-color:black;
-border:none;
-border-radius:12px;
-font-size:18px;
-font-weight:700;
-cursor:pointer;
+    padding:14px 24px;
+
+    background:#facc15;
+
+    color:black;
+
+    border:none;
+
+    border-radius:12px;
+
+    font-size:18px;
+
+    font-weight:700;
+
+    cursor:pointer;
 }
 
 .btn:hover{
-background:#fde047;
+    background:#fde047;
+}
+
+.btn:disabled{
+    opacity:.6;
+    cursor:not-allowed;
 }
 
 .hide{
-display:none;
+    display:none !important;
 }
 
 .hud{
-display:flex;
-justify-content:space-between;
-gap:10px;
-flex-wrap:wrap;
-background:#1e293b;
-padding:15px;
-border-radius:12px;
-margin-bottom:20px;
+    display:flex;
+
+    justify-content:space-between;
+
+    gap:10px;
+
+    flex-wrap:wrap;
+
+    background:#1e293b;
+
+    padding:15px;
+
+    border-radius:12px;
+
+    margin-bottom:20px;
 }
 
 .hud div{
-font-weight:700;
+    font-weight:700;
 }
 
 .q{
-font-size:22px;
-line-height:1.6;
-margin-bottom:20px;
+    font-size:22px;
+
+    line-height:1.6;
+
+    margin-bottom:20px;
 }
 
 .opts{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:15px;
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:15px;
 }
 
 .opt{
-background:#1e293b;
-padding:14px;
-border-radius:10px;
-cursor:pointer;
-transition:0.3s;
-border:2px solid transparent;
+    background:#1e293b;
+
+    padding:14px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+    border:2px solid transparent;
 }
 
 .opt:hover{
-background:#334155;
+    background:#334155;
+}
+
+.opt.disabled{
+    cursor:default;
 }
 
 .correct{
-background:#14532d !important;
-border-color:#22c55e !important;
+    background:#14532d !important;
+    border-color:#22c55e !important;
 }
 
 .wrong{
-background:#7f1d1d !important;
-border-color:#ef4444 !important;
+    background:#7f1d1d !important;
+    border-color:#ef4444 !important;
 }
 
 .result{
-background:#111827;
-padding:25px;
-border-radius:14px;
-margin-top:20px;
+    background:#111827;
+
+    padding:25px;
+
+    border-radius:14px;
+
+    margin-top:20px;
 }
 
 .review-card{
-background:#1e293b;
-padding:18px;
-border-radius:12px;
-margin-top:18px;
-line-height:1.7;
+    background:#1e293b;
+
+    padding:18px;
+
+    border-radius:12px;
+
+    margin-top:18px;
+
+    line-height:1.7;
 }
 
 .solution{
-margin-top:12px;
-background:#0f172a;
-padding:12px;
-border-left:4px solid #3b82f6;
-border-radius:6px;
+    margin-top:12px;
+
+    background:#0f172a;
+
+    padding:12px;
+
+    border-left:4px solid #3b82f6;
+
+    border-radius:6px;
 }
 
 #timer{
-color:#facc15;
+    color:#facc15;
+}
+
+#saveStatus{
+    font-weight:600;
 }
 
 @media(max-width:768px){
 
-.opts{
-grid-template-columns:1fr;
-}
+    .opts{
+        grid-template-columns:1fr;
+    }
 
-.logo{
-font-size:24px;
-}
+    .logo{
+        font-size:24px;
+    }
 
+    .quiz-wrap{
+        margin:10px;
+        padding:18px;
+    }
+
+    .q{
+        font-size:19px;
+    }
 }
 
 </style>
 
 </head>
 
+
 <body>
 
-<!-- TOPBAR -->
+
+<!-- ======================================
+     TOPBAR
+====================================== -->
 
 <div class="topbar">
 
-<div class="logo">
-MD QUIZZES
+    <div class="logo">
+        MD QUIZZES
+    </div>
+
+    <a href="#"
+       class="open-btn">
+        Open Full Quiz
+    </a>
+
 </div>
 
-<a href="#" class="open-btn">
-Open Full Quiz
-</a>
 
-</div>
-
-
-
-<!-- MAIN -->
+<!-- ======================================
+     MAIN
+====================================== -->
 
 <div class="quiz-wrap">
 
-<div class="center">
 
-<h1>🎯 MD QUIZZES</h1>
+    <div class="center">
+
+        <h1>
+            🎯 MD QUIZZES
+        </h1>
+
+    </div>
+
+
+    <!-- ==================================
+         SETTINGS
+    =================================== -->
+
+    <div id="settings">
+
+
+        <div class="row">
+
+            <label>
+                Select Board
+            </label>
+
+            <select id="board">
+
+                <option value="cbse">
+                    CBSE
+                </option>
+
+                <option value="gseb">
+                    GSEB
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="row">
+
+            <label>
+                Select Medium
+            </label>
+
+            <select id="medium">
+
+                <option value="english">
+                    English
+                </option>
+
+                <option value="gujarati">
+                    Gujarati
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="row">
+
+            <label>
+                Select Class
+            </label>
+
+            <select id="className">
+
+                <option value="class8">
+                    Class 8
+                </option>
+
+                <option value="class9">
+                    Class 9
+                </option>
+
+                <option value="class10">
+                    Class 10
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="row">
+
+            <label>
+                Select Subject
+            </label>
+
+            <select id="subject">
+
+                <option value="Mathematics">
+                    Mathematics
+                </option>
+
+                <option value="Science">
+                    Science
+                </option>
+
+                <option value="English">
+                    English
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="row">
+
+            <label>
+                No. of Questions
+            </label>
+
+            <select id="qCount">
+
+                <option value="10">
+                    10 Questions
+                </option>
+
+                <option value="20">
+                    20 Questions
+                </option>
+
+                <option value="40">
+                    40 Questions
+                </option>
+
+                <option value="60">
+                    60 Questions
+                </option>
+
+                <option value="80">
+                    80 Questions
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="row">
+
+            <label>
+                Marks for Correct (+)
+            </label>
+
+            <select id="posMarks">
+
+                <option value="1">
+                    +1
+                </option>
+
+                <option value="2">
+                    +2
+                </option>
+
+                <option value="3">
+                    +3
+                </option>
+
+                <option value="4" selected>
+                    +4
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="row">
+
+            <label>
+                Negative Marks (-)
+            </label>
+
+            <select id="negMarks">
+
+                <option value="0" selected>
+                    -0
+                </option>
+
+                <option value="1">
+                    -1
+                </option>
+
+                <option value="2">
+                    -2
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="row">
+
+            <label>
+                Timer
+            </label>
+
+            <select id="timerMode">
+
+                <option value="on">
+                    ON
+                </option>
+
+                <option value="off">
+                    OFF
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="center">
+
+            <button
+                class="btn"
+                id="startBtn">
+
+                🚀 Start Quiz
+
+            </button>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- ==================================
+         QUIZ
+    =================================== -->
+
+    <div id="quiz"
+         class="hide">
+
+
+        <div class="hud">
+
+            <div id="progress">
+                Q 0/0
+            </div>
+
+            <div id="score">
+                Practice Score : 0
+            </div>
+
+            <div id="timer">
+                Time Left
+            </div>
+
+        </div>
+
+
+        <div class="q"
+             id="question">
+        </div>
+
+
+        <div class="opts"
+             id="options">
+        </div>
+
+
+        <br>
+
+
+        <button
+            class="btn hide"
+            id="nextBtn">
+
+            Next
+
+        </button>
+
+
+    </div>
+
+
+    <!-- ==================================
+         RESULT
+    =================================== -->
+
+    <div id="result"
+         class="hide result">
+
+
+        <h2>
+            📊 Result Analysis
+        </h2>
+
+
+        <p id="rName"></p>
+
+        <p id="rScore"></p>
+
+        <p id="officialScore"></p>
+
+        <p id="rPercent"></p>
+
+        <p id="rAccuracy"></p>
+
+        <p id="rGrade"></p>
+
+        <p id="saveStatus"></p>
+
+
+        <div id="answerReview"></div>
+
+
+    </div>
+
 
 </div>
 
 
-
-<!-- SETTINGS -->
-
-<div id="settings">
-
-<div class="row">
-
-<label>Select Board</label>
-
-<select id="board">
-
-<option value="cbse">
-CBSE
-</option>
-
-<option value="gseb">
-GSEB
-</option>
-
-</select>
-
-</div>
-
-
-
-<div class="row">
-
-<label>Select Medium</label>
-
-<select id="medium">
-
-<option value="english">
-English
-</option>
-
-<option value="gujarati">
-Gujarati
-</option>
-
-</select>
-
-</div>
-
-
-
-<div class="row">
-
-<label>Select Class</label>
-
-<select id="className">
-
-<option value="class8">
-Class 8
-</option>
-
-<option value="class9">
-Class 9
-</option>
-
-<option value="class10">
-Class 10
-</option>
-
-</select>
-
-</div>
-
-
-
-<div class="row">
-
-<label>Select Subject</label>
-
-<select id="subject">
-
-<option value="Mathematics">
-Mathematics
-</option>
-
-<option value="Science">
-Science
-</option>
-
-<option value="English">
-English
-</option>
-
-</select>
-
-</div>
-
-
-
-<div class="row">
-
-<label>No. of Questions</label>
-
-<select id="qCount">
-
-<option value="10">
-10 Questions
-</option>
-
-<option value="20">
-20 Questions
-</option>
-
-<option value="40">
-40 Questions
-</option>
-
-<option value="60">
-60 Questions
-</option>
-
-<option value="80">
-80 Questions
-</option>
-
-</select>
-
-</div>
-
-
-
-<div class="row">
-
-<label>Marks for Correct (+)</label>
-
-<select id="posMarks">
-
-<option value="1">+1</option>
-<option value="2">+2</option>
-<option value="3">+3</option>
-<option value="4" selected>+4</option>
-
-</select>
-
-</div>
-
-
-
-<div class="row">
-
-<label>Negative Marks (-)</label>
-
-<select id="negMarks">
-
-<option value="0" selected>-0</option>
-<option value="1">-1</option>
-<option value="2">-2</option>
-
-</select>
-
-</div>
-
-
-
-<div class="row">
-
-<label>Timer</label>
-
-<select id="timerMode">
-
-<option value="on">
-ON
-</option>
-
-<option value="off">
-OFF
-</option>
-
-</select>
-
-</div>
-
-
-
-<div class="center">
-
-<button class="btn" id="startBtn">
-🚀 Start Quiz
-</button>
-
-</div>
-
-</div>
-
-
-
-<!-- QUIZ -->
-
-<div id="quiz" class="hide">
-
-<div class="hud">
-
-<div id="progress"></div>
-
-<div id="score">
-Practice Score : 0
-</div>
-
-<div id="timer">
-Time Left
-</div>
-
-</div>
-
-
-<div class="q" id="question"></div>
-
-<div class="opts" id="options"></div>
-
-<br>
-
-<button class="btn hide" id="nextBtn">
-Next
-</button>
-
-</div>
-
-
-
-<!-- RESULT -->
-
-<div id="result" class="hide result">
-
-<h2>📊 Result Analysis</h2>
-
-<p id="rName"></p>
-
-<p id="rScore"></p>
-
-<p id="officialScore"></p>
-
-<p id="rPercent"></p>
-
-<p id="rAccuracy"></p>
-
-<p id="rGrade"></p>
-
-<p id="saveStatus"></p>
-
-</div>
-
-</div>
-
-
-
-<!-- LOAD AUTH FIRST -->
+<!-- ======================================
+     AUTH
+====================================== -->
 
 <script type="module">
 
 import "./js/auth.js";
 
-window.authReady=true;
+window.authReady = true;
 
 </script>
 
 
+<!-- ======================================
+     ENGINE
+     
+     IMPORTANT:
+     Engine is loaded BEFORE the Start
+     button handler.
+====================================== -->
 
-<!-- LOAD QUIZ DATA -->
+<script src="js/uniquiz-engine.js"></script>
+
+
+<!-- ======================================
+     QUIZ DATA LOADER
+     
+     IMPORTANT:
+     This function belongs to quiz1.html.
+     
+     uniquiz-engine.js DOES NOT overwrite it.
+====================================== -->
 
 <script>
 
 window.loadQuizData = async function(){
 
-const board =
-document.getElementById("board").value;
+    const board =
+        document.getElementById("board").value;
 
-const medium =
-document.getElementById("medium").value;
+    const medium =
+        document.getElementById("medium").value;
 
-const className =
-document.getElementById("className").value;
+    const className =
+        document.getElementById("className").value;
 
-const subject =
-document.getElementById("subject").value;
+    const subject =
+        document.getElementById("subject").value;
 
-const path =
 
-`quiz-data/${board}/${medium}/${className}/${subject}.js`;
+    const qCount =
+        document.getElementById("qCount");
 
-console.log("Loading Quiz:",path);
 
-const old =
-document.getElementById("quizDataScript");
+    const posMarks =
+        document.getElementById("posMarks");
 
-if(old) old.remove();
 
-const script =
-document.createElement("script");
+    const negMarks =
+        document.getElementById("negMarks");
 
-script.src = path;
 
-script.id = "quizDataScript";
+    const timerMode =
+        document.getElementById("timerMode");
 
-script.onload=function(){
 
-console.log("Quiz File Loaded");
+    const startBtn =
+        document.getElementById("startBtn");
 
-setTimeout(()=>{
 
-if(!window.QUIZ_DATA){
+    const path =
+        `quiz-data/${board}/${medium}/${className}/${subject}.js`;
 
-alert("Quiz data not ready");
 
-return;
+    console.log(
+        "Loading Quiz:",
+        path
+    );
 
-}
 
-const ALL=window.QUIZ_DATA;
+    /*
+     * Remove previously loaded
+     * question file.
+     */
 
-const n=+qCountEl.value;
+    const old =
+        document.getElementById(
+            "quizDataScript"
+        );
 
-POS=+posMarksEl.value;
 
-NEG=+negMarksEl.value;
+    if(old){
 
-timerOn=timerModeEl.value==='on';
+        old.remove();
 
-quizQs=shuffle([...ALL]).slice(0,n);
+    }
 
-settings.classList.add('hide');
 
-quiz.classList.remove('hide');
+    /*
+     * Clear previous data.
+     */
 
-idx=0;
+    window.QUIZ_DATA = null;
 
-practiceScore=0;
-officialScore=0;
 
-attempted=0;
-correctCount=0;
+    /*
+     * Create question script.
+     */
 
-userAnswers=[];
+    const script =
+        document.createElement("script");
 
-if(timerOn){
 
-totalTime=quizQs.length*60;
+    script.src = path;
 
-startTimer();
+    script.id =
+        "quizDataScript";
 
-}else{
 
-timerEl.classList.add('hide');
+    /*
+     * Cache-busting.
+     */
 
-}
+    script.src +=
+        "?v=" + Date.now();
 
-renderQ();
 
-},300);
+    /*
+     * Loading started.
+     */
+
+    if(startBtn){
+
+        startBtn.disabled = true;
+
+        startBtn.textContent =
+            "⏳ Loading Quiz...";
+
+    }
+
+
+    /*
+     * Script loaded.
+     */
+
+    script.onload = function(){
+
+        console.log(
+            "Quiz File Loaded:",
+            path
+        );
+
+
+        setTimeout(() => {
+
+            /*
+             * Validate question data.
+             */
+
+            if(
+                !Array.isArray(
+                    window.QUIZ_DATA
+                )
+            ){
+
+                console.error(
+                    "QUIZ_DATA is missing or is not an array.",
+                    window.QUIZ_DATA
+                );
+
+
+                alert(
+                    "Quiz data could not be loaded.\n\n" +
+                    "Expected window.QUIZ_DATA array in:\n" +
+                    path
+                );
+
+
+                resetStartButton();
+
+                return;
+            }
+
+
+            const ALL =
+                window.QUIZ_DATA;
+
+
+            if(ALL.length === 0){
+
+                alert(
+                    "This quiz file contains no questions."
+                );
+
+
+                resetStartButton();
+
+                return;
+            }
+
+
+            /*
+             * Read settings.
+             */
+
+            const n =
+                Math.max(
+                    1,
+                    Number(qCount.value)
+                );
+
+
+            const selectedPOS =
+                Number(posMarks.value);
+
+
+            const selectedNEG =
+                Number(negMarks.value);
+
+
+            const timerEnabled =
+                timerMode.value === "on";
+
+
+            /*
+             * Pass settings to engine.
+             */
+
+            window.configureQuiz({
+
+                posMarks:
+                    Number.isFinite(selectedPOS)
+                        ? selectedPOS
+                        : 4,
+
+                negMarks:
+                    Number.isFinite(selectedNEG)
+                        ? selectedNEG
+                        : 0,
+
+                timerOn:
+                    timerEnabled
+
+            });
+
+
+            /*
+             * Shuffle and select questions.
+             */
+
+            const selectedQuestions =
+                window.shuffleQuestions(
+                    [...ALL]
+                ).slice(
+                    0,
+                    Math.min(
+                        n,
+                        ALL.length
+                    )
+                );
+
+
+            if(
+                !selectedQuestions.length
+            ){
+
+                alert(
+                    "No questions available."
+                );
+
+
+                resetStartButton();
+
+                return;
+            }
+
+
+            /*
+             * Start quiz.
+             */
+
+            window.startQuiz(
+                selectedQuestions
+            );
+
+
+        }, 50);
+
+    };
+
+
+    /*
+     * Script failed.
+     */
+
+    script.onerror = function(){
+
+        console.error(
+            "Quiz file failed to load:",
+            path
+        );
+
+
+        alert(
+            "Quiz file could not be loaded.\n\n" +
+            path
+        );
+
+
+        resetStartButton();
+
+    };
+
+
+    document.body.appendChild(
+        script
+    );
+
+
+    /*
+     * Reset button.
+     */
+
+    function resetStartButton(){
+
+        if(startBtn){
+
+            startBtn.disabled = false;
+
+            startBtn.textContent =
+                "🚀 Start Quiz";
+
+        }
+
+    }
 
 };
 
-  document.body.appendChild(script);
-
-};
 
 </script>
 
 
-
-<!-- LOAD ENGINE AFTER AUTH -->
+<!-- ======================================
+     START BUTTON
+====================================== -->
 
 <script>
 
-window.addEventListener("DOMContentLoaded",()=>{
+document
+    .getElementById("startBtn")
+    .addEventListener(
+        "click",
+        function(){
 
-const engine=document.createElement("script");
+            window.loadQuizData();
 
-engine.src="js/uniquiz-engine.js";
-
-document.body.appendChild(engine);
-
-});
-
-</script>
-
-
-
-<!-- START BUTTON -->
-
-<script>
-
-document.getElementById("startBtn")
-.addEventListener("click",async()=>{
-
-await loadQuizData();
-
-});
+        }
+    );
 
 </script>
+
 
 </body>
+
 </html>
